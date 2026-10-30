@@ -258,7 +258,7 @@ button,input{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .pwrap .cap{position:absolute;bottom:12px;left:14px;font-size:12px;background:rgba(0,0,0,.45);padding:3px 9px;border-radius:10px}
 .pcnt{position:absolute;top:12px;right:12px;font-size:12px;background:rgba(0,0,0,.55);padding:3px 9px;border-radius:12px}
 .aff{margin-top:8px;font-size:13px;color:var(--sub)}
-.aff span{color:#ff5c8a;letter-spacing:2px;font-size:15px}
+.aff span{color:#ff5c8a;letter-spacing:1px;font-size:13px}
 .cform{display:flex;align-items:center;gap:8px;margin:8px 14px 0;padding:8px 6px 8px 14px;border-radius:20px;background:#15151a;border:1px solid var(--line)}
 .cform input{flex:1;min-width:0;font-size:14px;outline:none;cursor:text;user-select:text;-webkit-user-select:text}
 .cform input::placeholder{color:#6d7186}
@@ -591,14 +591,14 @@ const anonHints = c => [
   `내 말투 잘 보면 알 텐데 ${c.laugh}`,
 ];
 /* 자유 채팅용 말투: 키워드 인사·잘자·칭찬, 같은 질문을 또 했을 때(again),
-   키워드가 없을 때 돌아가며 하는 말(idle), 메시지를 안 읽고 있을 때(nudge),
+   플러팅했을 때 돌아가며 하는 말(flirt), 키워드가 없을 때 돌아가며 하는 말(idle), 메시지를 안 읽고 있을 때(nudge),
    special: [키워드, 대사, 'jealous'] — 인스타 댓글에 나온 여자 이름을 물어보면 질투하냐며 귀여워한다 (처음 한 번 호감도 +1) */
 const CHAT_STYLE = {
   jay: {
     alias: ['종성', 'jay', '제이'],
     special: [[/윤지|yunji/i, ['윤지? 그냥 같은 과 동기 ㅋㅋ', '…왜, 질투해? ㅋㅋ', '너 지금 좀 귀여운 거 알아?'], 'jealous']],
     hi: ['오 ㅋㅋ 이 시간에 웬일이야'], night: ['벌써 자게? ㅋㅋ', '잘 자. 내일 연락할게'],
-    like: ['…갑자기? ㅋㅋ', '너도 참'], again: ['아까 말했잖아 ㅋㅋ'],
+    flirt: [['…야 갑자기 그러면 어떡해 ㅋㅋ', '아 진짜 얼굴 빨개졌어'], ['…ㅋㅋ 뭐야 너', '심장에 안 좋아 그런 말'], ['아 몰라 ㅋㅋ 부끄럽잖아', '…근데 싫진 않아']], again: ['아까 말했잖아 ㅋㅋ'],
     idle: ['ㅋㅋ 그래서?', '응응 듣고 있어', '너랑 얘기하니까 좋다 ㅋㅋ'],
     nudge: ['야 왜 안 읽어 ㅋㅋ', '바쁜가'],
   },
@@ -606,7 +606,7 @@ const CHAT_STYLE = {
     alias: ['성훈', 'psh'],
     special: [[/희서|heeseo/i, ['ㅎㅎㅎ 질투해?', '그냥 동아리 동기야. 원래 나 놀리는 애', '…근데 질투하는 거면 좀 좋은데 ㅎㅎ', '귀엽다 진짜'], 'jealous']],
     hi: ['어 안녕 ㅎㅎ 이 시간에 웬일이야'], night: ['그래 얼른 자 ㅎㅎ', '좋은 꿈 꿔'],
-    like: ['어…? ㅎㅎ 고마워', '갑자기 그러면 좀 설레잖아'], again: ['아까 말했잖아 ㅎㅎ'],
+    flirt: [['ㅎㅎ 그런 말은 직접 보고 해줘야지', '그래야 나도 대답해 주지'], ['너 그러다 나한테 반한다 ㅎㅎ'], ['ㅎㅎ 나도 방금 같은 생각 했는데']], again: ['아까 말했잖아 ㅎㅎ'],
     idle: ['응응 ㅎㅎ', '그랬구나', '너랑 얘기하는 거 좋다 ㅎㅎ'],
     nudge: ['혹시 바빠? ㅎㅎ', '읽으면 답장 줘'],
   },
@@ -614,7 +614,7 @@ const CHAT_STYLE = {
     alias: ['선우', 'sunoo'],
     special: [[/서인|seoin/i, ['서인이? 그냥 과 친구양 ㅎㅎ', '엥 혹시 질투하는 고야? 🥺', '헉 너무 귀여워어 ㅎㅎ 💛'], 'jealous']],
     hi: ['안뇽 ㅎㅎ 💛'], night: ['벌써 자게에? 🥺', '잘 자아 ㅎㅎ 내일 떡볶이 잊지 마'],
-    like: ['헉 진짜아? ㅎㅎ 🥺', '나 지금 엄청 웃고 있어'], again: ['아까 말해짜나 ㅎㅎ'],
+    flirt: [['헤헤 알고 이써 ㅎㅎ 💛', '근데 너가 더 귀여운 거 알지이?'], ['그런 말 하면 나 진짜 넘어간다아 ㅎㅎ'], ['히히 그럼 내일 떡볶이는 데이트로 할까아? 🥺']], again: ['아까 말해짜나 ㅎㅎ'],
     idle: ['웅웅 ㅎㅎ', '그랬구낭', '너랑 얘기하는 거 조아 💛'],
     nudge: ['왜 안 읽엉 🥺', '나 삐질 거야아'],
   },
@@ -622,7 +622,7 @@ const CHAT_STYLE = {
     alias: ['재윤', 'jake', '제이크'],
     special: [[/지우|jiwoo/i, ['지우? 그냥 유학 때 알던 동생이야 ㅋㅋ', 'Wait, 너 질투하는 거야?', '왜 이렇게 귀여워 ㅋㅋ'], 'jealous']],
     hi: ['Hi ㅋㅋ 네 연락 기다리고 있었어'], night: ['벌써 자? ㅋㅋ', 'Sweet dreams. 꿈에서 보자'],
-    like: ['Wait… 진짜? ㅋㅋ', '나 지금 엄청 웃고 있어'], again: ['아까 말했잖아 ㅋㅋ 근데 또 물어봐 줘서 좋다'],
+    flirt: [['ㅋㅋ I know', '근데 그 말 너한테 그대로 돌려줄게'], ['Careful, 나 그런 말 진심으로 받아들인다 ㅋㅋ'], ['너 오늘 왜 이렇게 귀엽게 굴어 ㅋㅋ']], again: ['아까 말했잖아 ㅋㅋ 근데 또 물어봐 줘서 좋다'],
     idle: ['ㅋㅋ 너 진짜 귀엽다', '응응 계속 얘기해 줘', '너랑 얘기하면 시간 가는 줄 모르겠어 ㅋㅋ'],
     nudge: ['Hello? 왜 안 읽어 ㅋㅋ', '나 계속 기다리는 중이야'],
   },
@@ -630,7 +630,7 @@ const CHAT_STYLE = {
     alias: ['니키', 'niki', 'ni_ki'],
     special: [[/유리|yuri/i, ['유리. 그냥 같은 연습실.', '…질투함?', '…귀엽네.'], 'jealous']],
     hi: ['왜.'], night: ['ㅇㅇ 자.', '잘 자.'],
-    like: ['…뭐래.', '빨리 자기나 해.'], again: ['아까 말했음.'],
+    flirt: [['…뭐래.', '…갑자기 왜 그럼.'], ['…', '…그런 말 하지 마. 부끄러우니까.'], ['…진짜 왜 그럼.', '…얼굴 뜨거워졌음.']], again: ['아까 말했음.'],
     idle: ['ㅇㅇ', '그래서.', '…알겠음.', '응. ㅋㅋ'],
     nudge: ['왜 안 읽음.', '…'],
   },
@@ -638,19 +638,43 @@ const CHAT_STYLE = {
     alias: ['정원', 'jungw0n', 'jungwon'],
     special: [[/연지|yeonji/i, ['연지? 알바할 때 같이 일한 동생이야 ㅎㅎ', '혹시 질투한 거야?', '그런 거면 오빠는 좀 기분 좋은데 ㅎㅎ 귀엽다 😊'], 'jealous']],
     hi: ['응 ㅎㅎ 오빠 여기 있어'], night: ['그래 푹 자 ㅎㅎ', '좋은 꿈 꿔. 내일 또 연락할게 😊'],
-    like: ['ㅎㅎ 고마워', '오빠도 너랑 얘기하는 게 제일 좋아'], again: ['아까 말했는데 ㅎㅎ 또 궁금했어?'],
+    flirt: [['ㅎㅎ 오빠 놀리는 거야?', '그런 건 오빠가 먼저 말하려고 했는데'], ['그런 말 들으니까 오늘 잠 다 잤다 ㅎㅎ 😊'], ['너는 말도 참 예쁘게 한다 ㅎㅎ']], again: ['아까 말했는데 ㅎㅎ 또 궁금했어?'],
     idle: ['응응 ㅎㅎ 다 듣고 있어', '그랬구나, 오늘도 고생했어', '너는 뭘 해도 귀엽다 ㅎㅎ'],
     nudge: ['많이 바쁜가 보다 ㅎㅎ', '천천히 봐도 괜찮아. 오빠 기다릴게 😊'],
   },
 };
-/* 키워드 → 대답 종류. 순서대로 먼저 맞는 것을 쓴다 */
+/* 호감도가 가득 차면(♥10) 하는 고백: confess(부르는 이름) → 대답 버튼, 거절했을 때(decline) */
+const SIDE_CONFESS = {
+  jay: { confess: c => [`…야 ${c}`, '나 할 말 있어', '…사실 나 너 좋아해. 꽤 오래전부터 ㅋㅋ', '너는… 나 어때?'], decline: ['아… 그렇구나 ㅋㅋ', '괜찮아. 말해줘서 고마워', '그래도 우리 지금처럼 지내자'] },
+  sh: { confess: c => [c, '이런 말 카톡으로 하는 거 좀 그렇지만', '나 너 좋아해 ㅎㅎ', '너도 같은 마음이야?'], decline: ['그렇구나 ㅎㅎ', '솔직하게 말해줘서 고마워', '불편해하지 말고 지금처럼 연락하자'] },
+  sunoo: { confess: c => [`${c}~`, '나 진짜 진지하게 할 말 있어 🥺', '나 너 조아해. 베프 말고, 진짜로', '너두… 나 조아해?'], decline: ['아… 그렇구낭 ㅎㅎ', '괜차나! 그래도 우리 베프인 건 변함없어 💛', '내일 떡볶이는 그대로 먹는 고다?'] },
+  jk: { confess: c => [c, 'I can\'t hold it anymore ㅋㅋ', '나 너 좋아해. 진심으로', '너도 나 좋아해?'], decline: ['Oh… 그렇구나 ㅋㅋ', '괜찮아. 말해줘서 고마워', '그래도 밥은 같이 먹어 줄 거지?'] },
+  nk: { confess: () => ['…야.', '할 말 있음.', '…좋아함. 너.', '…너는.'], decline: ['…그렇구나.', '…알겠음.', '…그래도 연락은 해.'] },
+  jw: { confess: c => [c, '오빠가 진지하게 할 말이 있는데', '나 너 좋아해 ㅎㅎ 동생 말고', '너도 오빠 좋아해?'], decline: ['그렇구나 ㅎㅎ', '괜찮아, 오빠는 네 마음이 제일 중요해', '앞으로도 편하게 연락해 😊'] },
+};
+/* 플레이어가 "좋아해"라고 하면 처음엔 장난으로 받고(tease),
+   이어서 "진짠데?"라고 하면 설레게 받아친다(serious). 두 번 다 호감도 +1 */
+const LOVE_TALK = {
+  jay: { tease: ['아 뭐래 ㅋㅋ', '장난치지 마라'], serious: ['…', '…야 너 지금 무슨 말 하는지 알아?', '그런 말 함부로 하면 나 진짜 착각한다 ㅋㅋ…'] },
+  sh: { tease: ['ㅎㅎ 뭐야 갑자기', '장난이지?'], serious: ['…', '너 지금 네가 무슨 말 하는지 모르지 ㅎㅎ', '그런 말은 내 앞에서 직접 해. 그때 제대로 대답해 줄게'] },
+  sunoo: { tease: ['아 뭐래애 ㅎㅎ', '나 놀리는 고지이?'], serious: ['…헐', '너 지금 너가 무슨 말 하는지 몰라아 🥺', '나 그런 말 들으면 진짜 잠 못 잔단 말이야…'] },
+  jk: { tease: ['ㅋㅋ 뭐래', 'Are you joking?'], serious: ['…', 'You don\'t know what you\'re saying ㅋㅋ', '그런 말 하면 나 진짜 진지해진다?'] },
+  nk: { tease: ['…뭐래.', '장난치지 마.'], serious: ['…', '…넌 지금 네가 뭔 말 하는지 몰라.', '…진짜 그러지 마. 설레니까.'] },
+  jw: { tease: ['ㅎㅎ 뭐래', '오빠 놀리는 거지?'], serious: ['…', '너는 지금 네가 무슨 말 하는지 모르는 것 같아 ㅎㅎ', '그런 말은… 오빠가 먼저 하고 싶었는데'] },
+};
+const LOVE_RE = /좋아해|좋아한다|사랑해|좋아하는 ?것 ?같/;
+const SERIOUS_RE = /진짜|진심|진짠|장난 ?아니|농담 ?아니|ㄹㅇ|레알/;
+const CONFESS_AT = 10;   // 호감도가 이만큼(가득) 차야 고백한다
+
+/* 키워드 → 대답 종류. 순서대로 먼저 맞는 것을 쓴다.
+   flirt(플러팅): 니키·종성은 부끄러워하고 나머지는 능숙하게 받아친다. 누구든 호감도 +1 */
 const INTENTS = [
-  ['you', /연락|너야|너지|니가|네가|익명|모르는 ?번호|알 ?수 ?없|보냈/],
+  ['flirt', /좋아해|좋아|보고 ?싶|귀여|잘생|멋있|예뻐|예쁘|설레|사랑|반했|심쿵|두근|내 ?스타일|데이트|손 ?잡|안아|애인|남친|자기야|내 ?꺼|내 ?거/],
+  ['you', /연락|너야|너지|익명|모르는 ?번호|알 ?수 ?없|보냈/],
   ['now', /뭐 ?해|뭐하|모해|머해|뭐함|어디|지금/],
   ['day', /하루|어땠|오늘|피곤|힘들/],
   ['night', /잘 ?자|자야|졸려|굿밤|굿나잇/],
   ['hi', /안녕|하이|ㅎㅇ|hello|hi\b/i],
-  ['like', /좋아|보고 ?싶|귀여|잘생|멋있/],
 ];
 const intentOf = t => (INTENTS.find(([, re]) => re.test(t)) || [null])[0];
 /* 메시지에 들어 있는 등장인물 이름 → 번호 (없으면 -1) */
@@ -679,7 +703,7 @@ function newGame(name) {
     unread: { sunoo: 2, sms: 1 },
     extra: {}, newCount: {}, touched: {}, clock: 0, asked: {}, arrived: false,
     queue: {}, idle: {}, nudged: {}, nudgeT: {},
-    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {},
+    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {}, flirted: {}, confess: {}, love: {},
     step: 0, typing: null,
     tries: 3, wrong: [], over: false,
     revealed: false, phase: 'guess',   // guess → answer(고백에 대답) → done
@@ -833,6 +857,7 @@ $('#app').addEventListener('click', e => {
   else if (t.dataset.toast) toast(t.dataset.toast);
   else if (t.dataset.act === 'guess') openGuess();
   else if (t.dataset.act === 'yes' || t.dataset.act === 'no') answerButton(t.dataset.act === 'yes');
+  else if (t.dataset.act === 'cyes' || t.dataset.act === 'cno') sideAnswerButton(cur().arg, t.dataset.act === 'cyes');
   else if (t.hasAttribute('data-tg')) { t.classList.toggle('on'); toast('지금은 설정을 바꿀 수 없어요'); }
 });
 
@@ -907,6 +932,7 @@ function chatFoot(id) {
   let quick = '';
   if (id === 'unknown' && S.phase === 'answer') quick = `<button type="button" class="chipb main" data-act="yes">${ANSWER_YES}</button><button type="button" class="chipb" data-act="no">${ANSWER_NO}</button>`;
   else if (id === 'unknown') quick = `<button type="button" class="chipb main" data-act="guess">너 누구야?</button>`;
+  else if (S.confess[id] === 'answer') quick = `<button type="button" class="chipb main" data-act="cyes">${ANSWER_YES}</button><button type="button" class="chipb" data-act="cno">${ANSWER_NO}</button>`;
   return `<div class="kfoot">${quick ? `<div class="kquick">${quick}</div>` : ''}<form class="kform" data-chat="${id}"><input maxlength="80" placeholder="메시지 입력" autocomplete="off"><button type="submit">전송</button></form></div>`;
 }
 function refreshChat(id) {
@@ -951,6 +977,11 @@ async function respond(id, text) {
   const ci = charOfChat(id);
   if (ci < 0) return themSay(id, [pickLine(['얼른 자~', '엄마 졸려, 내일 얘기하자', '재윤이한테 연락은 해 봤니?'], S.idle[id] = (S.idle[id] || 0) + 1)]);
   const c = CHARS[ci], st = CHAT_STYLE[id];
+  if (S.confess[id] === 'answer') {
+    if (/미안|아니|싫|별로|글쎄|노노/.test(text)) return sideAnswer(id, false);
+    if (/좋아|응|웅|그래|당연|나도|사랑/.test(text)) return sideAnswer(id, true);
+    return themSay(id, [SIDE_CONFESS[id].confess(call()).slice(-1)[0]]);
+  }
   const asked = S.asked[id] = S.asked[id] || new Set();
   const sp = (st.special || []).find(([re]) => re.test(text));
   if (sp) {
@@ -967,6 +998,24 @@ async function respond(id, text) {
     if (asked.has(intent)) return themSay(id, st.again);
     asked.add(intent);
     return themSay(id, c.replies[intent]);
+  }
+  /* 좋아해 → (장난으로 받음) → 진짠데? → (설레게 받아침) */
+  if (S.love[id] === 'teased' && SERIOUS_RE.test(text)) {
+    S.love[id] = 'done';
+    const ok = await themSay(id, LOVE_TALK[id].serious);
+    if (ok) addAffection(ci);
+    return ok;
+  }
+  if (!S.love[id] && LOVE_RE.test(text)) {
+    S.love[id] = 'teased';
+    const ok = await themSay(id, LOVE_TALK[id].tease);
+    if (ok) addAffection(ci);
+    return ok;
+  }
+  if (intent === 'flirt') {
+    const ok = await themSay(id, pickLine(st.flirt, (S.flirted[id] = (S.flirted[id] || 0) + 1) - 1));
+    if (ok) addAffection(ci);
+    return ok;
   }
   if (intent) return themSay(id, st[intent]);
   return themSay(id, [pickLine(st.idle, S.idle[id] = (S.idle[id] || 0) + 1)]);
@@ -1042,6 +1091,34 @@ function addAffection(who) {
   if (S.affection[who] >= MAX_AFFECTION) return;
   S.affection[who]++;
   toast(`💗 ${CHARS[who].label} 호감도 +1`);
+  /* 호감도가 가득 차면, ♡를 받은 사람(익명으로 연락하는 사람)이 아니어도 먼저 고백한다 */
+  const id = CHARS[who].chat;
+  if (S.affection[who] >= CONFESS_AT && who !== S.culprit && !S.confess[id] && !S.over) {
+    S.confess[id] = 'pending';
+    const g = S;
+    S.timers.push(setTimeout(() => { if (S === g) enqueue(id, () => sideConfess(id)); }, 3000));
+  }
+}
+async function sideConfess(id) {
+  if (S.over) return;
+  if (!await themSay(id, SIDE_CONFESS[id].confess(call()))) return;
+  S.confess[id] = 'answer'; refreshChat(id);
+}
+function sideAnswerButton(id, yes) {
+  if (S.confess[id] !== 'answer') return;
+  pushMsg(id, me(yes ? ANSWER_YES : ANSWER_NO));
+  enqueue(id, () => sideAnswer(id, yes));
+}
+/* 받아주면 그 사람과 해피엔딩, 거절하면 담담하게 받아들이고 게임은 계속된다 */
+async function sideAnswer(id, yes) {
+  if (S.confess[id] !== 'answer' || S.over) return;
+  const g = S, ci = charOfChat(id);
+  S.confess[id] = 'done'; refreshChat(id);
+  if (!yes) return themSay(id, SIDE_CONFESS[id].decline);
+  S.over = true; refreshChat('unknown');
+  if (!await themSay(id, REPLY_YES(call(), ci))) return;
+  await wait(1600); if (S !== g) return;
+  ending('happy', ci);
 }
 /* 댓글: 바로 보이고, 게시물 주인의 호감도가 오르고, 잠시 뒤 주인이 답글을 단다 */
 function addComment(id, text) {
@@ -1239,7 +1316,7 @@ const COMMENT_REPLY = [
   ['ㅇㅇ.', '…고마움.'],
   ['고마워 ㅎㅎ 😊', '역시 너밖에 없다 ㅎㅎ'],
 ];
-const MAX_AFFECTION = 5;
+const MAX_AFFECTION = 10;
 const hearts = n => '♥'.repeat(Math.min(n, MAX_AFFECTION)) + '♡'.repeat(MAX_AFFECTION - Math.min(n, MAX_AFFECTION));
 function postMedia(p) {
   if (!p.pics) return `<div class="pimg" style="background:${p.img[0]}">${p.img[1]}<span class="cap">📍 ${p.place}</span></div>`;
@@ -1430,8 +1507,8 @@ PAGES.settings = {
 
 /* ===================== 엔딩 ===================== */
 /* type: happy(고백 수락) / bad(고백 거절) / missed(3번 다 틀림) */
-function ending(type) {
-  const i = S.culprit, c = CHARS[i];
+function ending(type, i = S.culprit) {
+  const c = CHARS[i];
   const e = $('#end');
   e.className = 'end show ' + type + (type === 'happy' ? ' reveal' : '');
   const bg = type === 'happy' ? `background-image:url(${SELFIES['bed' + i]})` : photo(i);
