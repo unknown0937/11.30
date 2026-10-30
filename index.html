@@ -603,7 +603,7 @@ const anonHints = c => [
 const CHAT_STYLE = {
   jay: {
     alias: ['종성', 'jay', '제이'],
-    special: [[/유나|yuna/i, ['유나? 그냥 같은 과 동기 ㅋㅋ', '…왜, 질투해? ㅋㅋ', '너 지금 좀 귀여운 거 알아?'], 'jealous']],
+    special: [[/윤지|yunji/i, ['윤지? 그냥 같은 과 동기 ㅋㅋ', '…왜, 질투해? ㅋㅋ', '너 지금 좀 귀여운 거 알아?'], 'jealous']],
     hi: ['오 ㅋㅋ 이 시간에 웬일이야'], night: ['벌써 자게? ㅋㅋ', '잘 자. 내일 연락할게'],
     like: ['…갑자기? ㅋㅋ', '너도 참'], again: ['아까 말했잖아 ㅋㅋ'],
     idle: ['ㅋㅋ 그래서?', '응응 듣고 있어', '너랑 얘기하니까 좋다 ㅋㅋ'],
@@ -619,7 +619,7 @@ const CHAT_STYLE = {
   },
   sunoo: {
     alias: ['선우', 'sunoo'],
-    special: [[/서연|seoyeon/i, ['서연이? 그냥 과 친구양 ㅎㅎ', '엥 혹시 질투하는 고야? 🥺', '헉 너무 귀여워어 ㅎㅎ 💛'], 'jealous']],
+    special: [[/서인|seoin/i, ['서인이? 그냥 과 친구양 ㅎㅎ', '엥 혹시 질투하는 고야? 🥺', '헉 너무 귀여워어 ㅎㅎ 💛'], 'jealous']],
     hi: ['안뇽 ㅎㅎ 💛'], night: ['벌써 자게에? 🥺', '잘 자아 ㅎㅎ 내일 떡볶이 잊지 마'],
     like: ['헉 진짜아? ㅎㅎ 🥺', '나 지금 엄청 웃고 있어'], again: ['아까 말해짜나 ㅎㅎ'],
     idle: ['웅웅 ㅎㅎ', '그랬구낭', '너랑 얘기하는 거 조아 💛'],
@@ -635,7 +635,7 @@ const CHAT_STYLE = {
   },
   nk: {
     alias: ['니키', 'niki', 'ni_ki'],
-    special: [[/민지|minji/i, ['민지. 그냥 같은 연습실.', '…질투함?', '…귀엽네.'], 'jealous']],
+    special: [[/유리|yuri/i, ['유리. 그냥 같은 연습실.', '…질투함?', '…귀엽네.'], 'jealous']],
     hi: ['왜.'], night: ['ㅇㅇ 자.', '잘 자.'],
     like: ['…뭐래.', '빨리 자기나 해.'], again: ['아까 말했음.'],
     idle: ['ㅇㅇ', '그래서.', '…알겠음.', '응. ㅋㅋ'],
@@ -643,7 +643,7 @@ const CHAT_STYLE = {
   },
   jw: {
     alias: ['정원', 'jungw0n', 'jungwon'],
-    special: [[/채원|chaewon/i, ['채원이? 알바할 때 같이 일한 동생이야 ㅎㅎ', '혹시 질투한 거야?', '그런 거면 오빠는 좀 기분 좋은데 ㅎㅎ 귀엽다 😊'], 'jealous']],
+    special: [[/연지|yeonji/i, ['연지? 알바할 때 같이 일한 동생이야 ㅎㅎ', '혹시 질투한 거야?', '그런 거면 오빠는 좀 기분 좋은데 ㅎㅎ 귀엽다 😊'], 'jealous']],
     hi: ['응 ㅎㅎ 오빠 여기 있어'], night: ['그래 푹 자 ㅎㅎ', '좋은 꿈 꿔. 내일 또 연락할게 😊'],
     like: ['ㅎㅎ 고마워', '오빠도 너랑 얘기하는 게 제일 좋아'], again: ['아까 말했는데 ㅎㅎ 또 궁금했어?'],
     idle: ['응응 ㅎㅎ 다 듣고 있어', '그랬구나, 오늘도 고생했어', '너는 뭘 해도 귀엽다 ㅎㅎ'],
@@ -1242,10 +1242,10 @@ function instaPosts() {
     { id: 'shsofa', who: 1, time: '1일 전', pics: ['shpost3'], place: '대기실', likes: 412, text: '잠깐 쉬는 중', cmt: [['jake', '형 뭐 봐 ㅋㅋ'], ['jungw0n', '피곤해 보인다 ㅎㅎ 푹 쉬어']] },
     { id: 'jk1', who: 3, time: '3일 전', img: ['linear-gradient(160deg,#9bd0ff,#4d7cff)', '✈️'], place: '인천국제공항', likes: 532, text: 'Finally home 🇰🇷 3년 만이다', cmt: [['jungw0n', '재윤아 환영해! ㅎㅎ'], ['psh', '밥 한번 먹자 ㅎㅎ']] },
     { id: 'shsun', who: 1, time: '3일 전', pics: ['shpost2'], ratio: '4/3', place: '옥상', likes: 527, text: '날씨 좋다 ☀️', cmt: [['heeseo.__', 'ㅋㅋㅋㅋ 아저씨 같다'], ['sunoo_', '형 선글라스 머야 ㅎㅎ 멋있다아']] },
-    { id: 'sncafe', who: 2, time: '4일 전', pics: ['snpost1', 'snpost2'], place: '카페', likes: 688, text: '오늘 카페 투어 ☕ 모자 쓰니까 귀엽쥥? ㅎㅎ', cmt: [['seoyeon.log', '선우야 모자 너무 귀엽다 ㅠㅠ'], ['jake', 'ㅋㅋ 귀엽네'], ['psh', '선우 기분 좋아 보인다 ㅎㅎ']] },
-    { id: 'jwterrace', who: 5, time: '5일 전', pics: ['jwpost1', 'jwpost2'], place: '테라스', likes: 615, text: '오랜만에 교복 입어봤다 ㅎㅎ 날씨 좋았던 날 ☀️', cmt: [['chaewon_', '오빠 교복 너무 잘 어울려요 ㅎㅎ'], ['sunoo_', '오빠 교복 머야 ㅎㅎ 고딩 같아앙'], ['ni_ki', '포크는 왜. ㅋㅋ']] },
-    { id: 'jayfest', who: 0, time: '1주 전', pics: ['jaypost'], ratio: '3/4', place: '학교 축제', likes: 1024, text: '축제 무대 🎸 보러 와준 사람들 고마워. 특히 한 명', cmt: [['yuna_0303', '종성아 무대 진짜 멋있었어 😍'], ['sunoo_', '종성이 무대 미쳤땅 ㅎㅎ'], ['ni_ki', 'ㅇㅈ. ㅋㅋ']] },
-    { id: 'nkfilm', who: 4, time: '1주 전', pics: ['nkpost'], place: '연습실', likes: 903, text: '.', cmt: [['minji.day', '니키 분위기 미쳤다 🔥'], ['sunoo_', '니키 멋있당 ㅎㅎ'], ['js.jay', '분위기 뭐냐 ㅋㅋ']] },
+    { id: 'sncafe', who: 2, time: '4일 전', pics: ['snpost1', 'snpost2'], place: '카페', likes: 688, text: '오늘 카페 투어 ☕ 모자 쓰니까 귀엽쥥? ㅎㅎ', cmt: [['seoin.log', '선우야 모자 너무 귀엽다 ㅠㅠ'], ['jake', 'ㅋㅋ 귀엽네'], ['psh', '선우 기분 좋아 보인다 ㅎㅎ']] },
+    { id: 'jwterrace', who: 5, time: '5일 전', pics: ['jwpost1', 'jwpost2'], place: '테라스', likes: 615, text: '오랜만에 교복 입어봤다 ㅎㅎ 날씨 좋았던 날 ☀️', cmt: [['yeonji_', '오빠 교복 너무 잘 어울려요 ㅎㅎ'], ['sunoo_', '오빠 교복 머야 ㅎㅎ 고딩 같아앙'], ['ni_ki', '포크는 왜. ㅋㅋ']] },
+    { id: 'jayfest', who: 0, time: '1주 전', pics: ['jaypost'], ratio: '3/4', place: '학교 축제', likes: 1024, text: '축제 무대 🎸 보러 와준 사람들 고마워. 특히 한 명', cmt: [['yunji_0303', '종성아 무대 진짜 멋있었어 😍'], ['sunoo_', '종성이 무대 미쳤땅 ㅎㅎ'], ['ni_ki', 'ㅇㅈ. ㅋㅋ']] },
+    { id: 'nkfilm', who: 4, time: '1주 전', pics: ['nkpost'], place: '연습실', likes: 903, text: '.', cmt: [['yuri.day', '니키 분위기 미쳤다 🔥'], ['sunoo_', '니키 멋있당 ㅎㅎ'], ['js.jay', '분위기 뭐냐 ㅋㅋ']] },
     { id: 'jktokyo', who: 3, time: '2주 전', pics: ['jkpost'], place: '도쿄', likes: 741, text: '한국 가기 전에 도쿄 들렀다 가는 중 🗼 야경 미쳤다 ㅋㅋ', cmt: [['jiwoo_kim', '재윤 오빠 도쿄 또 가면 나도 데려가 ㅋㅋ'], ['jungw0n', '와 야경 예쁘다 ㅎㅎ'], ['ni_ki', '.']] },
   ];
 }
