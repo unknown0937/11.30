@@ -205,7 +205,11 @@ button,input{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .kinput{flex:1;background:#2c2c34;border-radius:20px;padding:10px 16px;color:#6f6f7a;font-size:14px}
 .chipb{flex:1;min-width:120px;padding:11px 12px;border-radius:20px;background:#30303a;font-size:14.5px;transition:opacity .2s}
 .chipb.main{background:var(--kakao);color:#191919;font-weight:700}
-.kfoot.busy .chipb{opacity:.35;pointer-events:none}
+.kquick{display:flex;gap:8px;width:100%}
+.kform{display:flex;gap:8px;width:100%}
+.kform input{flex:1;min-width:0;background:#2c2c34;border-radius:20px;padding:10px 16px;font-size:14.5px;outline:none;cursor:text;user-select:text;-webkit-user-select:text}
+.kform input::placeholder{color:#6f6f7a}
+.kform button{padding:0 16px;border-radius:20px;background:var(--kakao);color:#191919;font-weight:700;font-size:14px}
 
 /* ===================== 전화 / 문자 ===================== */
 .keypad2{display:grid;grid-template-columns:repeat(3,76px);gap:14px 26px;justify-content:center;margin-top:40px}
@@ -585,8 +589,65 @@ const anonHints = c => [
   c.out ? '나 지금 밖이야. 걷다가 네 생각나서 연락했어.' : '나 지금 집이야. 누워서 네 생각만 하는 중.',
   `내 말투 잘 보면 알 텐데 ${c.laugh}`,
 ];
-/* 다른 사람들에게 물어볼 수 있는 질문 */
-const QUESTIONS = [['now', '지금 뭐 해?'], ['day', '오늘 하루 어땠어?'], ['you', '혹시 방금 나한테 연락했어?']];
+/* 자유 채팅용 말투: 키워드 인사·잘자·칭찬, 같은 질문을 또 했을 때(again),
+   키워드가 없을 때 돌아가며 하는 말(idle), 메시지를 안 읽고 있을 때(nudge) */
+const CHAT_STYLE = {
+  jay: {
+    alias: ['종성', 'jay', '제이'],
+    hi: ['오 ㅋㅋ 이 시간에 웬일이야'], night: ['벌써 자게? ㅋㅋ', '잘 자. 내일 연락할게'],
+    like: ['…갑자기? ㅋㅋ', '너도 참'], again: ['아까 말했잖아 ㅋㅋ'],
+    idle: ['ㅋㅋ 그래서?', '응응 듣고 있어', '너랑 얘기하니까 좋다 ㅋㅋ'],
+    nudge: ['야 왜 안 읽어 ㅋㅋ', '바쁜가'],
+  },
+  sh: {
+    alias: ['성훈', 'psh'],
+    hi: ['어 안녕 ㅎㅎ 이 시간에 웬일이야'], night: ['그래 얼른 자 ㅎㅎ', '좋은 꿈 꿔'],
+    like: ['어…? ㅎㅎ 고마워', '갑자기 그러면 좀 설레잖아'], again: ['아까 말했잖아 ㅎㅎ'],
+    idle: ['응응 ㅎㅎ', '그랬구나', '너랑 얘기하는 거 좋다 ㅎㅎ'],
+    nudge: ['혹시 바빠? ㅎㅎ', '읽으면 답장 줘'],
+  },
+  sunoo: {
+    alias: ['선우', 'sunoo'],
+    hi: ['안뇽 ㅎㅎ 💛'], night: ['벌써 자게에? 🥺', '잘 자아 ㅎㅎ 내일 떡볶이 잊지 마'],
+    like: ['헉 진짜아? ㅎㅎ 🥺', '나 지금 엄청 웃고 있어'], again: ['아까 말해짜나 ㅎㅎ'],
+    idle: ['웅웅 ㅎㅎ', '그랬구낭', '너랑 얘기하는 거 조아 💛'],
+    nudge: ['왜 안 읽엉 🥺', '나 삐질 거야아'],
+  },
+  jk: {
+    alias: ['재윤', 'jake', '제이크'],
+    hi: ['Hi ㅋㅋ 이 시간에 웬일?'], night: ['Good night ㅋㅋ', '푹 자'],
+    like: ['Wait… 진짜? ㅋㅋ', '기분 좋다'], again: ['아까 말했잖아 ㅋㅋ'],
+    idle: ['ㅋㅋ okay', '오 진짜?', '너랑 얘기하니까 시차 적응 안 해도 될 듯 ㅋㅋ'],
+    nudge: ['Hello? 왜 안 읽어 ㅋㅋ', '나 기다리는 중'],
+  },
+  nk: {
+    alias: ['니키', 'niki', 'ni_ki'],
+    hi: ['왜'], night: ['ㅇㅇ 자', '…잘 자'],
+    like: ['…뭐래 ㅋㅋ', '빨리 자기나 해'], again: ['아까 말했잖아'],
+    idle: ['ㅇㅇ', '그래서', '…ㅋㅋ'],
+    nudge: ['왜 안 읽음', '…'],
+  },
+  jw: {
+    alias: ['정원', 'jungw0n', 'jungwon'],
+    hi: ['응 ㅎㅎ 아직 안 잤어?'], night: ['그래 푹 자 ㅎㅎ', '좋은 꿈 꿔 😊'],
+    like: ['ㅎㅎ 고마워', '오빠도 너랑 얘기하는 거 좋아'], again: ['아까 말했잖아 ㅎㅎ'],
+    idle: ['응응 ㅎㅎ', '그랬구나', '오늘도 수고 많았어 😊'],
+    nudge: ['많이 바쁜가 보다 ㅎㅎ', '천천히 봐도 괜찮아 😊'],
+  },
+};
+/* 키워드 → 대답 종류. 순서대로 먼저 맞는 것을 쓴다 */
+const INTENTS = [
+  ['you', /연락|너야|너지|니가|네가|익명|모르는 ?번호|알 ?수 ?없|보냈/],
+  ['now', /뭐 ?해|뭐하|모해|머해|뭐함|어디|지금/],
+  ['day', /하루|어땠|오늘|피곤|힘들/],
+  ['night', /잘 ?자|자야|졸려|굿밤|굿나잇/],
+  ['hi', /안녕|하이|ㅎㅇ|hello|hi\b/i],
+  ['like', /좋아|보고 ?싶|귀여|잘생|멋있/],
+];
+const intentOf = t => (INTENTS.find(([, re]) => re.test(t)) || [null])[0];
+/* 메시지에 들어 있는 등장인물 이름 → 번호 (없으면 -1) */
+const nameIn = t => { const low = t.toLowerCase(); return CHARS.findIndex(c => CHAT_STYLE[c.chat].alias.some(a => low.includes(a))); };
+const pickLine = (arr, k) => arr[k % arr.length];
 const charOfChat = id => CHARS.findIndex(c => c.chat === id);
 const UNKNOWN = '(알 수 없음)';
 const photo = i => `background-image:url(${STORY_IMG[i]})`;
@@ -609,8 +670,9 @@ function newGame(name) {
     badges: { kakao: 2, phone: 1 },
     unread: { sunoo: 2, sms: 1 },
     extra: {}, newCount: {}, touched: {}, clock: 0, asked: {}, arrived: false,
+    queue: {}, idle: {}, nudged: {}, nudgeT: {},
     comments: {}, shContacted: false,
-    step: 0, typing: null, busy: false,
+    step: 0, typing: null,
     tries: 3, wrong: [], over: false,
     revealed: false, phase: 'guess',   // guess → answer(고백에 대답) → done
     pending: null, fails: 0, timers: [],
@@ -647,6 +709,8 @@ const inApp = (app, page, arg) => {
 function renderApp() {
   const c = cur();
   const el = $('#app');
+  const oldInp = el.querySelector('.kform input');
+  const draft = oldInp ? { chat: oldInp.form.dataset.chat, value: oldInp.value, focus: document.activeElement === oldInp } : null;
   el.className = 'view active app-' + c.app;
   el.innerHTML = PAGES[c.app][c.page](c.arg);
   /* 채팅방·문자방은 배경이 다르고, 맨 아래(최신 메시지)부터 보여준다 */
@@ -655,6 +719,11 @@ function renderApp() {
   el.classList.toggle('sms', c.page === 'thread');
   const sc = el.querySelector('.scroll');
   if (sc) sc.scrollTop = thread ? sc.scrollHeight : 0;
+  const inp = el.querySelector('.kform input');
+  if (inp && draft && draft.chat === inp.form.dataset.chat) {
+    inp.value = draft.value;
+    if (draft.focus) inp.focus();
+  }
 }
 
 let toastT;
@@ -727,6 +796,7 @@ $('#keypad').addEventListener('click', e => {
 function checkCode() {
   if (code === '0000') {
     renderHome(); show('home');
+    if (S.unread.sunoo) scheduleNudge('sunoo');
     const app = S.pending;
     if (app) setTimeout(() => app === 'kakao' ? openApp('kakao', 'chat', 'sunoo') : openApp(app), 450);
     return;
@@ -757,18 +827,16 @@ $('#homebar').addEventListener('click', goHome);
 
 /* 앱 화면 안의 클릭 처리 */
 $('#app').addEventListener('click', e => {
-  const t = e.target.closest('[data-go],[data-tab],[data-back],[data-toast],[data-act],[data-tg],[data-story],[data-ask],[data-zoom]');
+  const t = e.target.closest('[data-go],[data-tab],[data-back],[data-toast],[data-act],[data-tg],[data-story],[data-zoom]');
   if (!t) return;
   if (t.dataset.zoom) openPhoto(t.dataset.zoom);
   else if (t.dataset.story) openStory(+t.dataset.story);
-  else if (t.dataset.ask) ask(cur().arg, t.dataset.ask);
   else if (t.dataset.go) { const [p, ...a] = t.dataset.go.split(':'); go(p, a.join(':')); }
   else if (t.dataset.tab) tab(t.dataset.tab);
   else if (t.hasAttribute('data-back')) back();
   else if (t.dataset.toast) toast(t.dataset.toast);
   else if (t.dataset.act === 'guess') openGuess();
-  else if (t.dataset.act === 'talk') talk();
-  else if (t.dataset.act === 'yes' || t.dataset.act === 'no') answer(t.dataset.act === 'yes');
+  else if (t.dataset.act === 'yes' || t.dataset.act === 'no') answerButton(t.dataset.act === 'yes');
   else if (t.hasAttribute('data-tg')) { t.classList.toggle('on'); toast('지금은 설정을 바꿀 수 없어요'); }
 });
 
@@ -837,14 +905,13 @@ PAGES.kakao = {
     return head(chatTitle(id), '<span>🔍</span><span>☰</span>') + `<div class="scroll">${body}</div>` + chatFoot(id);
   },
 };
-/* 채팅방 하단: 익명 채팅은 힌트/정답 버튼, 여섯 명과의 채팅은 질문 버튼 */
+/* 채팅방 하단: 직접 입력하는 칸. 익명 채팅에는 「너 누구야?」와 고백 대답 버튼도 있다 */
 function chatFoot(id) {
-  if (id === 'unknown') return anonFoot();
-  if (charOfChat(id) < 0) return `<div class="kfoot"><div class="kinput">메시지를 입력하세요</div></div>`;
-  const asked = S.asked[id] || new Set();
-  const qs = QUESTIONS.filter(([q]) => !asked.has(q) && (q !== 'you' || S.arrived));
-  if (!qs.length) return `<div class="kfoot"><div class="kinput">메시지를 입력하세요</div></div>`;
-  return `<div class="kfoot ${S.busy ? 'busy' : ''}">${qs.map(([q, t]) => `<button class="chipb" data-ask="${q}">${t}</button>`).join('')}</div>`;
+  if (id === 'unknown' && S.over && S.phase !== 'answer') return `<div class="kfoot"><div class="kinput">대화가 끝났습니다</div></div>`;
+  let quick = '';
+  if (id === 'unknown' && S.phase === 'answer') quick = `<button type="button" class="chipb main" data-act="yes">${ANSWER_YES}</button><button type="button" class="chipb" data-act="no">${ANSWER_NO}</button>`;
+  else if (id === 'unknown') quick = `<button type="button" class="chipb main" data-act="guess">너 누구야?</button>`;
+  return `<div class="kfoot">${quick ? `<div class="kquick">${quick}</div>` : ''}<form class="kform" data-chat="${id}"><input maxlength="80" placeholder="메시지 입력" autocomplete="off"><button type="submit">전송</button></form></div>`;
 }
 function refreshChat(id) {
   if (inApp('kakao', 'chat', id) || inApp('kakao', 'list')) renderApp();
@@ -857,6 +924,7 @@ function pushMsg(id, m) {
     S.unread[id] = (S.unread[id] || 0) + 1; S.badges.kakao++;
     renderHome(); refreshChat(id);
     banner('<div class="ni ic-kakao mini"></div>', chatTitle(id), esc(m.text), () => openApp('kakao', 'chat', id));
+    scheduleNudge(id);
   }
 }
 /* 상대가 입력 중(•••) 표시를 보여준 뒤 메시지를 하나씩 보낸다 */
@@ -872,26 +940,52 @@ async function themSay(id, lines) {
   }
   return true;
 }
-/* 여섯 명에게 질문하기 */
-async function ask(id, q) {
-  if (S.busy) return;
-  const c = CHARS[charOfChat(id)];
-  (S.asked[id] = S.asked[id] || new Set()).add(q);
-  S.busy = true;
-  pushMsg(id, me(QUESTIONS.find(x => x[0] === q)[1]));
-  const guilty = q === 'you' && charOfChat(id) === S.culprit;
-  if (!await themSay(id, c.replies[guilty ? 'youGuilty' : q])) return;
-  S.busy = false; refreshChat(id);
+/* 채팅방마다 대답을 차례대로 처리한다 (빠르게 여러 번 보내도 순서가 섞이지 않게) */
+function enqueue(id, fn) {
+  const g = S;
+  S.queue[id] = (S.queue[id] || Promise.resolve()).then(() => (S === g ? fn() : null));
+}
+/* 플레이어가 직접 입력한 메시지 보내기 */
+function send(id, text) {
+  pushMsg(id, me(text));
+  enqueue(id, () => respond(id, text));
+}
+async function respond(id, text) {
+  if (id === 'unknown') return respondUnknown(text);
+  const ci = charOfChat(id);
+  if (ci < 0) return themSay(id, [pickLine(['얼른 자~', '엄마 졸려, 내일 얘기하자', '재윤이한테 연락은 해 봤니?'], S.idle[id] = (S.idle[id] || 0) + 1)]);
+  const c = CHARS[ci], st = CHAT_STYLE[id];
+  const asked = S.asked[id] = S.asked[id] || new Set();
+  const intent = intentOf(text);
+  if (intent === 'you') {
+    if (!S.arrived) return themSay(id, [`무슨 연락? ${c.laugh}`]);
+    return themSay(id, c.replies[ci === S.culprit ? 'youGuilty' : 'you']);
+  }
+  if (intent === 'now' || intent === 'day') {
+    if (asked.has(intent)) return themSay(id, st.again);
+    asked.add(intent);
+    return themSay(id, c.replies[intent]);
+  }
+  if (intent) return themSay(id, st[intent]);
+  return themSay(id, [pickLine(st.idle, S.idle[id] = (S.idle[id] || 0) + 1)]);
+}
+/* 읽씹하면: 한참 안 읽은 채팅방에서 한 번 더 연락이 온다 */
+const NUDGE_MS = 40000;
+function scheduleNudge(id) {
+  if (S.nudged[id] || S.nudgeT[id] || id === 'mom') return;
+  const g = S;
+  S.nudgeT[id] = setTimeout(() => {
+    if (S !== g) return;
+    S.nudgeT[id] = null;
+    if (!S.unread[id] || (id === 'unknown' && S.over)) return;
+    S.nudged[id] = true;
+    const lines = id === 'unknown' ? [`자나?${CHARS[S.culprit].laugh}`] : CHAT_STYLE[id].nudge;
+    enqueue(id, () => themSay(id, lines));
+  }, NUDGE_MS);
+  S.timers.push(S.nudgeT[id]);
 }
 
 /* ===================== 익명 채팅: "나 기억나?" ===================== */
-const TALK = ['누구세요…?', '힌트 하나만 더 줘', '마지막 힌트!'];
-function anonFoot() {
-  if (S.phase === 'answer') return `<div class="kfoot ${S.busy ? 'busy' : ''}"><button class="chipb main" data-act="yes">${ANSWER_YES}</button><button class="chipb" data-act="no">${ANSWER_NO}</button></div>`;
-  if (S.over) return `<div class="kfoot"><div class="kinput">대화가 끝났습니다</div></div>`;
-  const talkBtn = S.step < TALK.length ? `<button class="chipb" data-act="talk">${TALK[S.step]}</button>` : '';
-  return `<div class="kfoot ${S.busy ? 'busy' : ''}">${talkBtn}<button class="chipb main" data-act="guess">너 누구야?</button></div>`;
-}
 /* 첫 ♡를 누르고 조금 뒤 도착하는 연락 */
 async function arrive() {
   const g = S;
@@ -901,19 +995,39 @@ async function arrive() {
   await wait(1600); if (S !== g) return;
   pushMsg('unknown', them(UNKNOWN, '나 기억나?'));
 }
-async function talk() {
-  if (S.busy || S.over || S.step >= TALK.length) return;
-  const c = CHARS[S.culprit], h = anonHints(c);
-  const step = S.step++;
-  S.busy = true;
-  pushMsg('unknown', me(TALK[step]));
-  const lines = step === 0 ? [`${c.laugh} 비밀이야`, '힌트 줄게. 맞혀봐', h[0]] : step === 1 ? [h[1]] : [h[2], `이제 알겠지? ${c.laugh}`];
-  if (!await themSay('unknown', lines)) return;
-  S.busy = false; refreshChat('unknown');
+/* 익명 채팅에서 입력한 말: 이름이 들어 있으면 정답 맞히기, "누구/힌트/기억" 등이면 힌트 */
+async function respondUnknown(text) {
+  const c = CHARS[S.culprit];
+  if (S.phase === 'answer') {
+    if (/미안|아니|싫|별로|글쎄|노노/.test(text)) return answerFlow(false);
+    if (/좋아|응|웅|그래|당연|나도|사랑/.test(text)) return answerFlow(true);
+    return themSay('unknown', ['…너도 날 좋아해?']);
+  }
+  if (S.over) return;
+  const i = nameIn(text);
+  if (i >= 0) return pickFlow(i);
+  if (/누구|누군|힌트|기억|모르|알려|뭐야/.test(text)) return hintFlow();
+  return themSay('unknown', [pickLine([`궁금하면 맞혀봐 ${c.laugh}`, '누군지 맞히면 다 말해줄게', `반응 귀엽다 ${c.laugh}`], S.idle.unknown = (S.idle.unknown || 0) + 1)]);
 }
-
+async function hintFlow() {
+  const c = CHARS[S.culprit], h = anonHints(c);
+  if (S.step >= 3) return themSay('unknown', [`힌트는 다 줬어 ${c.laugh}`, '이제 맞혀봐']);
+  const step = S.step++;
+  const lines = step === 0 ? [`${c.laugh} 비밀이야`, '힌트 줄게. 맞혀봐', h[0]] : step === 1 ? [h[1]] : [h[2], `이제 알겠지? ${c.laugh}`];
+  return themSay('unknown', lines);
+}
 /* 인스타 댓글 달기 */
 $('#app').addEventListener('submit', e => {
+  const k = e.target.closest('.kform');
+  if (k) {
+    e.preventDefault();
+    const inp = k.querySelector('input');
+    const text = inp.value.trim();
+    if (!text) return;
+    inp.value = '';
+    send(k.dataset.chat, text);
+    return;
+  }
   const f = e.target.closest('.cform'); if (!f) return;
   e.preventDefault();
   const inp = f.querySelector('input');
@@ -941,51 +1055,58 @@ $('#photo').addEventListener('click', () => $('#photo').classList.remove('show')
 
 /* ===================== 정답 고르기 ===================== */
 function openGuess() {
-  if (S.busy || S.over) return;
+  if (S.over) return;
   const m = $('#modal');
-  m.innerHTML = `<div class="sheet"><h3>너 누구야?</h3><p class="msub">남은 기회 ${S.tries}번</p>
+  m.innerHTML = `<div class="sheet"><h3>너 누구야?</h3><p class="msub">남은 기회 ${S.tries}번 · 채팅에 이름을 직접 써도 돼요</p>
     <div class="gl">${CHARS.map((c, i) => `<button class="gb" data-pick="${i}" ${S.wrong.includes(i) ? 'disabled' : ''}>${avatarPh(i, 'round')}<span>${c.label}</span></button>`).join('')}</div>
     <button class="gcancel" data-close>닫기</button></div>`;
   m.classList.add('show');
 }
 $('#modal').addEventListener('click', e => {
   const p = e.target.closest('[data-pick]');
-  if (p && !p.disabled) { closeModal(); pick(+p.dataset.pick); return; }
+  if (p && !p.disabled) {
+    closeModal();
+    const i = +p.dataset.pick;
+    pushMsg('unknown', me(`혹시… ${CHARS[i].label}?`));
+    enqueue('unknown', () => pickFlow(i));
+    return;
+  }
   if (e.target.closest('[data-close]') || e.target.id === 'modal') closeModal();
 });
 const closeModal = () => $('#modal').classList.remove('show');
 
-async function pick(i) {
-  const g = S;
-  S.busy = true;
-  pushMsg('unknown', me(`혹시… ${CHARS[i].label}?`));
+async function pickFlow(i) {
+  if (S.over) return;
+  const g = S, c = CHARS[S.culprit];
   if (i === S.culprit) {
     S.over = true;
     if (!await themSay('unknown', CONFESS.slice(0, 1))) return;
     S.revealed = true;                       // 채팅방 이름이 그 사람 이름으로 바뀐다
     renderHome(); refreshChat('unknown');
     if (!await themSay('unknown', CONFESS.slice(1))) return;
-    S.phase = 'answer'; S.busy = false; refreshChat('unknown');
+    S.phase = 'answer'; refreshChat('unknown');
     return;
   }
+  if (S.wrong.includes(i)) return themSay('unknown', [`아니라니까 ${c.laugh}`]);
   S.wrong.push(i); S.tries--;
   if (!await themSay('unknown', ['아닌데...'])) return;
   if (S.tries === 0) {
-    S.over = true; S.busy = false; refreshChat('unknown');
+    S.over = true; refreshChat('unknown');
     await wait(1100); if (S !== g) return;
     ending('missed');
-    return;
   }
-  S.busy = false; refreshChat('unknown');
 }
 /* 고백에 대한 대답: 나도 널 좋아해 → 해피엔딩 / 미안 → 배드엔딩 */
-async function answer(yes) {
-  if (S.busy || S.phase !== 'answer') return;
-  const g = S;
-  S.busy = true; S.phase = 'done';
+function answerButton(yes) {
+  if (S.phase !== 'answer') return;
   pushMsg('unknown', me(yes ? ANSWER_YES : ANSWER_NO));
+  enqueue('unknown', () => answerFlow(yes));
+}
+async function answerFlow(yes) {
+  if (S.phase !== 'answer') return;
+  const g = S;
+  S.phase = 'done'; refreshChat('unknown');
   if (!await themSay('unknown', yes ? REPLY_YES(call(), S.culprit) : REPLY_NO)) return;
-  S.busy = false; refreshChat('unknown');
   await wait(1600); if (S !== g) return;
   ending(yes ? 'happy' : 'bad');
 }
