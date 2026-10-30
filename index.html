@@ -239,6 +239,8 @@ body.playing .intro{display:none}
 .sb{max-width:250px;padding:10px 14px;border-radius:18px;background:#26272f;font-size:14.5px;line-height:1.5;margin:4px 0;word-break:keep-all}
 .sb.me{background:#2f7bf6;margin-left:auto}
 .stime{text-align:center;font-size:11.5px;color:var(--sub);margin:16px 0 6px}
+.blurred{filter:blur(4px);user-select:none}
+.unblk{color:#0a84ff;font-size:14px;padding:6px 8px}
 .dot{width:9px;height:9px;border-radius:50%;background:#2f7bf6}
 
 /* ===================== 메모 ===================== */
@@ -703,7 +705,7 @@ const CHAT_STYLE = {
   },
   jk: {
     alias: ['재윤', 'jake', '제이크'],
-    special: [[/지우|jiwoo/i, ['지우? 그냥 유학 때 알던 동생이야 ㅋㅋ', '근데 너 혹시 질투하는 거야?', '왜 이렇게 귀여워 ㅋㅋ'], 'jealous']],
+    special: [[/잘 ?왔|잘 ?돌아왔|환영/, ['ㅋㅋ thank you']], [/^(?![^]*\?)(?!나 ?보고)[^]*보고 ?싶었/, ['나도 보고 싶었어']], [/지우|jiwoo/i, ['지우? 그냥 유학 때 알던 동생이야 ㅋㅋ', '근데 너 혹시 질투하는 거야?', '왜 이렇게 귀여워 ㅋㅋ'], 'jealous']],
     hi: ['ㅋㅋ 안녕! 네 연락 기다리고 있었어'], night: ['벌써 자? ㅋㅋ', '잘 자. 꿈에서 보자'],
     flirt: [['ㅋㅋ 알아', '근데 그 말 너한테 그대로 돌려줄게'], ['조심해. 나 그런 말 진심으로 받아들인다 ㅋㅋ'], ['너 오늘 왜 이렇게 귀엽게 굴어 ㅋㅋ']], again: ['아까 말했잖아 ㅋㅋ 근데 또 물어봐 줘서 좋다'],
     nudge: ['왜 안 읽어 ㅋㅋ', '나 계속 기다리는 중이야'],
@@ -1044,7 +1046,7 @@ function newGame(name) {
     unread: { sunoo: 2, sms: 1 },
     extra: {}, newCount: {}, touched: {}, clock: 0, asked: {}, arrived: false,
     queue: {}, nudged: {}, nudgeT: {},
-    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, myBirthday: null, calls: [], inCall: null, heartStory: {}, called: {}, askN: {}, askState: {}, dmGot: false, dmRead: false, dmUnread: 0, dmTimer: false, myStory: null, composeTag: null, memoOpen: new Set(), cuteN: {},
+    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, myBirthday: null, unblocked: false, calls: [], inCall: null, heartStory: {}, called: {}, askN: {}, askState: {}, dmGot: false, dmRead: false, dmUnread: 0, dmTimer: false, myStory: null, composeTag: null, memoOpen: new Set(), cuteN: {},
     step: 0, typing: null,
     tries: 3, wrong: [], over: false,
     revealed: false, phase: 'guess',   // guess → answer(고백에 대답) → done
@@ -1192,6 +1194,7 @@ $('#app').addEventListener('click', e => {
   if (t.dataset.zoom) openPhoto(t.dataset.zoom);
   else if (t.dataset.tag) { S.composeTag = +t.dataset.tag; renderApp(); }
   else if (t.dataset.act === 'share') shareStory();
+  else if (t.dataset.act === 'unblock') { S.unblocked = true; toast('희승 차단을 해제했습니다'); renderApp(); }
   else if (t.dataset.act === 'mystory') openMyStory();
   else if (t.dataset.story) openStory(+t.dataset.story);
   else if (t.dataset.go) { const [p, ...a] = t.dataset.go.split(':'); go(p, a.join(':')); }
@@ -1779,6 +1782,8 @@ PAGES.phone = {
 /* ===================== 문자 ===================== */
 function smsList() {
   return [
+    /* 차단한 희승에게서 온 문자: 차단을 풀어야 보인다 */
+    { id: 'hs', from: S.unblocked ? '희승' : '차단된 연락처', last: S.unblocked ? '나 벌써 잊어버렸어?' : '가려진 메시지가 있습니다', time: '오후 11:02', hidden: !S.unblocked },
     { id: 'dawn', from: '1588-1255', last: '[Web발신] 새벽배송 상품이 출고되었습니다. 내일 오전 7시 전 도착 예정', time: '오후 10:52' },
     { id: 'auth', from: '1599-0001', last: '[Web발신] [모바일뱅킹] 인증번호 [482913]를 입력해 주세요.', time: '오후 9:58' },
     { id: 'card', from: '1588-8100', last: '[Web발신] ○○카드 승인 4,800원 편의점 일시불', time: '오후 9:41' },
@@ -1789,11 +1794,17 @@ PAGES.sms = {
   start: 'list',
   list() {
     return head('메시지', '<span>✏️</span>') + `<div class="scroll">` + smsList().map(m =>
-      `<div class="row" data-go="thread:${m.id}">${m.unread ? '<span class="dot"></span>' : '<span style="width:9px"></span>'}${avatar('#', '#3b3d4a', 'round')}<div class="mid"><div class="t1">${m.from}</div><div class="t2">${m.last}</div></div><div class="side">${m.time}</div></div>`).join('') + `</div>`;
+      `<div class="row" data-go="thread:${m.id}">${m.unread ? '<span class="dot"></span>' : '<span style="width:9px"></span>'}${avatar(m.hidden ? '?' : (m.id === 'hs' ? '희' : '#'), m.hidden ? '#5a2a32' : '#3b3d4a', 'round')}<div class="mid"><div class="t1">${m.from}</div><div class="t2 ${m.hidden ? 'blurred' : ''}">${m.last}</div></div><div class="side">${m.time}</div></div>`).join('') + `</div>`;
   },
   thread(id) {
     const m = smsList().find(x => x.id === id);
     let body = `<div class="stime">${m.time}</div><div class="sb">${m.last}</div>`;
+    if (id === 'hs') {
+      body = S.unblocked
+        ? `<div class="stime">오늘 오후 11:02</div><div class="sb">나 벌써 잊어버렸어?</div><div class="stime">차단했던 연락처입니다</div>`
+        : `<div class="stime">오늘 오후 11:02</div><div class="sb blurred">●●●● ●●●●●●●●●?</div><div class="stime">차단한 연락처의 메시지입니다.<br>설정 › 차단된 연락처에서 차단을 해제하면 볼 수 있어요.</div>`;
+      return head(m.from) + `<div class="scroll">${body}</div><div class="kfoot" style="background:#0f1016"><div class="kinput">이 대화에는 답장할 수 없습니다</div></div>`;
+    }
     if (id === 'jake') {
       S.unread.sms = 0;
       body = `<div class="stime">10월 27일 오후 2:14</div><div class="sb">Hey! 재윤이야 ㅋㅋ</div><div class="sb">한국 번호 새로 만들었어. 저장해 줘!</div><div class="sb">3년 만에 돌아오니까 다 신기하다 ㅋㅋ</div><div class="sb me">헐 재윤이?? 완전 오랜만이다!</div><div class="sb">ㅋㅋ 조만간 밥 먹자</div>`;
@@ -2169,7 +2180,7 @@ PAGES.settings = {
   },
   blocked() {
     return head('차단된 연락처') + `<div class="scroll"><div class="group">
-      <div class="row"><div class="mid"><div class="t1" style="font-weight:400">희승</div><div class="t2">010-3017-0822 · 2025.4.11 차단</div></div></div>
+      ${S.unblocked ? '' : '<div class="row"><div class="mid"><div class="t1" style="font-weight:400">희승</div><div class="t2">010-3017-0822 · 2025.4.11 차단</div></div><button class="unblk" data-act="unblock">차단 해제</button></div>'}
       <div class="row"><div class="mid"><div class="t1" style="font-weight:400">070-8012-3345</div><div class="t2">광고 전화 · 2025.6.3 차단</div></div></div>
       </div></div>`;
   },
