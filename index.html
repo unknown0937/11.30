@@ -320,6 +320,7 @@ body.playing .intro{display:none}
 .sv.show{display:block;animation:svin .25s ease-out}
 @keyframes svin{from{transform:scale(.92);opacity:0}}
 .sv-img{position:absolute;inset:0;background-size:cover;background-position:center}
+.sv-img.hs{display:grid;place-items:center;background:linear-gradient(160deg,#1a0f1f,#3a1430);font-size:140px;color:#ff4d7d;text-shadow:0 0 50px rgba(255,77,125,.5)}
 .sv-shade{position:absolute;left:0;right:0;top:0;height:170px;background:linear-gradient(rgba(0,0,0,.55),transparent)}
 .sv-shade.b{top:auto;bottom:0;height:150px;background:linear-gradient(transparent,rgba(0,0,0,.5))}
 .sv-bars{position:absolute;top:56px;left:10px;right:10px;display:flex;gap:4px}
@@ -403,6 +404,25 @@ body.playing .intro{display:none}
 .tgl::after{content:"";position:absolute;top:2px;left:2px;width:26px;height:26px;border-radius:50%;background:#fff;transition:.2s}
 .tgl.on{background:#34c759}
 .tgl.on::after{left:22px}
+
+/* ===================== 전화 오는 화면 ===================== */
+.call{position:absolute;inset:0;z-index:75;display:none;flex-direction:column;align-items:center;justify-content:space-between;padding:110px 30px 70px;background:linear-gradient(180deg,rgba(30,30,45,.97),rgba(10,10,18,.98));backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.call.show{display:flex;animation:fadein .3s}
+.call-top{text-align:center}
+.call-av .av{width:110px;height:110px;margin:0 auto;font-size:40px}
+.call.ringing .call-av{animation:ring 1.2s infinite}
+@keyframes ring{0%,40%,100%{transform:none}5%,15%,25%,35%{transform:rotate(-6deg)}10%,20%,30%{transform:rotate(6deg)}}
+.call-top h2{margin-top:18px;font-size:28px;font-weight:600}
+.call-state{margin-top:6px;color:#b8bccc;font-size:15px}
+.call-sub{flex:1;width:100%;display:flex;flex-direction:column;justify-content:center;gap:12px;text-align:center;font-size:17px;line-height:1.5}
+.call-sub div{animation:fadein .6s}
+.call-btns{display:flex;justify-content:space-around;width:100%}
+.cb{width:72px;height:72px;border-radius:50%;font-size:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.cb span{position:absolute;bottom:-26px;font-size:13px;color:#ddd}
+.cb.red{background:#ff3b30}
+.cb.red::first-line{transform:rotate(135deg)}
+.cb.green{background:#34c759;animation:pulse 1.4s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 12px rgba(52,199,89,.2)}}
 
 /* ===================== 정답 고르기 / 엔딩 ===================== */
 .modal{position:absolute;inset:0;z-index:65;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:.3s}
@@ -535,6 +555,7 @@ body.playing .intro{display:none}
     <div class="banner" id="banner"></div>
     <div class="modal" id="modal"></div>
     <div class="end" id="end"></div>
+    <div class="call" id="call"></div>
     <div class="toast" id="toast"></div>
   </div>
 </div>
@@ -692,14 +713,14 @@ const CHAT_STYLE = {
     nudge: ['많이 바쁜가 보다 ㅎㅎ', '천천히 봐도 괜찮아. 기다릴게 😊'],
   },
 };
-/* 호감도가 가득 차면(20) 하는 고백: confess(부르는 이름) → 대답 버튼, 거절했을 때(decline) */
+/* 호감도가 가득 차면(20) 하는 고백: pre(선톡 "바빠?") → 대답하면 confess → 대답 버튼, 거절했을 때(decline) */
 const SIDE_CONFESS = {
-  jay: { confess: c => [`…야 ${c}`, '나 할 말 있어', '…사실 나 너 좋아해. 꽤 오래전부터 ㅋㅋ', '너는… 나 어때?'], decline: ['아… 그렇구나 ㅋㅋ', '괜찮아. 말해줘서 고마워', '그래도 내일 또 연락한다?'] },
-  sh: { confess: c => [c, '이런 말 카톡으로 하는 거 좀 그렇지만', '나 너 좋아해 ㅎㅎ', '너도 같은 마음이야?'], decline: ['그렇구나 ㅎㅎ', '솔직하게 말해줘서 고마워', '불편해하지 말고 지금처럼 연락하자'] },
-  sunoo: { confess: c => [`${c}~`, '나 진짜 진지하게 할 말 있어 🥺', '나 너 조아해. 베프 말고, 진짜로', '너두… 나 조아해?'], decline: ['아… 그렇구낭 ㅎㅎ', '괜차나! 그래도 우리 베프인 건 변함없어 💛', '내일 떡볶이는 그대로 먹는 고다?'] },
-  jk: { confess: c => [c, '더는 못 참겠다 ㅋㅋ', '나 너 좋아해. 진심으로', '너도 나 좋아해?'], decline: ['아… 그렇구나 ㅋㅋ', '괜찮아. 말해줘서 고마워', '그래도 밥은 같이 먹어 줄 거지?'] },
-  nk: { confess: () => ['야', '할 말 있어', '나 너 좋아해', '너는?'], decline: ['…그렇구나', '알겠어', '그래도 연락은 해'] },
-  jw: { confess: c => [c, '진지하게 할 말이 있는데', '나 너 좋아해. 동생으로 말고', '너도 같은 마음이야?'], decline: ['그렇구나 ㅎㅎ', '괜찮아, 네 마음이 제일 중요해', '앞으로도 편하게 연락해 😊'] },
+  jay: { pre: '바빠?', confess: c => ['아니 그냥…', '나 요즘 좀 이상해 ㅋㅋ', '너만 보면 자꾸 웃음 나고', '…나 너 좋아하는 것 같아', '너는 어때?'], decline: ['아… 그렇구나 ㅋㅋ', '괜찮아. 말해줘서 고마워', '그래도 내일 또 연락한다?'] },
+  sh: { pre: '바빠?', confess: c => ['할 말이 있는데 잠깐 들어줄래?', '요즘 계속 네 생각만 나', '나 너 좋아하는 것 같아 ㅎㅎ', '너도 같은 마음이야?'], decline: ['그렇구나 ㅎㅎ', '솔직하게 말해줘서 고마워', '불편해하지 말고 지금처럼 연락하자'] },
+  sunoo: { pre: '바빠아?', confess: c => ['나 진지하게 할 말 이써 🥺', '베프로 지내는 것도 좋은데…', '나 너 좋아하는 것 같아', '너두… 나 조아해?'], decline: ['아… 그렇구낭 ㅎㅎ', '괜차나! 그래도 우리 베프인 건 변함없어 💛', '내일 떡볶이는 그대로 먹는 고다?'] },
+  jk: { pre: '바빠?', confess: c => ['한국 오고 나서 계속 생각했는데', '나 너 좋아하는 것 같아', '아니, 확실히 좋아해 ㅋㅋ', '너도 나 좋아해?'], decline: ['아… 그렇구나 ㅋㅋ', '괜찮아. 말해줘서 고마워', '그래도 밥은 같이 먹어 줄 거지?'] },
+  nk: { pre: '바빠?', confess: () => ['…할 말 있어', '나 너 좋아하는 것 같아', '…너는?'], decline: ['…그렇구나', '알겠어', '그래도 연락은 해'] },
+  jw: { pre: '바빠?', confess: c => ['진지하게 할 말이 있는데', '나 너 좋아하는 것 같아 ㅎㅎ', '동생으로 말고', '너도 같은 마음이야?'], decline: ['그렇구나 ㅎㅎ', '괜찮아, 네 마음이 제일 중요해', '앞으로도 편하게 연락해 😊'] },
 };
 /* 플레이어가 "좋아해"라고 하면 처음엔 장난으로 받고(tease),
    이어서 "진짠데?"라고 하면 설레게 받아친다(serious). 두 번 다 호감도 +1 */
@@ -999,7 +1020,7 @@ function newGame(name) {
     unread: { sunoo: 2, sms: 1 },
     extra: {}, newCount: {}, touched: {}, clock: 0, asked: {}, arrived: false,
     queue: {}, nudged: {}, nudgeT: {},
-    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, dmGot: false, dmRead: false, dmUnread: 0, dmTimer: false, myStory: null, composeTag: null, memoOpen: new Set(), cuteN: {},
+    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, calls: [], inCall: null, heartStory: {}, called: {}, askN: {}, askState: {}, dmGot: false, dmRead: false, dmUnread: 0, dmTimer: false, myStory: null, composeTag: null, memoOpen: new Set(), cuteN: {},
     step: 0, typing: null,
     tries: 3, wrong: [], over: false,
     revealed: false, phase: 'guess',   // guess → answer(고백에 대답) → done
@@ -1287,12 +1308,14 @@ async function respond(id, text) {
   const ci = charOfChat(id);
   if (ci < 0) return;   // 엄마: 키워드 대답 없음
   const c = CHARS[ci], st = CHAT_STYLE[id];
+  if (S.confess[id] === 'preface') return sideConfess2(id);
   if (S.confess[id] === 'answer') {
     if (/미안|아니|싫|별로|글쎄|노노/.test(text)) return sideAnswer(id, false);
     if (/좋아|응|웅|그래|당연|나도|사랑/.test(text)) return sideAnswer(id, true);
     return;
   }
   const asked = S.asked[id] = S.asked[id] || new Set();
+  if (await askOut(id, ci, text)) return;
   const sp = (st.special || []).find(([re]) => re.test(text));
   if (sp) {
     const ok = await themSay(id, sp[1]);
@@ -1367,6 +1390,8 @@ async function arrive() {
   pushMsg('unknown', them(UNKNOWN, call()));
   await wait(1600); if (S !== g) return;
   pushMsg('unknown', them(UNKNOWN, '나 기억나?'));
+  await wait(60000); if (S !== g) return;
+  incomingCall('hidden');
 }
 /* 익명 채팅에서 입력한 말: 이름이 들어 있으면 정답 맞히기, "누구/힌트/기억" 등이면 힌트 */
 async function respondUnknown(text) {
@@ -1428,8 +1453,13 @@ function addAffection(who, n = 1) {
   const d = S.affection[who] - before;
   if (!d) return;
   toast(`${d > 0 ? '💗' : '💔'} ${CHARS[who].label} 호감도 ${d > 0 ? '+' : ''}${d}`);
-  /* 호감도가 가득 차면, ♡를 받은 사람(익명으로 연락하는 사람)이 아니어도 먼저 고백한다 */
   const id = CHARS[who].chat;
+  if (S.affection[who] >= 10 && !S.called[who] && !S.over) {
+    S.called[who] = true;
+    const g = S;
+    S.timers.push(setTimeout(() => { if (S === g) incomingCall(who); }, 6000));
+  }
+  /* 호감도가 가득 차면, ♡를 받은 사람(익명으로 연락하는 사람)이 아니어도 먼저 고백한다 */
   if (S.affection[who] >= CONFESS_AT && who !== S.culprit && !S.confess[id] && !S.over) {
     S.confess[id] = 'pending';
     const g = S;
@@ -1438,6 +1468,14 @@ function addAffection(who, n = 1) {
 }
 async function sideConfess(id) {
   if (S.over) return;
+  if (!await themSay(id, [SIDE_CONFESS[id].pre])) return;
+  S.confess[id] = 'preface';
+  const g = S;
+  S.timers.push(setTimeout(() => { if (S === g && S.confess[id] === 'preface') enqueue(id, () => sideConfess2(id)); }, 20000));
+}
+async function sideConfess2(id) {
+  if (S.confess[id] !== 'preface' || S.over) return;
+  S.confess[id] = 'telling';
   if (!await themSay(id, SIDE_CONFESS[id].confess(call()))) return;
   S.confess[id] = 'answer'; refreshChat(id);
 }
@@ -1546,12 +1584,141 @@ async function answerFlow(yes) {
   ending(yes ? 'happy' : 'bad');
 }
 
+/* ===================== 전화 오는 연출 =====================
+   - 멤버: 호감도가 처음 10이 되면 "목소리 듣고 싶어서" 전화 (받으면 호감도 +1)
+   - (알 수 없음): 첫 연락 1분 뒤 발신번호 표시제한으로 전화
+   거절하거나 15초 동안 안 받으면 부재중 → 카톡으로 "왜 안 받아…" */
+const CALL_TALK = {
+  jay: ['여보세요? ㅋㅋ', '아니 그냥… 목소리 듣고 싶어서', '…야 아무 말이나 해 봐', '아 됐다 ㅋㅋ 잘 자'],
+  sh: ['어, 받았네 ㅎㅎ', '자기 전에 목소리 한 번 듣고 싶어서', '내일 학교에서 보자', '잘 자'],
+  sunoo: ['여보세여 ㅎㅎ', '그냥 목소리 듣고 시퍼서 🥺', '아 부끄러워 끊을래', '잘 자아 💛'],
+  jk: ['여보세요? ㅋㅋ', '그냥 네 목소리 듣고 싶었어', '…좋다', '잘 자, 내일 연락할게'],
+  nk: ['…', '그냥 걸었어', '…목소리 들으니까 됐어', '자'],
+  jw: ['응, 나야 ㅎㅎ', '늦었는데 목소리 듣고 싶어서', '오늘도 고생했어', '푹 자 😊'],
+  hidden: ['…', '(숨소리만 들린다)', '…목소리 들으니까 좋다', '(뚝)'],
+};
+const CALL_MISS = {
+  jay: ['왜 안 받아 ㅋㅋ'], sh: ['바쁜가 보네 ㅎㅎ 나중에 통화하자'], sunoo: ['왜 안 바다 🥺'],
+  jk: ['왜 안 받아? ㅋㅋ 기다렸는데'], nk: ['…왜 안 받아'], jw: ['바빴구나 ㅎㅎ 괜찮아'],
+};
+function incomingCall(who, script) {
+  const g = S;
+  if (S.over) return;
+  if (S.inCall) { S.timers.push(setTimeout(() => { if (S === g) incomingCall(who); }, 15000)); return; }
+  const hidden = who === 'hidden';
+  S.inCall = { who, sec: 0, script };
+  const el = $('#call');
+  el.innerHTML = `<div class="call-top"><div class="call-av">${hidden ? avatar('?', '#4a4a56', 'round') : avatarPh(who, 'round')}</div>
+    <h2>${hidden ? '발신번호 표시제한' : CHARS[who].label}</h2><p class="call-state">${hidden ? '' : '휴대전화 · '}수신 전화</p></div>
+    <div class="call-sub"></div>
+    <div class="call-btns"><button class="cb red" data-call="no">📞<span>거절</span></button><button class="cb green" data-call="yes">📞<span>응답</span></button></div>`;
+  el.className = 'call show ringing';
+  try { navigator.vibrate && navigator.vibrate([400, 200, 400, 200, 400]); } catch (e) {}
+  S.inCall.timeout = setTimeout(() => { if (S === g) endCall('missed'); }, 15000);
+  S.timers.push(S.inCall.timeout);
+}
+async function answerCall() {
+  const c = S.inCall; if (!c || c.answered) return;
+  const g = S;
+  c.answered = true; clearTimeout(c.timeout);
+  const el = $('#call');
+  el.className = 'call show talking';
+  el.querySelector('.call-btns').innerHTML = '<button class="cb red" data-call="end">📞<span>종료</span></button>';
+  const st = el.querySelector('.call-state');
+  c.tick = setInterval(() => { c.sec++; st.textContent = `${String(Math.floor(c.sec / 60)).padStart(2, '0')}:${String(c.sec % 60).padStart(2, '0')}`; }, 1000);
+  st.textContent = '00:00';
+  const lines = c.script || CALL_TALK[c.who === 'hidden' ? 'hidden' : CHARS[c.who].chat];
+  const sub = el.querySelector('.call-sub');
+  for (const l of lines) {
+    await wait(l.pause || rnd(1300, 2200)); if (S !== g || S.inCall !== c) return;
+    if (!l.pause) sub.insertAdjacentHTML('beforeend', `<div>${esc(l)}</div>`);
+  }
+  await wait(1800); if (S !== g || S.inCall !== c) return;
+  endCall('talked');
+}
+function endCall(kind) {
+  const c = S.inCall; if (!c) return;
+  clearTimeout(c.timeout); clearInterval(c.tick);
+  S.inCall = null;
+  $('#call').className = 'call';
+  const hidden = c.who === 'hidden';
+  const name = hidden ? '발신번호 표시제한' : CHARS[c.who].label;
+  const dur = `${Math.floor(c.sec / 60)}:${String(c.sec % 60).padStart(2, '0')}`;
+  const missed = kind !== 'talked';
+  S.calls.unshift([name, missed ? (kind === 'declined' ? '휴대전화 · 거절' : '휴대전화 · 부재중') : `휴대전화 · 수신 (${dur})`, '오후 11:30', missed]);
+  if (missed) { S.badges.phone++; renderHome(); }
+  if (inApp('phone')) renderApp();
+  if (kind === 'talked' && !hidden) addAffection(c.who);
+  if (missed) {
+    const id = hidden ? 'unknown' : CHARS[c.who].chat;
+    const lines = hidden ? [`왜 안 받아…${CHARS[S.culprit].laugh}`] : CALL_MISS[id];
+    enqueue(id, () => themSay(id, lines));
+  }
+}
+$('#call').addEventListener('click', e => {
+  const b = e.target.closest('[data-call]'); if (!b) return;
+  if (b.dataset.call === 'yes') answerCall();
+  else endCall(b.dataset.call === 'end' ? 'talked' : 'declined');
+});
+
+/* ===================== "사귀자" =====================
+   1~3번째: 부끄러워함 (호감도 +1) → 4번째: "진심이야? 너 그 말 책임질 수 있어?"
+   → "응"이면 "그럼 사귀던가ㅋㅋ" (호감도 +5) */
+const ASK_OUT_RE = /사귀자|사귈래|사귀어 ?줘|사귀면 ?안 ?돼|사귀어 ?볼래|연애하자|우리 ?사귀/;
+const ASK_YES_RE = /^(응|웅|어|ㅇㅇ|그래|당연|진심|진짜|책임)|진심이야|책임질게|당연하지/;
+const ASK_NO_RE = /아니|장난|농담|ㄴㄴ|미안/;
+const ASK_OUT = {
+  jay: { shy: [['…야 ㅋㅋ 갑자기 무슨 소리야'], ['아 진짜 ㅋㅋ 장난치지 마라', '…얼굴 빨개졌잖아'], ['…ㅋㅋ 너 계속 그러면 진짜 믿는다?']],
+    serious: ['…야', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['…ㅋㅋㅋ', '그럼 사귀던가ㅋㅋ'], no: ['ㅋㅋ 그럴 줄 알았다', '…아쉽네'], after: ['이미 사귀기로 한 거 아니었냐 ㅋㅋ'] },
+  sh: { shy: [['ㅎㅎ 뭐야 갑자기'], ['…농담이지? ㅎㅎ', '심장에 안 좋다'], ['자꾸 그러면 나 진짜 진지하게 받아들여 ㅎㅎ']],
+    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['ㅎㅎ', '그럼 사귀던가ㅎㅎ'], no: ['그치 ㅎㅎ 장난인 거 알았어', '…조금 아쉽다'], after: ['우리 이미 사귀기로 했잖아 ㅎㅎ'] },
+  sunoo: { shy: [['헉 뭐야아 🥺'], ['아 부끄러워어 ㅎㅎ', '그런 말 하지 마아'], ['너 자꾸 그러면 나 진짜 믿는다아? 🥺']],
+    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어? 🥺'], yes: ['히히', '그럼 사귀던가ㅎㅎ 💛'], no: ['칫 장난이었구낭', '나 좀 기대했는데에'], after: ['우리 이미 사귀는 거 아니야? ㅎㅎ 💛'] },
+  jk: { shy: [['ㅋㅋ 뭐야 갑자기'], ['…농담이지? ㅋㅋ', '나 지금 좀 설렜는데'], ['너 자꾸 그러면 나 진심으로 받아들인다 ㅋㅋ']],
+    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['ㅋㅋㅋ', '그럼 사귀던가ㅋㅋ'], no: ['ㅋㅋ 그럴 줄 알았어', '아쉽다 진짜'], after: ['우리 이미 사귀기로 했잖아 ㅋㅋ'] },
+  nk: { shy: [['…뭐래'], ['…장난치지 마', '부끄러우니까'], ['…자꾸 그러면 진짜로 믿는다']],
+    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['…ㅋㅋ', '그럼 사귀던가ㅋㅋ'], no: ['…그럴 줄 알았어', '…아쉽네'], after: ['…이미 사귀기로 했잖아'] },
+  jw: { shy: [['ㅎㅎ 갑자기?'], ['…장난이지? ㅎㅎ', '나 지금 좀 당황했어'], ['자꾸 그러면 진짜 믿어 버린다 ㅎㅎ']],
+    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['ㅎㅎ', '그럼 사귀던가ㅎㅎ 😊'], no: ['ㅎㅎ 장난인 거 알았어', '조금 아쉽긴 하다'], after: ['우리 이미 사귀기로 한 거 아니었어? ㅎㅎ'] },
+};
+/* 사귀게 되면: 잠시 뒤 스토리에 하트를 올리고, 조금 더 뒤에 전화가 온다 */
+const DATING_CALL = ['목소리 듣고 싶어서 전화했어', '너가 내 여자친구라니 너무 좋아서 죽을 것 같아', { pause: 3500 }, '사랑해', '(뚝)'];
+function startDating(ci) {
+  const g = S;
+  S.timers.push(setTimeout(() => {
+    if (S !== g) return;
+    S.heartStory[ci] = true; S.seenStories.delete(ci);
+    banner('<div class="ni ic-insta mini"></div>', 'Instagram', `${CHARS[ci].handle}님이 새 스토리를 올렸습니다.`, () => { openApp('insta'); openStory(ci); });
+    if (inApp('insta', 'feed')) renderApp();
+  }, 5000));
+  S.timers.push(setTimeout(() => { if (S === g) incomingCall(ci, DATING_CALL); }, 16000));
+}
+async function askOut(id, ci, text) {
+  const a = ASK_OUT[id];
+  if (S.askState[id] === 'ask') {
+    if (ASK_YES_RE.test(text)) {
+      S.askState[id] = 'done';
+      const ok = await themSay(id, a.yes);
+      if (ok) { addAffection(ci, 5); startDating(ci); }
+      return true;
+    }
+    if (ASK_NO_RE.test(text)) { S.askState[id] = null; S.askN[id] = 0; await themSay(id, a.no); return true; }
+  }
+  if (!ASK_OUT_RE.test(text)) return false;
+  if (S.askState[id] === 'done') { await themSay(id, a.after); return true; }
+  const n = S.askN[id] = (S.askN[id] || 0) + 1;
+  if (n >= 4) { S.askState[id] = 'ask'; await themSay(id, a.serious); return true; }
+  if (await themSay(id, a.shy[n - 1])) addAffection(ci);
+  return true;
+}
+
 /* ===================== 전화 ===================== */
 const PHONE_TABS = [['⭐', '즐겨찾기'], ['🕘', '최근 기록', 'recent'], ['👥', '연락처', 'contacts'], ['⌨️', '키패드', 'keypad']];
 PAGES.phone = {
   start: 'recent',
   recent() {
     const calls = [
+      ...S.calls,
       ['엄마', '휴대전화 · 부재중', '오후 9:30', true],
       ['정원', '휴대전화 · 수신 (12분)', '어제'],
       ['선우', '휴대전화 · 발신 (48분)', '어제'],
@@ -1751,9 +1918,10 @@ function openStory(i) {
   storyIdx = i;
   S.seenStories.add(i);
   const sv = $('#sv');
-  sv.innerHTML = `<div class="sv-img" style="${photo(i)}"></div><div class="sv-shade"></div><div class="sv-shade b"></div>
+  const heart = S.heartStory[i];   // 사귀게 된 사람은 하트 스토리를 올린다
+  sv.innerHTML = `${heart ? '<div class="sv-img hs">♥</div>' : `<div class="sv-img" style="${photo(i)}"></div>`}<div class="sv-shade"></div><div class="sv-shade b"></div>
     <div class="sv-bars"><i></i></div>
-    <div class="sv-head">${avatarPh(i)}<b>${CHARS[i].handle}</b><small>${STORY_TIME[i]}</small><button class="sv-x" data-close>×</button></div>
+    <div class="sv-head">${avatarPh(i)}<b>${CHARS[i].handle}</b><small>${heart ? '방금' : STORY_TIME[i]}</small><button class="sv-x" data-close>×</button></div>
     <div class="bigheart">♥</div>
     <div class="sv-foot"><div>메시지 보내기</div><button class="like ${S.liked.has(i) ? 'on' : ''}" data-like>${S.liked.has(i) ? '♥' : '♡'}</button><span>➤</span></div>`;
   sv.classList.add('show');
