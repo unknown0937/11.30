@@ -284,8 +284,9 @@ button,input{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .sv-shade{position:absolute;left:0;right:0;top:0;height:170px;background:linear-gradient(rgba(0,0,0,.55),transparent)}
 .sv-shade.b{top:auto;bottom:0;height:150px;background:linear-gradient(transparent,rgba(0,0,0,.5))}
 .sv-bars{position:absolute;top:56px;left:10px;right:10px;display:flex;gap:4px}
-.sv-bars i{flex:1;height:2.5px;border-radius:2px;background:rgba(255,255,255,.35)}
-.sv-bars i.on{background:#fff}
+.sv-bars i{flex:1;height:2.5px;border-radius:2px;background:rgba(255,255,255,.35);overflow:hidden}
+.sv-bars i::after{content:"";display:block;height:100%;width:100%;background:#fff;transform-origin:left;animation:svfill 5s linear forwards}
+@keyframes svfill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 .sv-head{position:absolute;top:68px;left:12px;right:12px;display:flex;align-items:center;gap:9px;font-size:14px}
 .sv-head .av{width:34px;height:34px;border-radius:50%}
 .sv-head b{font-weight:600}
@@ -1317,7 +1318,7 @@ function openStory(i) {
   S.seenStories.add(i);
   const sv = $('#sv');
   sv.innerHTML = `<div class="sv-img" style="${photo(i)}"></div><div class="sv-shade"></div><div class="sv-shade b"></div>
-    <div class="sv-bars">${CHARS.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div>
+    <div class="sv-bars"><i></i></div>
     <div class="sv-head">${avatarPh(i)}<b>${CHARS[i].handle}</b><small>${STORY_TIME[i]}</small><button class="sv-x" data-close>×</button></div>
     <div class="bigheart">♥</div>
     <div class="sv-foot"><div>메시지 보내기</div><button class="like ${S.liked.has(i) ? 'on' : ''}" data-like>${S.liked.has(i) ? '♥' : '♡'}</button><span>➤</span></div>`;
