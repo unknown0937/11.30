@@ -136,6 +136,24 @@ body.playing .intro{display:none}
 .ic-memo{background:linear-gradient(180deg,#ffd84d 0 28%,#fff 28%);overflow:hidden}
 .ic-memo::before{content:"";width:40px;height:26px;margin-top:16px;background:repeating-linear-gradient(180deg,#d8d8d8 0 1.5px,transparent 1.5px 8px)}
 .ic-settings{background:linear-gradient(160deg,#a3a7b0,#61656e)}
+.ic-blog{background:linear-gradient(160deg,#2fd27a,#03a94f);color:#fff;font-weight:800;font-size:17px;letter-spacing:-.5px}
+.ic-blog::before{content:"blog"}
+/* 블로그 */
+.app-blog{background:#0e1310!important}
+.blogo{color:#2fd27a;font-weight:800;font-size:22px;letter-spacing:-.5px}
+.bhead{display:flex;gap:12px;align-items:center;padding:6px 16px 10px}
+.bhead b{display:block;font-size:16px}
+.bhead small{color:var(--sub);font-size:12px}
+.bav{width:46px;height:46px;border-radius:50%;background:#2fd27a;color:#05210f;font-weight:800;display:grid;place-items:center;font-size:18px}
+.bpost{display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+.bpost .t1{font-size:15px;font-weight:600}
+.bpost .t2{font-size:12px;color:var(--sub);margin-top:3px}
+.bmood{width:46px;height:46px;border-radius:12px;background:#17201a;display:grid;place-items:center;font-size:22px}
+.blk{color:#2fd27a}
+.bview{padding:4px 18px 16px}
+.bview h2{font-size:21px;margin:8px 0 6px}
+.bview .t2{font-size:12px;color:var(--sub)}
+.bbody{margin-top:16px;font-size:15.5px;line-height:1.85;white-space:pre-wrap;word-break:keep-all}
 
 /* 홈바 */
 .homebar{position:absolute;bottom:0;left:0;right:0;height:30px;display:flex;align-items:center;justify-content:center;z-index:45;cursor:pointer;opacity:0;pointer-events:none}
@@ -981,7 +999,7 @@ function newGame(name) {
     unread: { sunoo: 2, sms: 1 },
     extra: {}, newCount: {}, touched: {}, clock: 0, asked: {}, arrived: false,
     queue: {}, nudged: {}, nudgeT: {},
-    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, dmGot: false, dmUnread: 0, dmTimer: false, myStory: null, composeTag: null, memoOpen: new Set(), cuteN: {},
+    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, dmGot: false, dmRead: false, dmUnread: 0, dmTimer: false, myStory: null, composeTag: null, memoOpen: new Set(), cuteN: {},
     step: 0, typing: null,
     tries: 3, wrong: [], over: false,
     revealed: false, phase: 'guess',   // guess → answer(고백에 대답) → done
@@ -1096,7 +1114,7 @@ function checkCode() {
     document.body.classList.add('playing');
     renderHome(); show('home');
     if (S.unread.sunoo) scheduleNudge('sunoo');
-    if (!S.dmTimer) { S.dmTimer = true; const g = S; S.timers.push(setTimeout(() => { if (S === g) receiveDM(); }, 25000)); }
+    if (!S.dmTimer) { S.dmTimer = true; const g = S; S.timers.push(setTimeout(() => { if (S === g) receiveDM(); }, 30000)); }
     const app = S.pending;
     if (app) setTimeout(() => app === 'kakao' ? openApp('kakao', 'chat', 'sunoo') : openApp(app), 450);
     return;
@@ -1109,7 +1127,7 @@ function checkCode() {
 }
 
 /* ===================== 화면 2: 홈 화면 ===================== */
-const HOME_APPS = [['web', '인터넷'], ['kakao', '카카오톡'], ['insta', '인스타'], ['yt', '유튜브']];
+const HOME_APPS = [['web', '인터넷'], ['kakao', '카카오톡'], ['insta', '인스타'], ['yt', '유튜브'], ['blog', '블로그']];
 const DOCK_APPS = [['phone', '전화'], ['sms', '문자'], ['memo', '메모'], ['settings', '설정']];
 const ICON_TXT = { web: '🌐', phone: '📞', settings: '⚙️' };
 function iconHTML([id, label]) {
@@ -1160,8 +1178,8 @@ function baseChat(id) {
     case 'unknown': return [];
     case 'sunoo': return [me('오늘 진짜 피곤하다 ㅠㅠ', '오후 10:02'), them('선우', '고생해쪄 ㅠㅠ 얼른 자 ㅎㅎ', '오후 10:03'), them('선우', `${call()}~ 내일 떡볶이 먹으러 가자아 🍢`, '오후 11:28'), them('선우', '아 그리구 인스타 봤어? 다들 스토리 올렸던뎅 ㅎㅎ', '오후 11:29')];
     case 'mom': return [them('엄마', '재윤이 유학 끝나고 한국 들어왔대~', '오후 9:30'), them('엄마', '연락 한번 해 봐. 너 보고 싶어 하더라', '오후 9:31'), them('엄마', '아 그리고 11월 15일 재윤이 생일이니까 선물 하나 챙겨~', '오후 9:31'), them('엄마', '전화는 왜 안 받아~ 일찍 자라 🙏', '오후 9:32')];
-    case 'jw': return [me('오빠 저번에 빌린 우산 다음에 꼭 돌려줄게요!', '오후 10:31'), them('정원', '천천히 줘도 돼 ㅎㅎ', '오후 10:35'), them('정원', '오늘 고생 많았지? 따뜻하게 하고 푹 쉬어 😊', '오후 10:40')];
-    case 'sh': return [them('성훈', '과제 자료 보내줬어~', '오후 8:10'), them('성훈', '막히는 거 있으면 언제든지 물어봐', '오후 8:11'), me('감사합니다 선배 ㅠㅠ 다음에 커피 살게요!', '오후 8:15'), them('성훈', 'ㅎㅎ 그래 그럼 약속', '오후 8:16')];
+    case 'jw': return [me('저번에 빌린 우산 다음에 꼭 돌려줄게!', '오후 10:31'), them('정원', '천천히 줘도 돼 ㅎㅎ', '오후 10:35'), them('정원', '오늘 고생 많았지? 따뜻하게 하고 푹 쉬어 😊', '오후 10:40')];
+    case 'sh': return [them('성훈', '과제 자료 보내줬어~', '오후 8:10'), them('성훈', '막히는 거 있으면 언제든지 물어봐', '오후 8:11'), me('고마워 ㅠㅠ 다음에 커피 살게!', '오후 8:15'), them('성훈', 'ㅎㅎ 그래 그럼 약속', '오후 8:16')];
     case 'nk': return [me('어디야?', '오후 9:50'), them('니키', '집', '오후 9:54'), me('아까 편의점에서 너 본 것 같은데', '오후 9:55'), them('니키', 'ㅋㅋ 잘못 봤겠지', '오후 9:58'), them('니키', '늦게 다니지 마', '오후 9:58')];
     case 'jay': return [them('종성', '새 기타 샀다 🎸', '오후 7:20'), them('종성', '나중에 소리 들어볼래?', '오후 7:20'), me('오 대박 들려줘!!', '오후 7:31'), them('종성', 'ㅋㅋ 새 곡 다 만들면 제일 먼저 들려줄게', '오후 7:33')];
     case 'jk': return [them('재윤', '카톡 새로 깔았어 ㅋㅋ 너한테 제일 먼저 연락하는 거야', '오후 6:05'), me('오 환영! 한국 온 거 축하해', '오후 6:20'), them('재윤', '고마워 ㅋㅋ 조만간 밥 먹자. 내가 살게', '오후 6:22')];
@@ -1546,7 +1564,7 @@ PAGES.phone = {
       `</div>` + tabs(PHONE_TABS, 'recent');
   },
   contacts() {
-    const list = [...CHARS.map(c => [c.label, c.since]), ['엄마', '']].sort((x, y) => x[0].localeCompare(y[0], 'ko'));
+    const list = [...CHARS.map(c => [c.label, '휴대전화']), ['엄마', '휴대전화']].sort((x, y) => x[0].localeCompare(y[0], 'ko'));
     return head('연락처', '<span>＋</span>') + `<div class="scroll"><div class="row" data-toast="내 번호: 010-2030-1130">${avatar('나', '#555', 'round')}<div class="mid"><div class="t1">${esc(S.name)}</div><div class="t2">내 카드</div></div></div>` +
       list.map(([n, role]) => `<div class="row" data-toast="지금 이 시간에 전화하긴 좀…">${avatarOf(n, 'round')}<div class="mid"><div class="t1">${n}</div><div class="t2">${role}</div></div></div>`).join('') +
       `</div>` + tabs(PHONE_TABS, 'contacts');
@@ -1589,15 +1607,15 @@ function memos() {
   return [
     { id: 'todo', title: '이번 주 할 일', date: '오늘', body: '- 정원 우산 돌려주기 ☂️\n- 성훈한테 커피 사기 (과제 도와줌)\n- 니키한테 편의점 우유값 갚기\n- 엄마가 재윤이네 반찬 갖다주래' },
     /* 처음 만난 날: 사람마다 따로 잠긴 메모. 제목은 별명이고, 암호는 그 사람 생일(월일 4자리, 연도 붙여도 됨) */
-    { id: 'm_js', title: 'js', date: '2025. 10. 18.', lock: '0420', body: '놀이터.\n그네 타다 떨어져서 엉엉 울고 있는데 업어서 집까지 데려다줬다고 함.\n(엄마가 아직도 그 얘기 함 ㅋㅋ)' },
+    { id: 'm_js', title: '소꿉친구', date: '2025. 10. 18.', lock: '0420', body: '놀이터.\n그네 타다 떨어져서 엉엉 울고 있는데 업어서 집까지 데려다줬다고 함.\n(엄마가 아직도 그 얘기 함 ㅋㅋ)' },
     { id: 'm_mom', title: '엄마 친구 아들', date: '2025. 10. 18.', lock: '1115', body: '엄마들 모임.\n케이크 떨어뜨려서 울었다고 함. 그때 자기 케이크 반 잘라줬대.\n(나는 기억 안 남…)' },
-    { id: 'm_bff', title: '내 베프', date: '2025. 10. 18.', lock: '0624', body: '중학교 입학식.\n반을 못 찾아서 복도에서 울고 있을 때 같이 찾아줌.\n알고 보니 같은 반이었음.' },
+    { id: 'm_bff', title: '내 베프', date: '2025. 10. 18.', lock: '0624', body: '중학교 입학식.\n반을 못 찾아서 복도에서 울고 있을 때 같이 찾아줌.\n알고 보니 같은 동네 사는 1년 선배였음.' },
     { id: 'm_club', title: '동아리 선배', date: '2025. 10. 18.', lock: '1208', body: '동아리 신입 환영회.\n게임하다 웃음이 안 멈춰서 사레들림.\n물 건네주면서 같이 웃어줌.' },
-    { id: 'm_class', title: '같은 수업 걔', date: '2025. 10. 18.', lock: '1209', body: '첫 수업 날.\n지각해서 뛰어 들어오다 미끄러짐. 혼자 웃음 터짐.\n옆자리에서 아무 말 없이 펜 빌려줌.' },
-    { id: 'm_cafe', title: '알바 오빠', date: '2025. 10. 18.', lock: '0209', body: '카페 알바 첫날.\n컵 엎고 너무 당황해서 웃음만 나옴.\n괜찮다고 웃으면서 같이 치워줌.' },
+    { id: 'm_class', title: '같은 수업', date: '2025. 10. 18.', lock: '1209', body: '첫 수업 날.\n지각해서 뛰어 들어오다 미끄러짐. 혼자 웃음 터짐.\n옆자리에서 아무 말 없이 펜 빌려줌.' },
+    { id: 'm_cafe', title: '알바 같이 한 사람', date: '2025. 10. 18.', lock: '0209', body: '카페 알바 첫날.\n컵 엎고 너무 당황해서 웃음만 나옴.\n괜찮다고 웃으면서 같이 치워줌.' },
     { id: 'bff', title: '선우랑 버킷리스트 💛', date: '2025. 9. 3.', body: '1. 떡볶이 맛집 10군데 도장깨기 (3/10)\n2. 같이 바다 보러 가기\n3. MBTI 똑같은 기념으로 사진 찍기 ㅋㅋ\n4. 6월 24일엔 떡볶이 케이크 만들어 주기 🎂\n\n말 안 해도 통하는 사이 🤝' },
     { id: 'shop', title: '장보기', date: '2025. 10. 29.', body: '딸기우유\n라면\n샴푸' },
-    { id: 'pw', title: '메모', date: '2025. 9. 2.', body: '폰 비밀번호 바꾸기 (아직 0000…)\n처음 만난 날 메모는 각자 생일로 잠가 둠 (이름 대신 별명으로!)' },
+    { id: 'pw', title: '메모', date: '2025. 9. 2.', body: '폰 비밀번호 바꾸기 (아직 0000…)\n처음 만난 날 메모는 각자 생일로 잠가 둠 (이름 대신 우리 사이로!)' },
   ];
 }
 PAGES.memo = {
@@ -1674,7 +1692,7 @@ PAGES.insta = {
   feed() {
     const mine = S.myStory
       ? `<div class="story" data-act="mystory"><div class="ring ${S.myStory.seen ? 'seen' : ''}">${avatar('나', '#555', 'round')}</div><span>내 스토리</span></div>`
-      : S.dmGot
+      : S.dmRead
         ? `<div class="story" data-go="compose"><div class="ring seen mys-add">${avatar('나', '#555', 'round')}<i>+</i></div><span>내 스토리</span></div>`
         : `<div class="story" data-toast="아직 올린 스토리가 없습니다"><div class="ring seen">${avatar('나', '#555', 'round')}</div><span>내 스토리</span></div>`;
     const stories = mine +
@@ -1686,10 +1704,8 @@ PAGES.insta = {
     i = +i;
     const c = CHARS[i];
     const mine = instaPosts().filter(p => p.who === i);
-    const tiles = [`<div style="${photo(i)}" data-story="${i}"></div>`, ...mine.map(p => p.pics ? `<div style="background-image:url(${SELFIES[p.pics[0]]})" data-go="post:${p.id}"></div>` : `<div style="background:${p.img[0]}" data-go="post:${p.id}">${p.img[1]}</div>`)];
-    const fill = ['🌙', '🎧', '☁️', '🌿', '📷'];
-    while (tiles.length % 3 || tiles.length < 6) tiles.push(`<div style="background:hsl(${(tiles.length * 67 + i * 40) % 360},30%,22%)">${fill[tiles.length % fill.length]}</div>`);
-    return head(c.handle) + `<div class="scroll"><div class="prof">${avatarPh(i, 'round')}<div class="pstat"><div><b>${mine.length + 9}</b>게시물</div><div><b>1,204</b>팔로워</div><div><b>198</b>팔로잉</div></div></div>
+    const tiles = [...mine.map(p => p.pics ? `<div style="background-image:url(${SELFIES[p.pics[0]]})" data-go="post:${p.id}"></div>` : `<div style="background:${p.img[0]}" data-go="post:${p.id}">${p.img[1]}</div>`)];
+    return head(c.handle) + `<div class="scroll"><div class="prof">${avatarPh(i, 'round')}<div class="pstat"><div><b>${mine.length}</b>게시물</div><div><b>1,204</b>팔로워</div><div><b>198</b>팔로잉</div></div></div>
       <div class="pbio"><b>${c.name}</b><br>${c.bio}<div class="aff">호감도 <span>${hearts(S.affection[i])}</span></div></div>
       <div class="pgrid">${tiles.join('')}</div></div>`;
   },
@@ -1698,11 +1714,12 @@ PAGES.insta = {
     return head('메시지') + `<div class="scroll">${row}</div>`;
   },
   dmthread() {
-    S.dmUnread = 0;
+    S.dmUnread = 0; S.dmRead = true;   // DM을 읽어야 「내 스토리」로 태그할 수 있다
     const act = S.myStory ? '<div class="sec" style="text-align:center">스토리를 올렸어요 🍀</div>' : '<div style="padding:16px"><button class="chipb main" style="width:100%" data-go="compose">🍀 스토리 올리러 가기</button></div>';
     return head('unknown') + `<div class="scroll"><div class="stime">오후 11:30</div><div class="dmb">${DM_TEXT}</div>${act}</div>`;
   },
   compose() {
+    if (!S.dmRead) return head('스토리') + '<div class="scroll"><div class="sec" style="text-align:center">아직 올린 스토리가 없습니다</div></div>';
     if (S.myStory) return head('스토리') + '<div class="scroll"><div class="sec" style="text-align:center">이미 스토리를 올렸어요</div></div>';
     const t = S.composeTag;
     return head('스토리 만들기') + `<div class="scroll"><div class="cmp" style="background:var(--wallbg)"><div class="mys-t">보고 싶다 🍀</div>${t === null ? '<div class="mys-tag dim">@누구를 태그할까?</div>' : `<div class="mys-tag">@${CHARS[t].handle}</div>`}</div>
@@ -1853,6 +1870,42 @@ PAGES.yt = {
   },
 };
 
+/* ===================== 블로그 (나와 친구들만 보는 일기) =====================
+   각 인물과 어떤 사이인지(소꿉친구, 엄마 친구 아들, 베프, 동아리 선배, 같은 수업, 알바)는 여기서 알 수 있다.
+   잠긴 메모의 제목이 '사이'라서, 일기를 읽어야 누구 메모인지 알 수 있다. 댓글은 친구들(유진·지원·윤아)만 단다. */
+const BLOG = [
+  { id: 'b1', date: '2025. 10. 27.', title: '3년 만에 돌아온 엄마 친구 아들', mood: '✈️',
+    body: '엄마 친구 아들인 재윤이가 3년 만에 한국에 왔다.\n엄마들끼리 워낙 친해서 아기 때부터 봤다는데, 나는 기억이 거의 없다 ㅋㅋ\n나보다 나이는 많은데 어릴 때부터 그냥 이름 부르면서 반말했다. 지금 다시 존댓말 하기엔 너무 늦었음.\n엄마는 벌써 반찬 갖다주라고 난리.',
+    cmt: [['윤아', '헐 그 유학 갔다는 애?? 사진 보여줘'], ['지원', '엄마 친구 아들 클리셰 ㅋㅋㅋㅋ'], ['유진', '아기 때부터 알았으면 그냥 소꿉친구 아니야?']] },
+  { id: 'b2', date: '2025. 10. 23.', title: '축제 🎸', mood: '🎸',
+    body: '종성이가 축제 무대에서 기타 쳤다.\n유치원 때부터 같은 동네 놀이터에서 맨날 붙어 놀던 소꿉친구가 무대 위에 있으니까 기분이 너무 이상했음.\n한 살 많다고 어릴 때부터 형처럼 굴더니 오늘은 좀 멋있었다. 아주 조금.',
+    cmt: [['유진', '조금이 아니던데? 너 계속 무대만 보던데'], ['지원', '소꿉친구 맞아?? 눈빛이 소꿉친구가 아니었음'], ['윤아', 'ㅋㅋㅋ 인정']] },
+  { id: 'b3', date: '2025. 9. 10.', title: '같은 수업 듣는 그 애', mood: '📚',
+    body: '이번 학기 같은 수업 듣는 니키.\n나보다 나이 많은 건 알았는데 말이 진짜 없다. 처음엔 무서웠음.\n근데 오늘 내가 펜 놓고 온 거 보고 말없이 하나 빌려줬다. 반말로 고맙다고 했더니 "응" 한 마디 ㅋㅋ',
+    cmt: [['지원', '츤데레 그 자체'], ['윤아', '말없이 펜 빌려주는 거 설렘 포인트 아님?'], ['유진', '근데 걔 춤 잘 춘다며']] },
+  { id: 'b4', date: '2025. 6. 24.', title: '베프 생일 🎂', mood: '🎂',
+    body: '오늘은 내 베프 선우 생일!\n중학교 입학식 날 반 못 찾아서 울고 있을 때 같이 찾아준 1년 선배가 지금은 제일 친한 친구가 됐다.\n한 살 많은데 진짜 친구처럼 지내는 게 신기하다. 떡볶이 케이크 대성공 ㅋㅋ',
+    cmt: [['윤아', '선우 오빠 케이크 보고 울 뻔했다며 ㅋㅋㅋ'], ['유진', '둘이 맨날 붙어 다니잖아 베프 맞냐고'], ['지원', '떡볶이 케이크 나도 해줘']] },
+  { id: 'b5', date: '2025. 3. 4.', title: '동아리 신입 환영회', mood: '🎲',
+    body: '동아리 들어갔다!\n신입 환영회 때 성훈 선배가 엄청 챙겨줬다. 게임하다 내가 웃음 못 참고 사레들렸는데 물 건네주면서 같이 웃어줌.\n선배인데 말 편하게 하라고 해서 그날부터 그냥 성훈이라고 부름 ㅋㅋ',
+    cmt: [['지원', '동아리 선배가 말 놓으라고 하는 거 = 관심 있다는 뜻'], ['유진', '그건 너무 앞서갔다 ㅋㅋㅋ'], ['윤아', '그 선배 도서관에서 자주 보이더라']] },
+  { id: 'b6', date: '2025. 1. 31.', title: '카페 알바 마지막 날', mood: '☕',
+    body: '겨울 방학 동안 했던 카페 알바 끝!\n같이 일한 정원이가 제일 생각날 듯. 첫날 내가 컵 엎고 당황해서 웃기만 할 때 괜찮다고 같이 치워준 사람.\n나보다 나이 많은데 처음부터 반말 편하게 하라고 해줬다. 비 오는 날 우산도 빌려줌.',
+    cmt: [['유진', '우산 빌려준 거 아직 안 돌려줬지?'], ['윤아', '알바 같이 한 사람 = 제일 친해지는 사람'], ['지원', '정원 오빠 착한 거 유명함']] },
+];
+PAGES.blog = {
+  start: 'home',
+  home() {
+    const posts = BLOG.map(b => `<div class="bpost" data-go="bview:${b.id}"><div class="bmood">${b.mood}</div><div class="mid"><div class="t1">${b.title}</div><div class="t2">${b.date} · <span class="blk">🔒 서로이웃공개</span> · 댓글 ${b.cmt.length}</div></div></div>`).join('');
+    return head('<span class="blogo">blog</span>', '<span>🔔</span><span>☰</span>') + `<div class="scroll"><div class="bhead"><div class="bav">${esc(S.name)[0]}</div><div><b>${esc(S.name)}의 일기장</b><small>나만 보는 거 아님 · 유진, 지원, 윤아만 ✌️</small></div></div><div class="sec">전체 글 ${BLOG.length}</div>${posts}</div>`;
+  },
+  bview(id) {
+    const b = BLOG.find(x => x.id === id);
+    return head('') + `<div class="scroll"><div class="bview"><div class="t2">일기 · <span class="blk">🔒 서로이웃공개</span></div><h2>${b.title}</h2><div class="t2">${esc(S.name)} · ${b.date}</div><div class="bbody">${b.body}</div></div>
+      <div class="sec">댓글 ${b.cmt.length}</div>${b.cmt.map(([n, t]) => `<div class="cmt">${avatar(n, n === '유진' ? '#e6829e' : n === '지원' ? '#6aa5e6' : '#a98bff', 'round')}<div><small>${n}</small><p>${t}</p></div></div>`).join('')}</div>`;
+  },
+};
+
 /* ===================== 인터넷 ===================== */
 const SEARCHES = [
   ['나 기억나 답장 뭐라고 해', [['○○지식인', '모르는 사람이 "나 기억나?"라고 보냈어요', '힌트를 돌려서 말할 거예요. 폰 속 메모나 대화랑 하나씩 맞춰 보세요!'], ['커뮤니티', '"나 기억나?"는 고백 전 단계다 vs 아니다', '댓글 1,024개 · 무조건 고백 전 단계임 ㅋㅋ']]],
@@ -1868,7 +1921,9 @@ PAGES.web = {
     const sc = [['📰', '뉴스'], ['🌤', '날씨'], ['🗺', '지도'], ['🛒', '쇼핑']].map(([e, l]) => `<div data-toast="${l} — 준비 중입니다"><div>${e}</div>${l}</div>`).join('');
     return head('', '<span>⋯</span>') + `<div class="scroll"><div class="weblogo">search</div><div class="sbox">🔍 검색어를 입력하세요</div>
       <div class="shortcuts">${sc}</div><div class="sec">최근 검색어</div>
-      ${SEARCHES.map(([q], i) => `<div class="row" data-go="search:${i}"><span style="color:var(--sub)">🕘</span><div class="mid"><div class="t1" style="font-weight:400">${q}</div></div><span class="chev">↖</span></div>`).join('')}</div>`;
+      ${S.arrived   /* 최근 검색어는 (알 수 없음)에게 연락이 온 뒤에야 생긴다 */
+        ? SEARCHES.map(([q], i) => `<div class="row" data-go="search:${i}"><span style="color:var(--sub)">🕘</span><div class="mid"><div class="t1" style="font-weight:400">${q}</div></div><span class="chev">↖</span></div>`).join('')
+        : '<div class="sec" style="text-align:center;padding:30px 16px">최근 검색어가 없습니다</div>'}</div>`;
   },
   search(i) {
     const [q, res] = SEARCHES[i];
