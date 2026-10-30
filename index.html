@@ -271,6 +271,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .vmeta .av{width:36px;height:36px;border-radius:50%;font-size:14px}
 .vmeta b{font-size:14.5px;font-weight:600;line-height:1.4;display:block}
 .vmeta small{font-size:12px;color:var(--sub);display:block;margin-top:3px}
+.hrow{display:flex;gap:12px;padding:8px 12px;cursor:pointer}
+.hthumb{width:150px;flex-shrink:0;font-size:34px;border-radius:10px;overflow:hidden}
+.hrow .mid{min-width:0}
+.hrow b{font-size:14px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hrow small{display:block;font-size:12px;color:var(--sub);margin-top:3px}
 .player{aspect-ratio:16/9;background:#000;display:grid;place-items:center;position:relative}
 .player .pl{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.15);display:grid;place-items:center;font-size:26px}
 .vtitle{padding:12px;font-size:17px;font-weight:700;line-height:1.4}
@@ -829,6 +834,13 @@ function videos() {
   v.push({ id: 'ghost', title: '밤 11시 30분에 절대 하면 안 되는 것 5가지', ch: '괴담채널', meta: '조회수 5.1만회 · 1개월 전', dur: '9:13', bg: 'linear-gradient(160deg,#000,#2c003e)', emo: '👁', cm: [['쫄보', '모르는 번호로 온 연락 답장하기… 이거 진짜임?']] });
   return v;
 }
+/* 시청 기록에만 있는 영상 (홈 목록에는 안 나옴) */
+const HISTORY_ONLY = [
+  { id: 'vlog', title: '별빛펜션 가는 길 🚌 버스 종점에서 40분 등산 브이로그', ch: '주말여행러', meta: '조회수 3.4천회 · 3년 전', dur: '14:52', bg: 'linear-gradient(160deg,#0b1a2e,#2e4a3d)', emo: '🏕', prog: 100, cm: [['등산러', '밤에 저 갈림길은 진짜 위험함'], ['익명', '그날도 이 길로 올라갔지?']] },
+  { id: 'hide', title: '발신번호 표시제한 전화, 누가 건 건지 알아내는 3가지 방법', ch: '폰박사', meta: '조회수 21만회 · 1년 전', dur: '7:45', bg: 'linear-gradient(160deg,#232526,#414345)', emo: '📵', prog: 35, cm: [['폰박사', '정답: 그 시간에 전화를 걸 수 있었던 사람을 떠올려 보세요']] },
+];
+const findVideo = id => [...videos(), ...HISTORY_ONLY].find(x => x.id === id);
+const YT_TABS = [['🏠', '홈', 'home'], ['⚡', 'Shorts'], ['➕', ''], ['📺', '구독'], ['📁', '보관함', 'history']];
 PAGES.yt = {
   start: 'home',
   home() {
@@ -836,10 +848,27 @@ PAGES.yt = {
     const list = videos().map(v => `<div class="vid" data-go="watch:${v.id}"><div class="thumb" style="background:${v.bg}">${v.emo}<span class="dur ${v.id === 'live' ? 'live' : ''}">${v.id === 'live' ? '다시보기 ' + v.dur : v.dur}</span>${v.prog ? `<span class="prog" style="width:${v.prog}%"></span>` : ''}</div>
       <div class="vmeta">${avatar(v.chn || v.ch, v.chn ? null : '#444', 'round')}<div><b>${v.title}</b><small>${v.ch} · ${v.meta}</small></div></div></div>`).join('');
     return head('<span class="logo-yt"><i></i>YouTube</span>', '<span>🔔</span><span>🔍</span>') + `<div class="scroll"><div class="chips">${chips}</div>${list}</div>` +
-      tabs([['🏠', '홈', 'home'], ['⚡', 'Shorts'], ['➕', ''], ['📺', '구독'], ['📁', '보관함']], 'home');
+      tabs(YT_TABS, 'home');
+  },
+  /* 보관함 → 시청 기록 */
+  history() {
+    const hist = [
+      ['hide', '오늘 · 오후 11:31'],
+      ['case', '오늘 · 이 영상을 7번 시청함'],
+      ['vlog', '어제 · 오전 2:14'],
+      ['ghost', '10월 25일'],
+      ['rain', '10월 22일'],
+    ];
+    if (S.alibi.live) hist.splice(2, 0, ['live', `오늘 · 오후 9:31 (${S.alibi.live}의 공부방 실시간)`]);
+    const rows = hist.map(([id, when]) => {
+      const v = findVideo(id);
+      return `<div class="hrow" data-go="watch:${id}"><div class="thumb hthumb" style="background:${v.bg}">${v.emo}<span class="dur">${v.dur}</span>${v.prog ? `<span class="prog" style="width:${v.prog}%"></span>` : ''}</div>
+        <div class="mid"><b>${v.title}</b><small>${v.ch}</small><small>${when}</small></div></div>`;
+    }).join('');
+    return head('시청 기록', '<span>🔍</span><span>⋮</span>') + `<div class="scroll"><div class="sec">최근 시청한 동영상</div>${rows}</div>` + tabs(YT_TABS, 'history');
   },
   watch(id) {
-    const v = videos().find(x => x.id === id);
+    const v = findVideo(id);
     return head('') + `<div class="scroll"><div class="player" style="background:${v.bg}"><div class="pl">▶</div></div>
       <div class="vtitle">${v.title}</div><div class="vinfo">${v.meta}</div>
       <div class="vmeta" style="padding-bottom:14px;border-bottom:1px solid var(--line)">${avatar(v.chn || v.ch, v.chn ? null : '#444', 'round')}<div><b>${v.ch}</b><small>구독자 ${v.chn ? '1,204' : '38.2만'}명</small></div></div>
@@ -895,8 +924,7 @@ PAGES.settings = {
   },
   blocked() {
     return head('차단된 연락처') + `<div class="scroll"><div class="group">
-      <div class="row"><div class="mid"><div class="t1" style="font-weight:400">010-5517-0319</div><div class="t2">스팸 의심 · 2025.9.28 차단</div></div></div>
-      <div class="row"><div class="mid"><div class="t1" style="font-weight:400">070-8012-3345</div><div class="t2">광고 · 2025.6.3 차단</div></div></div>
+      <div class="row"><div class="mid"><div class="t1" style="font-weight:400">010-5517-0319</div><div class="t2">2022.10.31 차단</div></div></div>
       </div><div class="sec" style="line-height:1.6">${CREEP_NUM}은(는) 차단되어 있지 않습니다.</div></div>`;
   },
   about() {
@@ -933,7 +961,7 @@ function pick(n) {
   }
   S.wrong.push(n); S.tries--;
   S.extra.push(me(`${n}?`, '오후 11:30'));
-  const replies = S.tries === 2 ? ['틀렸어.'] : S.tries === 1 ? ['아니.', '한 번 남았어.'] : ['…'];
+  const replies = ['아닌데...'];
   replies.forEach(t => S.extra.push(them(UNKNOWN, t, '오후 11:30')));
   S.newCount = replies.length + 1; refreshChat();
   if (S.tries === 0) { S.over = true; S.timers.push(setTimeout(() => ending(false), 1600)); }
