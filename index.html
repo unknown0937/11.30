@@ -708,6 +708,63 @@ const INTENTS = [
 /* 아무 말이나 했을 때를 위한 주제별 대답. 사람마다 [대사들] 여러 벌을 돌아가며 쓴다.
    { img: '키' }는 셀카 사진. 순서: TOPIC_FIRST(플러팅보다 먼저 확인) → 플러팅·연락 → TOPIC_ORDER → 기본 키워드 → 질문. 키워드가 없으면 대답하지 않는다 */
 const TOPICS = {
+  /* 사용자가 직접 정한 질문들 (aff: 대답하면 호감도 +1) */
+  thinkme: { aff: true, re: /(나|내) ?생각(했|해|하고|난)|내 ?생각 ?(했|해|나)/, lines: {
+    jay: [['…응 ㅋㅋ', '야구 보는데도 계속 생각나더라']],
+    sh: [['응 ㅎㅎ', '도서관에서 공부하다가도 자꾸 생각났어']],
+    sunoo: [['당연하지이 ㅎㅎ', '하루 종일 너 생각만 했는뎅 💛']],
+    jk: [['응 ㅋㅋ', '사실 지금도 하고 있어']],
+    nk: [['…응', '아까부터 계속']],
+    jw: [['응 ㅎㅎ', '오늘 하루 중에 네 생각 제일 많이 했어']],
+  } },
+  missme: { aff: true, re: /(나|내).{0,3}보고 ?싶었|보고 ?싶었어|나 ?보고 ?싶어\?|나 ?안 ?보고 ?싶/, lines: {
+    jay: [['보고 싶었지 ㅋㅋ', '…많이']],
+    sh: [['응, 보고 싶었어 ㅎㅎ', '내일 볼까?']],
+    sunoo: [['완전 보고 싶었어 🥺', '지금 당장 보러 가고 싶어어']],
+    jk: [['당연하지 ㅋㅋ', '한국 와서 제일 보고 싶었던 게 너야']],
+    nk: [['…응', '보고 싶었어']],
+    jw: [['응 ㅎㅎ 보고 싶었어', '목소리라도 듣고 싶네 😊']],
+  } },
+  pretty: { aff: true, re: /(나|내가) ?(예뻐|이뻐|예쁘|이쁘)|(예뻐|이뻐|예쁘냐|이쁘냐)\?/, lines: {
+    jay: [['당연한걸 묻냐ㅋㅋ']],
+    sh: [['아이고 이뻐 이뻐']],
+    sunoo: [['세상에서 젤 이뻐']],
+    jk: [['갑자기?ㅋㅋㅋ', '이뻐']],
+    nk: [['응 이뻐ㅋㅋ']],
+    jw: [['이쁘지']],
+  } },
+  crush: { re: /좋아하는 ?(사람|애|여자) ?(있|생)/, lines: {
+    jay: [['응?', '아..ㅋㅋ 있을수도 없을수도']],
+    sh: [['있게 없게ㅎㅎ']],
+    sunoo: [['있지ㅋㅎㅋㅎ']],
+    jk: [['음... 비밀!ㅋㅋ']],
+    nk: [['응 있어']],
+    jw: [['응ㅎㅎ']],
+  } },
+  gf: { re: /여자 ?친구|여친|애인 ?(있|생)/, lines: {
+    jay: [['없지 ㅋㅋ', '있으면 이 시간에 너랑 카톡하겠냐']],
+    sh: [['없어 ㅎㅎ', '왜, 궁금했어?']],
+    sunoo: [['없징 ㅎㅎ', '나 너밖에 없는 거 알면서어 🥺']],
+    jk: [['응 있어', '…', '농담이야 ㅋㅋ 없어', '놀랐어?']],
+    nk: [['없어', '…왜 물어봐']],
+    jw: [['없어 ㅎㅎ', '그런 거 물어보면 괜히 설레잖아']],
+  } },
+  date: { aff: true, re: /데이트 ?(할|하자|해|갈|가자)|나랑 ?데이트/, lines: {
+    jay: [['콜 ㅋㅋ', '어디 갈래? 야구장 갈래?']],
+    sh: [['좋아 ㅎㅎ', '맛있는 데 알아 둘게']],
+    sunoo: [['헐 조아조아!! 💛', '내일 당장 가자아']],
+    jk: [['당연하지 ㅋㅋ', '내가 데리러 갈게']],
+    nk: [['…응', '언제? 시간 비워둘게']],
+    jw: [['좋아 ㅎㅎ', '네가 가고 싶은 데로 가자 😊']],
+  } },
+  hold: { aff: true, re: /손 ?(잡|잡아|잡고)/, lines: {
+    jay: [['…갑자기? ㅋㅋ', '…어 돼. 아 부끄럽네']],
+    sh: [['…응 ㅎㅎ', '나 좀 떨리는데']],
+    sunoo: [['헉… 🥺', '조아… 근데 나 손에 땀 나면 어떡해 ㅎㅎ']],
+    jk: [['…ㅋㅋ 당연히 돼', '근데 왜 내가 더 떨리지']],
+    nk: [['…', '…응 돼', '부끄러우니까 그만 물어봐']],
+    jw: [['…ㅎㅎ 응', '좀 부끄럽긴 한데 좋아']],
+  } },
   birthday: { re: /생일|생신|몇 ?년생|나이/, lines: {
     jay: [['02년 4월 20일 ㅋㅋ', '설마 까먹은 거 아니지?']],
     sh: [['12월 8일이야 ㅎㅎ', '02년생. 기억해 줄 거지?']],
@@ -884,12 +941,14 @@ const CUTE_SERIOUS = {
   nk: ['…', '진짜 왜 그래', '…설레잖아'],
   jw: ['…', '진짜 왜 그래…', '너 때문에 잠 다 깼어'],
 };
-const TOPIC_FIRST = ['birthday', 'ideal', 'photo'];
+const TOPIC_FIRST = ['birthday', 'crush', 'gf', 'thinkme', 'missme', 'pretty', 'date', 'hold', 'ideal', 'photo'];
 const TOPIC_ORDER = ['food', 'drink', 'scared', 'bored', 'angry', 'weather', 'study', 'music', 'media', 'meet', 'call', 'thanks', 'sorry', 'laugh', 'bye', 'ok', 'sad'];
 const topicOf = (t, order) => order.find(k => TOPICS[k].re.test(t));
-function topicSay(id, topic) {
+async function topicSay(id, topic) {
   const key = id + ':' + topic;
-  return themSay(id, pickLine(TOPICS[topic].lines[id], (S.topicN[key] = (S.topicN[key] || 0) + 1) - 1));
+  const ok = await themSay(id, pickLine(TOPICS[topic].lines[id], (S.topicN[key] = (S.topicN[key] || 0) + 1) - 1));
+  if (ok && TOPICS[topic].aff) addAffection(charOfChat(id));
+  return ok;
 }
 
 const intentOf = t => (INTENTS.find(([, re]) => re.test(t)) || [null])[0];
