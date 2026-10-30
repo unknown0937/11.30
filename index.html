@@ -21,6 +21,8 @@ body{
 }
 button,input{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .intro{max-width:290px}
+/* 잠금을 풀면 옆 설명은 사라지고 폰만 화면 가운데에 */
+body.playing .intro{display:none}
 .intro h1{font-size:76px;font-weight:200;letter-spacing:2px}
 .intro p{color:#b5b0cc;line-height:1.8;font-size:14px;margin-top:14px}
 .intro small{display:block;color:#6f6a88;margin-top:24px;font-size:12px;line-height:1.8}
@@ -1091,6 +1093,7 @@ $('#keypad').addEventListener('click', e => {
 });
 function checkCode() {
   if (code === '0000') {
+    document.body.classList.add('playing');
     renderHome(); show('home');
     if (S.unread.sunoo) scheduleNudge('sunoo');
     if (!S.dmTimer) { S.dmTimer = true; const g = S; S.timers.push(setTimeout(() => { if (S === g) receiveDM(); }, 25000)); }
@@ -1953,6 +1956,7 @@ function restart() {
   closeModal();
   $('#phint').textContent = '';
   stack = [];
+  document.body.classList.remove('playing');
   show('start');
 }
 
