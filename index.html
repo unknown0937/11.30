@@ -669,13 +669,173 @@ const CONFESS_AT = 10;   // 호감도가 이만큼(가득) 차야 고백한다
 /* 키워드 → 대답 종류. 순서대로 먼저 맞는 것을 쓴다.
    flirt(플러팅): 니키·종성은 부끄러워하고 나머지는 능숙하게 받아친다. 누구든 호감도 +1 */
 const INTENTS = [
-  ['flirt', /좋아해|좋아|보고 ?싶|귀여|잘생|멋있|예뻐|예쁘|설레|사랑|반했|심쿵|두근|내 ?스타일|데이트|손 ?잡|안아|애인|남친|자기야|내 ?꺼|내 ?거/],
+  ['flirt', /좋아해|(너|니|네|널|당신).{0,4}좋아|보고 ?싶|귀여|잘생|멋있|예뻐|예쁘|설레|사랑|반했|심쿵|두근|내 ?스타일|데이트|손 ?잡|안아|애인|남친|자기야|내 ?꺼|내 ?거/],
   ['you', /연락|너야|너지|익명|모르는 ?번호|알 ?수 ?없|보냈/],
   ['now', /뭐 ?해|뭐하|모해|머해|뭐함|어디|지금/],
   ['day', /하루|어땠|오늘|피곤|힘들/],
   ['night', /잘 ?자|자야|졸려|굿밤|굿나잇/],
   ['hi', /안녕|하이|ㅎㅇ|hello|hi\b/i],
 ];
+/* 아무 말이나 했을 때를 위한 주제별 대답. 사람마다 [대사들] 여러 벌을 돌아가며 쓴다.
+   { img: '키' }는 셀카 사진. 순서: TOPIC_FIRST(플러팅보다 먼저 확인) → 플러팅·연락 → TOPIC_ORDER → 기본 키워드 → 질문 → 아무 말 */
+const TOPICS = {
+  favorite: { re: /(뭐|무슨|어떤|뭘|머).{0,8}좋아/, lines: {
+    jay: [['기타랑 야구 ㅋㅋ', '…그리고 하나 더 있는데 비밀']],
+    sh: [['조용한 도서관이랑 따뜻한 커피 ㅎㅎ', '요즘은 너랑 카톡하는 것도']],
+    sunoo: [['떡볶이!! ㅎㅎ', '그리구 너랑 노는 거 💛']],
+    jk: [['강아지랑 한국 음식 ㅋㅋ', '그리고… 음 나중에 말해줄게']],
+    nk: [['춤.', '…딸기우유.']],
+    jw: [['비 오는 날 산책 ㅎㅎ', '같이 걸을 사람 있으면 더 좋고']],
+  } },
+  ideal: { re: /이상형|어떤 ?사람 ?좋아|좋아하는 ?(사람|스타일|타입)/, lines: {
+    jay: [['이상형? ㅋㅋ', '…지금 나랑 카톡하는 사람 정도?']],
+    sh: [['이상형 ㅎㅎ', '밤늦게 이렇게 연락해 주는 사람?']],
+    sunoo: [['내 이상형은 말 안 해도 통하는 사람 ㅎㅎ', '…누구랑 비슷하지 않아? 🥺']],
+    jk: [['음… 웃는 거 예쁜 사람', '아 너 말하는 거 아니고 ㅋㅋ …맞는데']],
+    nk: [['…비밀.', '…말 안 해도 알 텐데.']],
+    jw: [['상냥한 사람 ㅎㅎ', '너처럼']],
+  } },
+  photo: { re: /사진|셀카|얼굴 ?보|얼굴 ?좀/, lines: {
+    jay: [['ㅋㅋ 또 보고 싶어?', { img: 'jay' }]],
+    sh: [['ㅎㅎ 좀 부끄러운데', { img: 'sh' }]],
+    sunoo: [['히히 특별히 보내주는 고야 ㅎㅎ', { img: 'sn' }]],
+    jk: [['ㅋㅋ 너만 보는 거다', { img: 'jk' }]],
+    nk: [['…왜.', { img: 'nk' }, '이거면 됨?']],
+    jw: [['ㅎㅎ 잘 나왔나 모르겠다', { img: 'jw' }]],
+  } },
+  food: { re: /배고|배고파|밥|먹었|먹을|먹고|야식|치킨|라면|피자|맛있|간식|떡볶이/, lines: {
+    jay: [['또 배고파? ㅋㅋ', '이 시간에 라면 먹으면 내일 붓는다 ㅋㅋ'], ['나도 배고프다 ㅋㅋ 야구장 핫도그라도 사갈까']],
+    sh: [['이 시간에 먹으면 속 불편해 ㅎㅎ', '내일 아침에 맛있는 거 먹자'], ['밥은 제대로 챙겨 먹었어?']],
+    sunoo: [['헉 나두 배고파아 🥺', '내일 떡볶이 두 배로 먹자 ㅎㅎ'], ['야식 먹을 거면 나도 불러조 ㅎㅎ']],
+    jk: [['뭐 먹고 싶어? ㅋㅋ', '내일 내가 사줄게'], ['한국 야식 최고지 ㅋㅋ 치킨 시킬까?']],
+    nk: [['이 시간에 먹으면 안 됨.', '…딸기우유는 괜찮음.'], ['밥은 먹었음?']],
+    jw: [['배고프구나 ㅎㅎ 뭐라도 좀 챙겨 먹어', '빈속으로 자면 속 쓰려'], ['내일 맛있는 거 먹으러 가자 😊']],
+  } },
+  drink: { re: /커피|카페|라떼|술|맥주|소주|한잔|한 잔/, lines: {
+    jay: [['술 마셨냐? ㅋㅋ', '취한 거 아니지?']],
+    sh: [['이 시간에 커피 마시면 잠 못 자 ㅎㅎ']],
+    sunoo: [['카페 투어 또 가자아 ☕ ㅎㅎ']],
+    jk: [['한잔하고 싶어? ㅋㅋ', '다음에 같이 마시자']],
+    nk: [['카페인 그만.']],
+    jw: [['따뜻한 거 마시고 자 ㅎㅎ']],
+  } },
+  scared: { re: /무서|무섭|겁나|귀신/, lines: {
+    jay: [['무섭냐? ㅋㅋ', '…전화해 줄까?']],
+    sh: [['괜찮아 ㅎㅎ', '무서우면 전화해. 받을게']],
+    sunoo: [['헉 무서워? 🥺', '나랑 카톡하면서 자자아']],
+    jk: [['괜찮아, 나 여기 있어', '잠들 때까지 얘기해 줄게']],
+    nk: [['…무서우면 불 켜고 자.', '아니면 연락하든가.']],
+    jw: [['무서웠구나 ㅎㅎ', '잠들 때까지 옆에 있어 줄게. 카톡으로라도 😊']],
+  } },
+  bored: { re: /심심|할 ?게 ?없|할 ?거 ?없|지루/, lines: {
+    jay: [['심심하면 나랑 놀자 ㅋㅋ', '기타 쳐서 녹음해 보내줄까?']],
+    sh: [['심심하구나 ㅎㅎ', '그럼 나랑 얘기하자']],
+    sunoo: [['나두 심심해애 ㅎㅎ', '우리 밤새 카톡할까? 🥺']],
+    jk: [['그럼 나랑 놀아 ㅋㅋ', '강아지 얘기 더 해줄까?']],
+    nk: [['…그럼 자.'], ['심심하면 연락하든가.']],
+    jw: [['심심하구나 ㅎㅎ', '나랑 얘기하자. 오늘 뭐 했어?']],
+  } },
+  angry: { re: /짜증|화나|열받|빡쳐|빡치|스트레스/, lines: {
+    jay: [['누가 열받게 했어? ㅋㅋ', '말만 해. 내가 혼내줌']],
+    sh: [['무슨 일 있었구나', '스트레스 받을 땐 좀 쉬어 ㅎㅎ']],
+    sunoo: [['누가 너 화나게 해써 😠', '내가 혼내줄게에']],
+    jk: [['누가 그랬어? ㅋㅋ', '화난 것도 귀엽긴 한데… 아 미안 ㅋㅋ']],
+    nk: [['누구.', '…말해.']],
+    jw: [['많이 속상했구나', '내일 맛있는 거 사줄게 ㅎㅎ']],
+  } },
+  weather: { re: /추워|춥다|추운|더워|덥다|날씨|비 ?와|눈 ?와|바람/, lines: {
+    jay: [['오늘 좀 춥더라 ㅋㅋ', '이불 꼭 덮고 자']],
+    sh: [['밤에 많이 쌀쌀하더라', '따뜻하게 하고 자 ㅎㅎ']],
+    sunoo: [['추워어 🥶', '수면양말 신구 자 ㅎㅎ']],
+    jk: [['한국 날씨 진짜 오랜만이다 ㅋㅋ', '감기 걸리지 마']],
+    nk: [['옷 따뜻하게 입어.']],
+    jw: [['감기 조심해 ㅎㅎ', '따뜻한 물 한 잔 마시고 자 😊']],
+  } },
+  study: { re: /공부|시험|과제|숙제|수업|학교|레포트|발표|알바|출근|회사/, lines: {
+    jay: [['아 과제 얘기하지 마 ㅋㅋ', '나도 아직 안 했어']],
+    sh: [['막히는 거 있으면 물어봐 ㅎㅎ', '내가 도와줄게']],
+    sunoo: [['과제 시로오 ㅠㅠ', '우리 같이 카페 가서 하자아']],
+    jk: [['한국 수업 다시 적응 중이야 ㅋㅋ', '너도 화이팅']],
+    nk: [['…수업 때 졸지 마.']],
+    jw: [['너무 무리하지 마 ㅎㅎ', '쉬엄쉬엄 해']],
+  } },
+  music: { re: /노래|음악|플리|플레이리스트|가수|기타/, lines: {
+    jay: [['노래 추천해 줄까? ㅋㅋ', '아니다, 내가 직접 불러줄게']],
+    sh: [['요즘 뭐 들어? ㅎㅎ', '나도 추천해 줘']],
+    sunoo: [['나 요즘 한 노래 무한반복 중이양 ㅎㅎ', '나중에 같이 들어']],
+    jk: [['나 요즘 한국 노래만 들어 ㅋㅋ', '추천해 줘']],
+    nk: [['춤 연습 노래만 들음.']],
+    jw: [['좋은 노래 있으면 공유해 줘 ㅎㅎ']],
+  } },
+  media: { re: /게임|영화|드라마|넷플|웹툰|애니|유튜브/, lines: {
+    jay: [['게임 한 판 할래? ㅋㅋ']],
+    sh: [['요즘 볼 만한 거 있어? ㅎㅎ', '같이 보자']],
+    sunoo: [['우리 영화 보러 가자아 🎬 ㅎㅎ']],
+    jk: [['한국 드라마 추천해 줘 ㅋㅋ', '같이 보면 더 좋고']],
+    nk: [['…그거 나도 봄.']],
+    jw: [['재밌는 거 있으면 같이 보자 ㅎㅎ']],
+  } },
+  meet: { re: /만나|보자|놀자|만날래|주말|내일 ?뭐|약속|놀러/, lines: {
+    jay: [['ㅋㅋ 내일 볼래?', '야구 끝나고 연락할게']],
+    sh: [['좋아 ㅎㅎ 시간 맞춰 보자', '맛있는 데 데려갈게']],
+    sunoo: [['조아조아 ㅎㅎ 💛', '내일 떡볶이 먹고 카페까지 가자아']],
+    jk: [['좋지 ㅋㅋ', '언제든 불러. 바로 나갈게']],
+    nk: [['…언제.', '시간 되면.']],
+    jw: [['좋아 ㅎㅎ 언제가 편해?', '네 시간에 맞출게 😊']],
+  } },
+  call: { re: /전화|통화|영통|목소리/, lines: {
+    jay: [['지금? ㅋㅋ', '…목소리 들으면 잠 다 깰 것 같은데']],
+    sh: [['ㅎㅎ 지금은 늦었으니까', '내일 통화하자']],
+    sunoo: [['웅 전화해 전화해 ㅎㅎ 🥺']],
+    jk: [['나야 좋지 ㅋㅋ', '근데 네 목소리 들으면 못 끊을 것 같아']],
+    nk: [['…지금은 안 됨.', '내일.']],
+    jw: [['늦었는데 괜찮아? ㅎㅎ', '그럼 잠깐만 통화하자']],
+  } },
+  thanks: { re: /고마워|고맙|땡큐|감사/, lines: {
+    jay: [['고맙긴 ㅋㅋ']], sh: [['ㅎㅎ 별말을']], sunoo: [['헤헤 뭘 이런 걸루 💛']],
+    jk: [['고맙긴 ㅋㅋ 너니까']], nk: [['…응.']], jw: [['고마워할 거 없어 ㅎㅎ']],
+  } },
+  sorry: { re: /미안|쏘리|죄송/, lines: {
+    jay: [['뭐가 미안해 ㅋㅋ']], sh: [['괜찮아 ㅎㅎ']], sunoo: [['괜차나 괜차나 ㅎㅎ']],
+    jk: [['괜찮아 ㅋㅋ 신경 쓰지 마']], nk: [['…됐어.']], jw: [['괜찮아, 미안해할 거 없어 😊']],
+  } },
+  laugh: { re: /^[ㅋㅎ\s]{2,}$|웃겨|웃기|개웃/, lines: {
+    jay: [['ㅋㅋㅋㅋ 왜 웃어']], sh: [['ㅎㅎ 뭐가 그렇게 웃겨']], sunoo: [['헤헤 나도 웃겨 ㅎㅎ']],
+    jk: [['ㅋㅋㅋ 너 웃는 거 상상돼']], nk: [['…뭐가 웃김.']], jw: [['ㅎㅎ 웃으니까 좋다']],
+  } },
+  bye: { re: /바이|빠이|이따 ?봐|나중에 ?(봐|얘기)|끊을게|갈게/, lines: {
+    jay: [['ㅇㅋ 잘 자라 ㅋㅋ']], sh: [['그래 ㅎㅎ 또 연락해']], sunoo: [['웅웅 빠이 💛']],
+    jk: [['응 이따 연락해 ㅋㅋ']], nk: [['ㅇㅇ.']], jw: [['응 ㅎㅎ 또 연락해']],
+  } },
+  ok: { re: /^(응|웅|ㅇㅇ|어|그래|ㅇㅋ|오케이|알겠어|알았어|맞아|그치|ㄱㄱ)[.!~ㅋㅎ\s]*$/, lines: {
+    jay: [['ㅋㅋ 대답 짧다']], sh: [['ㅎㅎ 그래서 오늘은 뭐 했어?']], sunoo: [['웅웅 ㅎㅎ 그래서 그래서?']],
+    jk: [['ㅋㅋ 그래서 지금 뭐 하고 있었어?']], nk: [['ㅇㅇ.']], jw: [['응 ㅎㅎ 그래서?']],
+  } },
+  sad: { re: /슬퍼|우울|속상|눈물|울었|울고|외로|힘들어|ㅠㅠ|ㅜㅜ/, lines: {
+    jay: [['왜 무슨 일 있어?', '…말해 봐. 다 들어줄게'], ['울지 마 ㅋㅋ 아니 웃으라는 게 아니라…', '그냥 내가 옆에 있을게']],
+    sh: [['무슨 일 있었어?', '천천히 얘기해. 나 안 자고 있을게'], ['힘들 땐 힘들다고 말해도 돼 ㅎㅎ']],
+    sunoo: [['헉 왜애 🥺 무슨 일이야', '내가 지금 달려갈까?'], ['울지마아 ㅠㅠ 내가 꼬옥 안아줄게 💛']],
+    jk: [['무슨 일 있어?', '나한테 다 말해도 돼'], ['네가 속상하면 나도 속상해']],
+    nk: [['…왜.', '누가 그랬음?'], ['…울지 마.', '내일 딸기우유 사줌.']],
+    jw: [['괜찮아? 무슨 일 있었어?', '언제든 얘기해 줘'], ['오늘 많이 힘들었구나', '푹 자고 일어나면 조금 나아질 거야 😊']],
+  } },
+  question: { re: /\?|왜|어떻게|언제|무슨|뭐야|누구/, lines: {
+    jay: [['음… 글쎄 ㅋㅋ', '너는 어떻게 생각하는데?'], ['그건 비밀 ㅋㅋ']],
+    sh: [['음 ㅎㅎ 좋은 질문이다', '내일 만나서 얘기해 줄게']],
+    sunoo: [['우웅… 모르겠어 ㅎㅎ', '너는?']],
+    jk: [['음… ㅋㅋ', '그건 직접 만나서 알려줄게']],
+    nk: [['몰라.'], ['…왜 궁금함.']],
+    jw: [['음 ㅎㅎ 글쎄', '너는 어떻게 생각해?']],
+  } },
+};
+const TOPIC_FIRST = ['ideal', 'photo'];
+const TOPIC_ORDER = ['food', 'drink', 'scared', 'bored', 'angry', 'weather', 'study', 'music', 'media', 'meet', 'call', 'thanks', 'sorry', 'laugh', 'bye', 'ok', 'sad'];
+const topicOf = (t, order) => order.find(k => TOPICS[k].re.test(t));
+function topicSay(id, topic) {
+  const key = id + ':' + topic;
+  return themSay(id, pickLine(TOPICS[topic].lines[id], (S.topicN[key] = (S.topicN[key] || 0) + 1) - 1));
+}
+
 const intentOf = t => (INTENTS.find(([, re]) => re.test(t)) || [null])[0];
 /* 메시지에 들어 있는 등장인물 이름 → 번호 (없으면 -1) */
 const nameIn = t => { const low = t.toLowerCase(); return CHARS.findIndex(c => CHAT_STYLE[c.chat].alias.some(a => low.includes(a))); };
@@ -703,7 +863,7 @@ function newGame(name) {
     unread: { sunoo: 2, sms: 1 },
     extra: {}, newCount: {}, touched: {}, clock: 0, asked: {}, arrived: false,
     queue: {}, idle: {}, nudged: {}, nudgeT: {},
-    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {}, flirted: {}, confess: {}, love: {},
+    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {},
     step: 0, typing: null,
     tries: 3, wrong: [], over: false,
     revealed: false, phase: 'guess',   // guess → answer(고백에 대답) → done
@@ -989,16 +1149,7 @@ async function respond(id, text) {
     if (ok && sp[2] === 'jealous' && !S.jealous[id]) { S.jealous[id] = true; addAffection(ci); }
     return ok;
   }
-  const intent = intentOf(text);
-  if (intent === 'you') {
-    if (!S.arrived) return themSay(id, [`무슨 연락? ${c.laugh}`]);
-    return themSay(id, c.replies[ci === S.culprit ? 'youGuilty' : 'you']);
-  }
-  if (intent === 'now' || intent === 'day') {
-    if (asked.has(intent)) return themSay(id, st.again);
-    asked.add(intent);
-    return themSay(id, c.replies[intent]);
-  }
+  if (TOPICS.favorite.re.test(text)) return topicSay(id, 'favorite');
   /* 좋아해 → (장난으로 받음) → 진짠데? → (설레게 받아침) */
   if (S.love[id] === 'teased' && SERIOUS_RE.test(text)) {
     S.love[id] = 'done';
@@ -1012,12 +1163,27 @@ async function respond(id, text) {
     if (ok) addAffection(ci);
     return ok;
   }
+  const first = topicOf(text, TOPIC_FIRST);
+  if (first) return topicSay(id, first);
+  const intent = intentOf(text);
   if (intent === 'flirt') {
     const ok = await themSay(id, pickLine(st.flirt, (S.flirted[id] = (S.flirted[id] || 0) + 1) - 1));
     if (ok) addAffection(ci);
     return ok;
   }
+  if (intent === 'you') {
+    if (!S.arrived) return themSay(id, [`무슨 연락? ${c.laugh}`]);
+    return themSay(id, c.replies[ci === S.culprit ? 'youGuilty' : 'you']);
+  }
+  const topic = topicOf(text, TOPIC_ORDER);
+  if (topic) return topicSay(id, topic);
+  if (intent === 'now' || intent === 'day') {
+    if (asked.has(intent)) return themSay(id, st.again);
+    asked.add(intent);
+    return themSay(id, c.replies[intent]);
+  }
   if (intent) return themSay(id, st[intent]);
+  if (TOPICS.question.re.test(text)) return topicSay(id, 'question');
   return themSay(id, [pickLine(st.idle, S.idle[id] = (S.idle[id] || 0) + 1)]);
 }
 /* 읽씹하면: 한참 안 읽은 채팅방에서 한 번 더 연락이 온다 */
