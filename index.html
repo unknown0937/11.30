@@ -1046,12 +1046,27 @@ function newGame(name) {
     unread: { sunoo: 2, sms: 1 },
     extra: {}, newCount: {}, touched: {}, clock: 0, asked: {}, arrived: false,
     queue: {}, nudged: {}, nudgeT: {},
-    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, myBirthday: null, unblocked: false, calls: [], inCall: null, heartStory: {}, called: {}, askN: {}, askState: {}, dmGot: false, dmRead: false, dmUnread: 0, dmTimer: false, myStory: null, composeTag: null, memoOpen: new Set(), cuteN: {},
+    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, chimed: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, myBirthday: null, unblocked: false, calls: [], inCall: null, heartStory: {}, called: {}, askN: {}, askState: {}, dmGot: false, dmRead: false, dmUnread: 0, dmTimer: false, myStory: null, composeTag: null, memoOpen: new Set(), cuteN: {},
     step: 0, typing: null,
     tries: 3, wrong: [], over: false,
     revealed: false, phase: 'guess',   // guess → answer(고백에 대답) → done
     pending: null, timers: [],
   };
+}
+/* 내 인스타 아이디: 한글 이름을 영어 발음대로 (예: 수진 → sujin). 미지만 mejee */
+const RR = {
+  ini: ['g', 'kk', 'n', 'd', 'tt', 'r', 'm', 'b', 'pp', 's', 'ss', '', 'j', 'jj', 'ch', 'k', 't', 'p', 'h'],
+  mid: ['a', 'ae', 'ya', 'yae', 'eo', 'e', 'yeo', 'ye', 'o', 'wa', 'wae', 'oe', 'yo', 'u', 'wo', 'we', 'wi', 'yu', 'eu', 'ui', 'i'],
+  fin: ['', 'k', 'k', 'k', 'n', 'n', 'n', 't', 'l', 'k', 'm', 'l', 'l', 'l', 'p', 'l', 'm', 'p', 'p', 't', 't', 'ng', 't', 't', 'k', 't', 'p', 't'],
+};
+function myHandle() {
+  if (S.name === '미지') return 'mejee';
+  const out = [...S.name].map(ch => {
+    const c = ch.charCodeAt(0) - 0xAC00;
+    if (c < 0 || c > 11171) return /[a-z0-9._]/i.test(ch) ? ch.toLowerCase() : '';
+    return RR.ini[Math.floor(c / 588)] + RR.mid[Math.floor((c % 588) / 28)] + RR.fin[c % 28];
+  }).join('');
+  return out || 'me';
 }
 const call = () => josa(S.name, '아', '야');   // 지민아 / 미지야
 const unknownName = () => S.revealed ? CHARS[S.culprit].label : UNKNOWN;
@@ -1539,10 +1554,19 @@ function addComment(id, text) {
     const box = document.querySelector(`[data-cms="${id}"]`);
     if (box) box.insertAdjacentHTML('beforeend', commentHTML(c, true));
   };
-  put([S.name, text]);
+  put([myHandle(), text]);
   addAffection(who);
   const g = S, k = (S.replied[who] = (S.replied[who] || 0) + 1);
-  S.timers.push(setTimeout(() => { if (S === g) put([CHARS[who].handle, `@${S.name} ${pickLine(COMMENT_REPLY[who], k - 1)}`]); }, 1800));
+  /* 게시물 주인이 댓글 내용에 맞춰 답글 (칭찬·질문·웃음·놀림), 아니면 기본 답글 */
+  const kind = COMMENT_KINDS.find(([, re]) => re.test(text));
+  const line = kind ? COMMENT_TALK[kind[0]][who] : pickLine(COMMENT_REPLY[who], k - 1);
+  S.timers.push(setTimeout(() => { if (S === g) put([CHARS[who].handle, `@${myHandle()} ${line}`]); }, rnd(1800, 3200)));
+  /* 가끔 다른 멤버가 끼어든다 (게시물마다 한 번) */
+  if (!S.chimed[id] && Math.random() < 0.5) {
+    S.chimed[id] = true;
+    const other = shuffle(CHARS.map((_, i) => i).filter(i => i !== who))[0];
+    S.timers.push(setTimeout(() => { if (S === g) put([CHARS[other].handle, `@${CHARS[who].handle} ${COMMENT_CHIME[other]}`]); }, rnd(4500, 6500)));
+  }
   if (id === 'shpic' && !S.shContacted) { S.shContacted = true; shContact(); }
 }
 /* 성훈: 댓글을 보고 연락해 온다 */
@@ -1871,6 +1895,21 @@ function instaPosts() {
   ];
 }
 /* 댓글을 달면 게시물 주인이 답글을 단다 (호감도도 오른다) */
+/* 댓글 내용별 답글 (CHARS 순서: 종성, 성훈, 선우, 재윤, 니키, 정원) */
+const COMMENT_KINDS = [
+  ['tease', /못생|별로|아저씨|이상해|뭐야 이게|웃기게/],
+  ['praise', /멋있|멋지|잘생|예쁘|이쁘|귀여|최고|미쳤|대박|좋다|사랑|♥|❤|😍|🥰/],
+  ['question', /\?|어디|뭐 ?해|언제|누구|뭐야/],
+  ['laugh', /ㅋㅋ|ㅎㅎ|웃겨|웃기/],
+];
+const COMMENT_TALK = {
+  praise: ['…갑자기 칭찬하니까 이상하네 ㅋㅋ 고마워', '그렇게 말해주니까 기분 좋다 ㅎㅎ', '히히 너가 더 귀여워 💛', 'ㅋㅋ 너한테 듣는 게 제일 좋아', '…고마워', '고마워 ㅎㅎ 너 덕분에 기분 좋다 😊'],
+  question: ['ㅋㅋ 궁금하면 카톡해', '궁금한 거 있으면 카톡으로 물어봐 ㅎㅎ', '카톡으로 알려줄게에 ㅎㅎ', '카톡으로 말해줄게 ㅋㅋ', '카톡해', '카톡으로 자세히 얘기해 줄게 ㅎㅎ'],
+  laugh: ['ㅋㅋㅋ 왜 웃어', 'ㅎㅎ 뭐가 그렇게 웃겨', '헤헤 ㅎㅎ 같이 웃어', 'ㅋㅋㅋ 너 웃는 거 상상돼', '…뭐가 웃겨', 'ㅎㅎ 웃어주니까 좋다'],
+  tease: ['야 ㅋㅋ 너 진짜', '아이고 ㅎㅎ 상처받았다', '힝 너무해애 🥺', '아 ㅋㅋ 너무하다', '…너도', 'ㅎㅎ 너무해'],
+};
+/* 다른 사람 게시물에 내가 댓글을 달면 끼어드는 말 */
+const COMMENT_CHIME = ['…나한테도 댓글 달아줘라 ㅋㅋ', '좋겠다 ㅎㅎ', '나도 댓글 받고 시퍼 🥺', '나한테도 댓글 달아줘 ㅋㅋ', '…', '둘이 친하네 ㅎㅎ'];
 const COMMENT_REPLY = [
   ['ㅋㅋ 땡큐', '너 댓글 기다렸다 ㅋㅋ'],
   ['ㅎㅎ 고마워', '댓글 달아줘서 좋다 ㅎㅎ'],
@@ -1898,7 +1937,7 @@ function postHTML(p) {
     <div class="ptxt"><b>${c.handle}</b> ${p.text}</div><div class="pcms" data-cms="${p.id}">${cm}</div>
     <form class="cform" data-post="${p.id}"><input maxlength="60" placeholder="댓글 달기..." autocomplete="off"><button type="submit">게시</button></form></article>`;
 }
-const INSTA_TABS = [['🏠', '홈', 'feed'], ['🔍', '검색'], ['🎬', '릴스'], ['🛍', '쇼핑'], ['👤', '프로필']];
+const INSTA_TABS = [['🏠', '홈', 'feed'], ['🔍', '검색'], ['➕', '게시글 추가'], ['🎬', '릴스'], ['👤', '프로필', 'me']];
 PAGES.insta = {
   start: 'feed',
   feed() {
@@ -1937,6 +1976,12 @@ PAGES.insta = {
     return head('스토리 만들기') + `<div class="scroll"><div class="cmp" style="background:var(--wallbg)"><div class="mys-t">보고 싶다 🍀</div>${t === null ? '<div class="mys-tag dim">@누구를 태그할까?</div>' : `<div class="mys-tag">@${CHARS[t].handle}</div>`}</div>
       <div class="sec">태그할 사람 (한 명)</div><div class="tagl">${CHARS.map((c, i) => `<button class="tagb ${t === i ? 'on' : ''}" data-tag="${i}">${avatarPh(i, 'round')}<span>${c.handle}</span></button>`).join('')}</div>
       <div style="padding:16px 16px 30px"><button class="chipb main" style="width:100%;${t === null ? 'opacity:.4' : ''}" data-act="share">스토리에 공유</button></div></div>`;
+  },
+  /* 내 프로필 (아래 탭의 「프로필」) */
+  me() {
+    return head(myHandle()) + `<div class="scroll"><div class="prof">${avatar(S.name, '#555', 'round')}<div class="pstat"><div><b>0</b>게시물</div><div><b>312</b>팔로워</div><div><b>286</b>팔로잉</div></div></div>
+      <div class="pbio"><b>${esc(S.name)}</b><br>🌙</div>
+      <div class="sec" style="text-align:center;padding:40px 16px">아직 게시물이 없어요</div></div>` + tabs(INSTA_TABS, 'me');
   },
   /* 프로필에서 게시물 하나를 눌렀을 때 */
   post(id) {
