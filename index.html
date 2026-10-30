@@ -1413,6 +1413,8 @@ async function respondUnknown(text) {
   const i = nameIn(text);
   if (i >= 0) return pickFlow(i);
   if (/(내|나의|제) ?생일|나 ?생일/.test(text)) return themSay('unknown', [`${myBday()}. 내가 그걸 잊을 리가 ${c.laugh}`]);
+  /* "누구야"를 다섯 번째 물어보면 서운해한다 */
+  if (/누구|누군/.test(text) && (S.whoN = (S.whoN || 0) + 1) === 5) return themSay('unknown', ['…', '서운해ㅠㅠ', '진짜 나 누군지 하나도 모르겠어?']);
   if (/누구|누군|힌트|기억|모르|알려|뭐야/.test(text)) return hintFlow();
   if (CUTE_RE.test(text)) return themSay('unknown', [`…귀엽다고? ${c.laugh}`, '그 말 들으려고 연락한 건 아닌데… 좋다']);
   /* 키워드가 없으면 대답하지 않는다 */
