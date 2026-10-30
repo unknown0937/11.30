@@ -1850,12 +1850,12 @@ PAGES.phone = {
 /* ===================== 문자 ===================== */
 function smsList() {
   return [
-    /* 차단한 희승에게서 온 문자: 차단을 풀어야 보인다 */
-    { id: 'hs', from: S.unblocked ? '희승' : '차단된 연락처', last: S.unblocked ? '나 벌써 잊어버렸어?' : '가려진 메시지가 있습니다', time: '오후 11:02', hidden: !S.unblocked },
     { id: 'dawn', from: '1588-1255', last: '[Web발신] 새벽배송 상품이 출고되었습니다. 내일 오전 7시 전 도착 예정', time: '오후 10:52' },
     { id: 'auth', from: '1599-0001', last: '[Web발신] [모바일뱅킹] 인증번호 [482913]를 입력해 주세요.', time: '오후 9:58' },
     { id: 'card', from: '1588-8100', last: '[Web발신] ○○카드 승인 4,800원 편의점 일시불', time: '오후 9:41' },
     { id: 'jake', from: '010-4821-0915', last: 'Hey! 재윤이야 ㅋㅋ 한국 번호 새로 만들었어. 저장해 줘!', time: '10월 27일', unread: S.unread.sms },
+    /* 차단한 희승에게서 온 문자: 맨 아래에 있고, 차단을 풀어야 보인다 */
+    { id: 'hs', from: S.unblocked ? '희승' : '차단된 연락처', last: S.unblocked ? '나 벌써 잊어버렸어?' : '가려진 메시지가 있습니다', time: '오후 11:02', hidden: !S.unblocked },
   ];
 }
 PAGES.sms = {
