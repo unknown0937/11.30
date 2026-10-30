@@ -1073,7 +1073,7 @@ function newGame(name) {
     unread: { sunoo: 2, sms: 1 },
     extra: {}, newCount: {}, touched: {}, clock: 0, asked: {}, arrived: false,
     queue: {}, nudged: {}, nudgeT: {},
-    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, chimed: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, myBirthday: null, unblocked: false, likeWindow: null, calls: [], inCall: null, heartStory: {}, called: {}, askN: {}, askState: {}, dmGot: false, dmRead: false, dmUnread: 0, dmTimer: false, myStory: null, composeTag: null, memoOpen: new Set(), cuteN: {},
+    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, chimed: {}, cmtDM: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, myBirthday: null, unblocked: false, likeWindow: null, calls: [], inCall: null, heartStory: {}, called: {}, askN: {}, askState: {}, dmGot: false, dmRead: false, dmUnread: 0, dmTimer: false, myStory: null, composeTag: null, memoOpen: new Set(), cuteN: {},
     step: 0, typing: null,
     tries: 3, wrong: [], over: false,
     revealed: false, phase: 'guess',   // guess → answer(고백에 대답) → done
@@ -1597,8 +1597,22 @@ function addComment(id, text) {
     const other = shuffle(CHARS.map((_, i) => i).filter(i => i !== who))[0];
     S.timers.push(setTimeout(() => { if (S === g) put([CHARS[other].handle, `@${CHARS[who].handle} ${COMMENT_CHIME[other]}`]); }, rnd(4500, 6500)));
   }
-  if (id === 'shpic' && !S.shContacted) { S.shContacted = true; shContact(); }
+  /* 그 사람 게시물에 처음 댓글을 달면, 잠시 뒤 카톡으로 먼저 연락이 온다 (사람마다 한 번) */
+  if (id === 'shpic' && !S.shContacted) { S.shContacted = true; S.cmtDM[who] = true; shContact(); }
+  else if (!S.cmtDM[who]) {
+    S.cmtDM[who] = true;
+    const chat = CHARS[who].chat;
+    S.timers.push(setTimeout(() => { if (S === g) enqueue(chat, () => themSay(chat, COMMENT_DM[chat])); }, rnd(4000, 7000)));
+  }
 }
+const COMMENT_DM = {
+  jay: ['댓글 봤다 ㅋㅋ', '아직 안 자냐?'],
+  sh: ['댓글 봤어 ㅎㅎ', '아직 안 잤나 보네'],
+  sunoo: ['댓글 봤지롱 ㅎㅎ', '심심해? 나랑 놀자아 🥺'],
+  jk: ['댓글 봤어 ㅋㅋ', '아직 안 자나 보네?'],
+  nk: ['댓글 봤어', '심심해?ㅋㅋ'],
+  jw: ['댓글 봤어 ㅎㅎ', '아직 안 잤구나. 일찍 자야지 😊'],
+};
 /* 성훈: 댓글을 보고 연락해 온다 */
 async function shContact() {
   const g = S;
