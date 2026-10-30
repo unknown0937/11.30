@@ -228,6 +228,15 @@ button,input{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .note{padding:4px 22px 40px;font-size:16px;line-height:1.85;white-space:pre-wrap;word-break:keep-all}
 .note .nd{font-size:12.5px;color:var(--sub);text-align:center;margin-bottom:14px}
 .note h2{font-size:24px;margin-bottom:8px}
+.mlock{text-align:center;padding:60px 30px}
+.mlock-ic{font-size:46px}
+.mlock h3{margin-top:12px;font-size:19px}
+.mlock p{color:var(--sub);font-size:14px;margin-top:8px;line-height:1.6}
+.mform{display:flex;gap:8px;margin:22px auto 0;max-width:240px}
+.mform input{flex:1;min-width:0;text-align:center;padding:11px;border-radius:12px;background:#1c1c1f;border:1px solid #333;font-size:17px;letter-spacing:4px;outline:none;cursor:text;user-select:text;-webkit-user-select:text}
+.mform button{padding:0 16px;border-radius:12px;background:#ffcc33;color:#111;font-weight:700}
+.mhint{color:#ffcc33!important}
+.merr{color:#ff6b6b!important;height:18px}
 
 /* ===================== 인스타 ===================== */
 .app-insta{background:#000!important}
@@ -524,7 +533,7 @@ const REPLY_NO = ['아...', '미안 내가 너무 갑작스럽게 연락했지. 
 
 const CHARS = [
   {
-    chat: 'jay', handle: 'js.jay', name: '박종성', label: '종성', role: '소꿉친구', since: '소꿉친구 · 유치원 때부터', bio: '🎸 기타 치는 사람 | 박종성',
+    chat: 'jay', handle: 'js.jay', name: '박종성', label: '종성', role: '소꿉친구', since: '소꿉친구', bio: '🎸 기타 치는 사람 | 박종성',
     old: true, laugh: 'ㅋㅋ', out: true,
     replies: {
       now: ['야구 보러 왔어 ㅋㅋ', { img: 'jay' }, '연장전 가서 아직도 경기 중이야', '다음엔 너도 같이 오자'],
@@ -534,7 +543,7 @@ const CHARS = [
     },
   },
   {
-    chat: 'sh', handle: 'psh', name: '박성훈', label: '성훈 선배', role: '아는 선배', since: '동아리 선배 · 올해 3월에 처음 만남', bio: '📚 | 박성훈',
+    chat: 'sh', handle: 'psh', name: '박성훈', label: '성훈 선배', role: '아는 선배', since: '동아리 선배', bio: '📚 | 박성훈',
     old: false, laugh: 'ㅎㅎ', out: false,
     replies: {
       now: ['지금은 그냥 쉬고 있어 ㅎㅎ', { img: 'sh' }, '도서관 갔다 와서 이제 집에서 뒹굴거리는 중', '너는 아직 안 잤어? 일찍 자야지'],
@@ -544,7 +553,7 @@ const CHARS = [
     },
   },
   {
-    chat: 'sunoo', handle: 'sunoo_', name: '김선우', label: '선우', role: '베프', since: '베프 · 중학교 입학식 때부터', bio: '☀️ 떡볶이 러버 | 김선우',
+    chat: 'sunoo', handle: 'sunoo_', name: '김선우', label: '선우', role: '베프', since: '내 베프', bio: '☀️ 떡볶이 러버 | 김선우',
     old: true, laugh: 'ㅎㅎ', out: false,
     replies: {
       now: ['나 방금 씻구 나와쩡 ㅎㅎ', { img: 'sn' }, '머리 아직 안 말렸는뎅 🥺', '너는 모해? 아직 안 자구? ㅎㅎ'],
@@ -554,7 +563,7 @@ const CHARS = [
     },
   },
   {
-    chat: 'jk', handle: 'jake', name: '심재윤', label: '재윤', role: '엄마 친구 아들', since: '엄마 친구 아들 · 아기 때부터', bio: '✈️ back in Seoul | 심재윤',
+    chat: 'jk', handle: 'jake', name: '심재윤', label: '재윤', role: '엄마 친구 아들', since: '엄마 친구 아들', bio: '✈️ back in Seoul | 심재윤',
     old: true, laugh: 'ㅋㅋ', out: false,
     replies: {
       now: ['집에서 강아지랑 놀고 있어 ㅋㅋ', { img: 'jk' }, '3년 만에 봐서 그런지 나한테서 안 떨어지려고 해', '근데 나는 너 보고 싶다. 얘만큼 ㅋㅋ'],
@@ -564,7 +573,7 @@ const CHARS = [
     },
   },
   {
-    chat: 'nk', handle: 'ni_ki', name: '니키', label: '니키', role: '츤데레', since: '같은 수업 · 이번 학기에 처음 만남', bio: '.',
+    chat: 'nk', handle: 'ni_ki', name: '니키', label: '니키', role: '츤데레', since: '같은 수업', bio: '.',
     old: false, laugh: 'ㅋㅋ', out: true,
     replies: {
       now: ['나와 있음.', { img: 'nk' }, '춤 연습 가는 중.', '너는 왜 안 자. 빨리 자.'],
@@ -574,7 +583,7 @@ const CHARS = [
     },
   },
   {
-    chat: 'jw', handle: 'jungw0n', name: '양정원', label: '정원 오빠', role: '친한 오빠', since: '알바 같이 한 오빠 · 작년 겨울에 처음 만남', bio: '🌿 | 양정원',
+    chat: 'jw', handle: 'jungw0n', name: '양정원', label: '정원 오빠', role: '친한 오빠', since: '알바 같이 한 오빠', bio: '🌿 | 양정원',
     old: false, laugh: 'ㅎㅎ', out: true,
     replies: {
       now: ['나 잠깐 갈 곳이 있어서 나왔어 ㅠㅠ', { img: 'jw' }, '지금 엘베 타고 내려가는 중 ㅎㅎ', '금방 들어갈게. 너는 따뜻하게 하고 얼른 쉬어 😊'],
@@ -585,10 +594,11 @@ const CHARS = [
   },
 ];
 /* 익명 채팅의 힌트: 연락한 사람의 특징에 따라 정해진다 */
+/* 힌트는 돌려서 말한다: ① 처음 만난 날 (잠긴 메모와 맞춰 봐야 함) ② 지금 있는 곳 (각자에게 물어봐야 함) ③ 웃는 습관 (평소 말투와 비교) */
 const anonHints = c => [
-  c.old ? '우리 진짜 오래 알았잖아. 어릴 때부터.' : '우리 알게 된 지 얼마 안 됐잖아. 근데 처음 본 날부터 계속 신경 쓰였어.',
-  c.out ? '나 지금 밖이야. 걷다가 네 생각나서 연락했어.' : '나 지금 집이야. 누워서 네 생각만 하는 중.',
-  `내 말투 잘 보면 알 텐데 ${c.laugh}`,
+  c.old ? '처음 만났을 때 기억나? 너 울고 있었잖아' : '처음 만났을 때 기억나? 너 엄청 웃고 있었잖아',
+  c.out ? '여기 바람 불어서 손 시려. 그래도 네 생각나서 연락했어' : '이불 속이라 따뜻하다. 그냥 네 생각나서 연락했어',
+  `나 원래 웃을 때 이렇게 웃잖아 ${c.laugh}`,
 ];
 /* 자유 채팅용 말투: 키워드 인사·잘자·칭찬, 같은 질문을 또 했을 때(again),
    플러팅했을 때 돌아가며 하는 말(flirt), 키워드가 없을 때 돌아가며 하는 말(idle), 메시지를 안 읽고 있을 때(nudge),
@@ -863,7 +873,7 @@ function newGame(name) {
     unread: { sunoo: 2, sms: 1 },
     extra: {}, newCount: {}, touched: {}, clock: 0, asked: {}, arrived: false,
     queue: {}, idle: {}, nudged: {}, nudgeT: {},
-    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {},
+    comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, memoOpen: false,
     step: 0, typing: null,
     tries: 3, wrong: [], over: false,
     revealed: false, phase: 'guess',   // guess → answer(고백에 대답) → done
@@ -1036,7 +1046,7 @@ function baseChat(id) {
   switch (id) {
     case 'unknown': return [];
     case 'sunoo': return [me('오늘 진짜 피곤하다 ㅠㅠ', '오후 10:02'), them('선우', '고생해쪄 ㅠㅠ 얼른 자 ㅎㅎ', '오후 10:03'), them('선우', `${call()}~ 내일 떡볶이 먹으러 가자아 🍢`, '오후 11:28'), them('선우', '아 그리구 인스타 봤어? 다들 스토리 올렸던뎅 ㅎㅎ', '오후 11:29')];
-    case 'mom': return [them('엄마', '재윤이 유학 끝나고 한국 들어왔대~', '오후 9:30'), them('엄마', '아기 때부터 엄마 모임 때마다 같이 놀던 재윤이 기억나지? 연락 한번 해 봐', '오후 9:31'), them('엄마', '전화는 왜 안 받아~ 일찍 자라 🙏', '오후 9:32')];
+    case 'mom': return [them('엄마', '재윤이 유학 끝나고 한국 들어왔대~', '오후 9:30'), them('엄마', '연락 한번 해 봐. 너 보고 싶어 하더라', '오후 9:31'), them('엄마', '전화는 왜 안 받아~ 일찍 자라 🙏', '오후 9:32')];
     case 'jw': return [me('오빠 저번에 빌린 우산 다음에 꼭 돌려줄게요!', '오후 10:31'), them('정원 오빠', '천천히 줘도 돼 ㅎㅎ', '오후 10:35'), them('정원 오빠', '오늘 고생 많았지? 따뜻하게 하고 푹 쉬어 😊', '오후 10:40')];
     case 'sh': return [them('성훈 선배', '과제 자료 보내줬어~', '오후 8:10'), them('성훈 선배', '막히는 거 있으면 언제든지 물어봐', '오후 8:11'), me('감사합니다 선배 ㅠㅠ 다음에 커피 살게요!', '오후 8:15'), them('성훈 선배', 'ㅎㅎ 그래 그럼 약속', '오후 8:16')];
     case 'nk': return [me('어디야?', '오후 9:50'), them('니키', '집.', '오후 9:54'), me('아까 편의점에서 너 본 것 같은데', '오후 9:55'), them('니키', 'ㅋㅋ 잘못 봤겠지.', '오후 9:58'), them('니키', '늦게 다니지 마.', '오후 9:58')];
@@ -1235,6 +1245,17 @@ async function hintFlow() {
 }
 /* 인스타 댓글 달기 */
 $('#app').addEventListener('submit', e => {
+  const mf = e.target.closest('.mform');
+  if (mf) {
+    e.preventDefault();
+    const v = mf.querySelector('input').value.replace(/\D/g, '');
+    if (v === '1130') { S.memoOpen = true; renderApp(); return; }
+    const err = mf.parentElement.querySelector('.merr');
+    err.textContent = '암호가 틀렸습니다';
+    mf.classList.remove('shake'); void mf.offsetWidth; mf.classList.add('shake');
+    mf.querySelector('input').value = '';
+    return;
+  }
   const k = e.target.closest('.kform');
   if (k) {
     e.preventDefault();
@@ -1433,21 +1454,28 @@ PAGES.sms = {
 function memos() {
   return [
     { id: 'todo', title: '이번 주 할 일', date: '오늘', body: '- 정원 오빠 우산 돌려주기 ☂️\n- 성훈 선배한테 커피 사기 (과제 도와줌)\n- 니키한테 편의점 우유값 갚기\n- 엄마가 재윤이네 반찬 갖다주래' },
-    { id: 'photo', title: '어릴 때 사진 정리', date: '2025. 10. 18.', body: '앨범 정리하다가 발견 ㅋㅋㅋ\n\n- 다섯 살, 놀이터 그네 앞에서 종성이랑\n  (넘어져서 울고 있음 ㅋㅋ 종성이가 업어줬다고 엄마가 그랬음)\n- 아기 때 엄마 모임에서 재윤이랑 케이크 먹는 사진\n- 중학교 입학식, 선우랑 (이때부터 베프 💛)' },
-    { id: 'new', title: '최근에 알게 된 사람들', date: '2025. 10. 1.', body: '- 성훈 선배: 올해 3월 동아리에서 처음 만남. 친절함\n- 니키: 이번 학기 같은 수업. 말은 별로 없는데 은근 챙겨줌\n- 정원 오빠: 작년 겨울 카페 알바에서 처음 만남. 상냥함' },
+    { id: 'first', title: '처음 만난 날들', date: '2025. 10. 18.', locked: true, hint: '오늘 연락이 온 시간',
+      body: '언젠가 다 같이 보여주려고 적어 둠. (이름 쓰면 들킬까 봐 별명으로)\n\n- js : 놀이터. 그네 타다 떨어져서 엉엉 울고 있는데 업어줬다고 함\n- 엄마 친구 아들 : 엄마들 모임. 케이크 떨어뜨려서 울었다고 함 (기억 안 남…)\n- 내 베프 : 중학교 입학식. 반을 못 찾아서 울고 있을 때 같이 찾아줌\n- 동아리 선배 : 신입 환영회. 게임하다 웃음이 안 멈춰서 사레들림\n- 같은 수업 걔 : 첫 수업에 지각해서 뛰어 들어오다 미끄러짐. 혼자 웃음 터짐\n- 알바 오빠 : 카페 알바 첫날. 컵 엎고 너무 당황해서 웃음만 나옴' },
     { id: 'bff', title: '선우랑 버킷리스트 💛', date: '2025. 9. 3.', body: '1. 떡볶이 맛집 10군데 도장깨기 (3/10)\n2. 같이 바다 보러 가기\n3. MBTI 똑같은 기념으로 사진 찍기 ㅋㅋ\n\n말 안 해도 통하는 사이 🤝' },
     { id: 'shop', title: '장보기', date: '2025. 10. 29.', body: '딸기우유\n라면\n샴푸' },
-    { id: 'pw', title: '메모', date: '2025. 9. 2.', body: '폰 비밀번호 바꾸기 (아직 0000…)' },
+    { id: 'pw', title: '메모', date: '2025. 9. 2.', body: '폰 비밀번호 바꾸기 (아직 0000…)\n메모 잠금 비밀번호는 절대 안 까먹을 숫자로 함' },
   ];
 }
 PAGES.memo = {
   start: 'list',
   list() {
     return head('메모', '<span style="color:#ffcc33">⋯</span>') + `<div class="scroll"><div class="sec">${memos().length}개의 메모</div><div class="memo-list">` +
-      memos().map(m => `<div class="row" data-go="note:${m.id}"><div class="mid"><div class="t1">${m.title}</div><div class="t2">${m.date} · ${m.body.split('\n')[0]}</div></div></div>`).join('') + `</div></div>`;
+      memos().map(m => {
+        const shut = m.locked && !S.memoOpen;
+        return `<div class="row" data-go="note:${m.id}"><div class="mid"><div class="t1">${shut ? '🔒 ' : ''}${m.title}</div><div class="t2">${m.date} · ${shut ? '잠긴 메모' : m.body.split('\n')[0]}</div></div></div>`;
+      }).join('') + `</div></div>`;
   },
   note(id) {
     const m = memos().find(x => x.id === id);
+    /* 잠긴 메모: 비밀번호(1130)를 넣어야 열린다 */
+    if (m.locked && !S.memoOpen) return head('') + `<div class="scroll"><div class="mlock"><div class="mlock-ic">🔒</div><h3>잠긴 메모</h3><p>이 메모를 보려면 암호를 입력하세요.</p>
+      <form class="mform"><input inputmode="numeric" maxlength="8" placeholder="암호" autocomplete="off"><button type="submit">확인</button></form>
+      <p class="mhint">암호 힌트: ${m.hint}</p><p class="merr"></p></div></div>`;
     return head('', '<span style="color:#ffcc33">⤴</span>') + `<div class="scroll"><div class="note"><div class="nd">${m.date}</div><h2>${m.title}</h2>${m.body}</div></div>`;
   },
 };
@@ -1617,11 +1645,12 @@ PAGES.yt = {
 
 /* ===================== 인터넷 ===================== */
 const SEARCHES = [
-  ['나 기억나 답장 뭐라고 해', [['○○지식인', '모르는 사람이 "나 기억나?"라고 보냈어요', '오래 알던 사람일 수도, 최근에 알게 된 사람일 수도 있어요. 대화 속 힌트를 하나씩 맞춰 보세요!'], ['커뮤니티', '"나 기억나?"는 고백 전 단계다 vs 아니다', '댓글 1,024개 · 무조건 고백 전 단계임 ㅋㅋ']]],
+  ['나 기억나 답장 뭐라고 해', [['○○지식인', '모르는 사람이 "나 기억나?"라고 보냈어요', '힌트를 돌려서 말할 거예요. 폰 속 메모나 대화랑 하나씩 맞춰 보세요!'], ['커뮤니티', '"나 기억나?"는 고백 전 단계다 vs 아니다', '댓글 1,024개 · 무조건 고백 전 단계임 ㅋㅋ']]],
   ['좋아하는 사람한테 하는 행동', [['연애 칼럼', '좋아하면 나오는 행동 BEST 5', '1. 사소한 걸 기억한다 2. 핑계를 만들어 연락한다 3. 걱정을 한다 4. 뭔가를 챙겨준다 5. 호칭에 신경 쓴다']]],
-  ['카톡 말투로 누군지 알아내는 법', [['커뮤니티', '익명으로 연락 와도 말투는 못 숨긴다', 'ㅋㅋ 쓰는 사람은 익명이어도 ㅋㅋ 씀. ㅎㅎ 쓰는 사람은 ㅎㅎ 씀. 평소 대화랑 비교해 보세요.'], ['○○지식인', '지금 밖인지 집인지 물어보면 되나요?', '"지금 뭐 해?"라고 한 명씩 물어보면 생각보다 금방 좁혀져요.']]],
+  ['웃는 습관 ㅋㅋ ㅎㅎ 차이', [['커뮤니티', '익명으로 연락 와도 못 숨기는 것', '웃는 습관이요. 사람마다 ㅋㅋ인지 ㅎㅎ인지 거의 안 바뀜 ㅋㅋ'], ['○○지식인', '지금 어디 있는지 돌려 말하는 사람', '"바람 분다", "이불 속이다" 이런 말 하면 진짜 그 자리에 있는 거임. 다른 사람들한테도 지금 뭐 하는지 물어보세요.']]],
+  ['잠긴 메모 비밀번호 까먹음', [['고객센터', '메모 잠금 암호를 잊으셨나요?', '암호를 설정할 때 남긴 힌트를 확인해 보세요. 숫자 4자리를 쓰는 경우가 많습니다.'], ['커뮤니티', '메모 비번 뭐로 했는지 기억 안 남', '나는 의미 있는 시간으로 함. 예를 들면 무슨 일이 있었던 시각 같은 거']]],
+  ['처음 만난 날 기억하는 남자 심리', [['연애 칼럼', '첫 만남을 기억하는 사람', '첫 만남 얘기를 먼저 꺼낸다면, 그날의 당신 모습을 아직도 기억하고 있다는 뜻이에요.']]],
   ['츤데레 특징', [['백과사전', '츤데레', '겉으로는 무뚝뚝하지만 속으로는 다정한 성격. 말보다 행동으로 마음을 보여주는 경우가 많다.']]],
-  ['소꿉친구랑 연애', [['커뮤니티', '소꿉친구가 갑자기 남자로 보일 때', '어릴 때 일을 꺼내면 신호임 ㅋㅋ']]],
 ];
 PAGES.web = {
   start: 'home',
