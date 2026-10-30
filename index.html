@@ -7,23 +7,23 @@
 <style>
 /* ===================== 기본 ===================== */
 :root{
-  --bg:#05060c; --text:#eef0f7; --sub:#8b90a6; --line:rgba(255,255,255,.08);
-  --red:#ff3b30; --kakao:#fee500; --glass:rgba(40,44,70,.45);
+  --text:#eef0f7; --sub:#8b90a6; --line:rgba(255,255,255,.08);
+  --red:#ff3b30; --kakao:#fee500; --pink:#ff86b0; --glass:rgba(48,42,78,.45);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{
-  background:radial-gradient(ellipse at top,#141830,#05060c 70%);
+  background:radial-gradient(ellipse at top,#22183a,#07060d 70%);
   color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;
   display:flex;align-items:center;justify-content:center;gap:64px;
   overflow:hidden;user-select:none;-webkit-user-select:none;
 }
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-.intro{max-width:280px}
+button,input{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.intro{max-width:290px}
 .intro h1{font-size:76px;font-weight:200;letter-spacing:2px}
-.intro p{color:var(--sub);line-height:1.8;font-size:14px;margin-top:14px}
-.intro small{display:block;color:#5d6180;margin-top:24px;font-size:12px;line-height:1.7}
+.intro p{color:#b5b0cc;line-height:1.8;font-size:14px;margin-top:14px}
+.intro small{display:block;color:#6f6a88;margin-top:24px;font-size:12px;line-height:1.8}
 
 /* ===================== 폰 프레임 ===================== */
 .phone{
@@ -51,25 +51,36 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .view{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease}
 .view.active{opacity:1;pointer-events:auto}
 
-/* 배경화면 */
+/* 배경화면: 별이 뜬 밤하늘 */
 .wall{background:
-  radial-gradient(circle at 80% 34%,rgba(255,244,214,.9) 0 16px,rgba(255,244,214,.08) 17px 46px,transparent 47px),
-  linear-gradient(180deg,#05070f 0%,#0d1330 42%,#1a1336 72%,#08070d 100%)}
-.wall.dim::before{content:"";position:absolute;inset:0;background:rgba(5,6,14,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+  radial-gradient(circle at 80% 34%,rgba(255,236,240,.9) 0 16px,rgba(255,200,220,.08) 17px 46px,transparent 47px),
+  linear-gradient(180deg,#07060f 0%,#15123a 42%,#2a1640 72%,#0b0710 100%)}
+.wall.dim::before{content:"";position:absolute;inset:0;background:rgba(8,6,16,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
 .stars{position:absolute;top:0;left:0;width:1px;height:1px;border-radius:50%;animation:twinkle 4s ease-in-out infinite alternate}
 @keyframes twinkle{from{opacity:.55}to{opacity:1}}
-.hill{position:absolute;left:-10%;right:-10%;bottom:-40px;height:200px;background:#05050a;border-radius:50% 50% 0 0/100% 100% 0 0}
+.hill{position:absolute;left:-10%;right:-10%;bottom:-40px;height:200px;background:#07050b;border-radius:50% 50% 0 0/100% 100% 0 0}
+
+/* ===================== 시작: 이름 입력 ===================== */
+.start{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 34px;z-index:1;text-align:center}
+.st-title{font-size:84px;font-weight:200;letter-spacing:3px;text-shadow:0 0 40px rgba(255,140,190,.35)}
+.st-sub{margin-top:10px;color:#c9c2e0;line-height:1.7;font-size:15px}
+.start form{width:100%;margin-top:46px;display:flex;flex-direction:column;gap:12px}
+.start input{width:100%;padding:15px 18px;border-radius:16px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);text-align:center;font-size:17px;cursor:text;user-select:text;-webkit-user-select:text;outline:none}
+.start input:focus{border-color:var(--pink)}
+.start form button{padding:15px;border-radius:16px;background:linear-gradient(90deg,#ff86b0,#a98bff);font-weight:700;font-size:16px;color:#fff}
+.st-hint{margin-top:16px;font-size:12.5px;color:#8b84a8}
 
 /* ===================== 잠금화면 ===================== */
 #lock{cursor:pointer}
 .lock-top{position:absolute;top:70px;left:0;right:0;text-align:center}
 .lock-ic{font-size:16px;opacity:.8}
 .lock-date{margin-top:10px;font-size:19px;font-weight:500;opacity:.85}
-.lock-clock{font-size:96px;font-weight:600;letter-spacing:-2px;line-height:1.05;text-shadow:0 0 40px rgba(140,160,255,.25)}
-.notis{position:absolute;top:330px;left:12px;right:12px;display:flex;flex-direction:column;gap:8px;z-index:2}
+.lock-clock{font-size:96px;font-weight:600;letter-spacing:-2px;line-height:1.05;text-shadow:0 0 40px rgba(255,150,200,.25)}
+.notis{position:absolute;top:310px;left:12px;right:12px;display:flex;flex-direction:column;gap:8px;z-index:2}
 .noti,.banner{display:flex;gap:11px;align-items:center;padding:13px 14px;border-radius:22px;background:var(--glass);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.07);cursor:pointer}
 .noti:active{transform:scale(.98)}
 .ni{position:relative;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:20px;flex-shrink:0}
+.ni.mini{width:62px;height:62px;margin:-12px;border-radius:16px;transform:scale(.62)}
 .nb{flex:1;min-width:0}
 .nh{display:flex;justify-content:space-between;font-size:14px}
 .nh span{color:rgba(255,255,255,.55);font-size:12.5px}
@@ -86,9 +97,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .dots{display:flex;gap:22px;margin-top:22px}
 .dots i{width:13px;height:13px;border-radius:50%;border:1.5px solid #fff;transition:background .1s}
 .dots i.on{background:#fff}
-.dots.shake{animation:shake .45s}
+.shake{animation:shake .45s}
 @keyframes shake{20%,60%{transform:translateX(-12px)}40%,80%{transform:translateX(12px)}}
-.pass-msg{height:20px;margin-top:16px;font-size:13.5px;color:#ff8a80}
+.pass-msg{height:20px;margin-top:16px;font-size:13.5px;color:#ff9db8}
 .pass-hint{height:18px;font-size:12.5px;color:var(--sub)}
 .keypad{display:grid;grid-template-columns:repeat(3,78px);gap:16px 26px;margin-top:34px}
 .key{width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.13);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:background .12s}
@@ -109,7 +120,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .app-ic:active .ic{filter:brightness(.7)}
 .ic{width:62px;height:62px;border-radius:16px;display:grid;place-items:center;font-size:30px;position:relative;box-shadow:0 4px 14px rgba(0,0,0,.35)}
 .badge{position:absolute;top:-6px;right:2px;min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:var(--red);color:#fff;font-size:13px;font-weight:600;display:grid;place-items:center;z-index:2}
-.dock{position:absolute;bottom:26px;left:12px;right:12px;padding:16px 10px;border-radius:32px;background:rgba(60,64,96,.35);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);display:grid;grid-template-columns:repeat(4,1fr)}
+.dock{position:absolute;bottom:26px;left:12px;right:12px;padding:16px 10px;border-radius:32px;background:rgba(70,60,110,.35);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);display:grid;grid-template-columns:repeat(4,1fr)}
 .dock .lb{display:none}
 .ic-web{background:linear-gradient(160deg,#5fb6ff,#1d5fe0)}
 .ic-kakao{background:var(--kakao)}
@@ -134,7 +145,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .homebar i{width:134px;height:5px;border-radius:3px;background:rgba(255,255,255,.85)}
 
 /* 상단 배너 */
-.banner{position:absolute;top:50px;left:10px;right:10px;z-index:55;transform:translateY(-220px);opacity:0;transition:transform .45s cubic-bezier(.2,.9,.3,1.2),opacity .3s;background:rgba(36,38,58,.82)}
+.banner{position:absolute;top:50px;left:10px;right:10px;z-index:68;transform:translateY(-220px);opacity:0;transition:transform .45s cubic-bezier(.2,.9,.3,1.2),opacity .3s;background:rgba(44,38,66,.88)}
 .banner.show{transform:none;opacity:1}
 
 /* 토스트 */
@@ -154,8 +165,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .tab b{font-size:20px;font-weight:400;filter:grayscale(1);opacity:.6}
 .tab.on{color:#fff}
 .tab.on b{filter:none;opacity:1}
-.av{width:44px;height:44px;border-radius:16px;display:grid;place-items:center;font-weight:700;font-size:17px;color:#fff;flex-shrink:0}
+.av{width:44px;height:44px;border-radius:16px;display:grid;place-items:center;font-weight:700;font-size:17px;color:#fff;flex-shrink:0;background-size:cover;background-position:center 20%}
 .av.round{border-radius:50%}
+.av.ph{font-size:0}
 .row{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer}
 .row:active{background:rgba(255,255,255,.05)}
 .row .mid{flex:1;min-width:0}
@@ -165,18 +177,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .un{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--red);color:#fff;font-size:12px;font-weight:600;display:grid;place-items:center}
 .sec{padding:18px 16px 6px;font-size:13px;color:var(--sub)}
 .missed{color:#ff5a52!important}
-.hr{border-bottom:1px solid var(--line);margin-left:72px}
 
 /* ===================== 카카오톡 ===================== */
 .app-kakao{background:#17171c!important}
-.app-kakao .t1 em{font-style:normal;color:#7c7c88;font-weight:400;font-size:14px}
-.chat{background:#2b3a4e!important}
+.chat{background:#2f3a52!important}
 .chat .scroll{padding:6px 12px 14px}
 .ksys{text-align:center;margin:12px auto;font-size:12px;background:rgba(0,0,0,.25);color:#d8e0ea;padding:5px 14px;border-radius:14px;width:max-content}
 .km{display:flex;gap:8px;margin:6px 0;align-items:flex-end}
 .km .av{width:38px;height:38px;border-radius:14px;font-size:15px;align-self:flex-start}
 .km .kn{font-size:12.5px;color:#d5dde8;margin:0 0 4px 2px}
-.kb{max-width:230px;padding:9px 12px;border-radius:4px 16px 16px 16px;background:#3a3f4b;font-size:14.5px;line-height:1.45;word-break:keep-all}
+.kb{max-width:230px;padding:9px 12px;border-radius:4px 16px 16px 16px;background:#434a5c;font-size:14.5px;line-height:1.45;word-break:keep-all}
 .km.me{justify-content:flex-end}
 .km.me .kb{background:var(--kakao);color:#191919;border-radius:16px 4px 16px 16px}
 .kt{font-size:10.5px;color:#aab5c3;flex-shrink:0}
@@ -185,18 +195,21 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .km.cont .kn{display:none}
 .km.new .kb{animation:pop .35s}
 @keyframes pop{from{transform:scale(.7);opacity:0}}
-.kfoot{flex-shrink:0;padding:10px 12px 40px;background:#1c1c22;display:flex;gap:8px}
+/* 상대가 입력 중(•••) */
+.typing .kb{display:flex;gap:5px;padding:13px 14px}
+.typing .kb i{width:7px;height:7px;border-radius:50%;background:#c3c9d6;animation:blink 1.2s infinite}
+.typing .kb i:nth-child(2){animation-delay:.2s}
+.typing .kb i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,60%,100%{opacity:.3;transform:none}30%{opacity:1;transform:translateY(-3px)}}
+.kfoot{flex-shrink:0;padding:10px 12px 40px;background:#1c1c22;display:flex;gap:8px;flex-wrap:wrap}
 .kinput{flex:1;background:#2c2c34;border-radius:20px;padding:10px 16px;color:#6f6f7a;font-size:14px}
-.kguess{flex:1;background:var(--kakao);color:#191919;font-weight:700;border-radius:20px;padding:12px;font-size:15px;animation:glow 2s ease-in-out infinite}
-@keyframes glow{50%{box-shadow:0 0 0 6px rgba(254,229,0,.15)}}
+.chipb{flex:1;min-width:120px;padding:11px 12px;border-radius:20px;background:#30303a;font-size:14.5px;transition:opacity .2s}
+.chipb.main{background:var(--kakao);color:#191919;font-weight:700}
+.kfoot.busy .chipb{opacity:.35;pointer-events:none}
 
 /* ===================== 전화 / 문자 ===================== */
 .keypad2{display:grid;grid-template-columns:repeat(3,76px);gap:14px 26px;justify-content:center;margin-top:40px}
 .keypad2 .key{width:76px;height:76px;background:#25262e}
-.callinfo{text-align:center;padding:30px 20px}
-.callinfo .av{width:90px;height:90px;border-radius:50%;margin:0 auto 14px;font-size:36px}
-.callinfo h2{font-size:24px;font-weight:600}
-.callinfo p{color:var(--sub);margin-top:6px;font-size:14px}
 .ctable{margin:24px 16px;background:#1b1c24;border-radius:14px;padding:4px 16px}
 .ctable div{display:flex;justify-content:space-between;padding:12px 0;font-size:14.5px;border-bottom:1px solid var(--line)}
 .ctable div:last-child{border:0}
@@ -204,11 +217,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .sms .scroll{padding:8px 14px}
 .sb{max-width:250px;padding:10px 14px;border-radius:18px;background:#26272f;font-size:14.5px;line-height:1.5;margin:4px 0;word-break:keep-all}
 .sb.me{background:#2f7bf6;margin-left:auto}
-.sb.creep{background:#2a1a1e;border:1px solid #5a2a32}
-.sname{font-size:11.5px;color:var(--sub);margin:10px 0 0 6px}
 .stime{text-align:center;font-size:11.5px;color:var(--sub);margin:16px 0 6px}
-.recv{margin:4px 0 10px;padding:10px 14px;background:#191a22;border-radius:12px;font-size:13px;color:var(--sub);line-height:1.6}
-.recv b{color:#fff;font-weight:600}
 .dot{width:9px;height:9px;border-radius:50%;background:#2f7bf6}
 
 /* ===================== 메모 ===================== */
@@ -230,46 +239,50 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .story .ring{padding:2.5px;border-radius:50%;background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf)}
 .story .ring.seen{background:#3a3a3a}
 .story .ring .av{width:58px;height:58px;border-radius:50%;border:3px solid #000}
-.story .ring .av.photo{background-size:cover!important;background-position:center 20%!important;font-size:0}
+.story span{width:66px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.post{border-bottom:1px solid var(--line);padding-bottom:12px}
+.ph-h{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer}
+.ph-h .av{width:34px;height:34px;border-radius:50%;font-size:13px}
+.ph-h b{font-size:14px}
+.ph-h small{display:block;font-size:11.5px;color:var(--sub)}
+.pimg{aspect-ratio:1/1;display:grid;place-items:center;font-size:96px;position:relative;overflow:hidden}
+.pimg .cap{position:absolute;bottom:12px;left:14px;font-size:12px;background:rgba(0,0,0,.45);padding:3px 9px;border-radius:10px}
+.pact{display:flex;gap:16px;padding:10px 14px 4px;font-size:22px}
+.ptxt{padding:2px 14px;font-size:14px;line-height:1.55}
+.pcm{padding:4px 14px;font-size:14px;line-height:1.5}
+.prof{padding:6px 16px 16px;display:flex;align-items:center;gap:22px}
+.prof .av{width:84px;height:84px;border-radius:50%;font-size:32px}
+.pstat{display:flex;gap:20px;text-align:center;font-size:13px}
+.pstat b{display:block;font-size:17px}
+.pbio{padding:0 16px 16px;font-size:14px;line-height:1.6}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;border-top:1px solid var(--line)}
+.pgrid div{aspect-ratio:1/1;display:grid;place-items:center;font-size:36px;background-size:cover;background-position:center 25%}
+
 /* 스토리 뷰어 */
 .sv{position:absolute;inset:0;z-index:66;background:#000;display:none;cursor:pointer}
 .sv.show{display:block;animation:svin .25s ease-out}
 @keyframes svin{from{transform:scale(.92);opacity:0}}
 .sv-img{position:absolute;inset:0;background-size:cover;background-position:center}
 .sv-shade{position:absolute;left:0;right:0;top:0;height:170px;background:linear-gradient(rgba(0,0,0,.55),transparent)}
+.sv-shade.b{top:auto;bottom:0;height:150px;background:linear-gradient(transparent,rgba(0,0,0,.5))}
 .sv-bars{position:absolute;top:56px;left:10px;right:10px;display:flex;gap:4px}
 .sv-bars i{flex:1;height:2.5px;border-radius:2px;background:rgba(255,255,255,.35)}
 .sv-bars i.on{background:#fff}
 .sv-head{position:absolute;top:68px;left:12px;right:12px;display:flex;align-items:center;gap:9px;font-size:14px}
-.sv-head .av{width:34px;height:34px;border-radius:50%;background-size:cover!important;background-position:center 20%!important;font-size:0}
+.sv-head .av{width:34px;height:34px;border-radius:50%}
 .sv-head b{font-weight:600}
 .sv-head small{color:rgba(255,255,255,.7);font-size:13px}
 .sv-x{margin-left:auto;font-size:26px;line-height:1;padding:4px 6px}
-.sv-foot{position:absolute;bottom:40px;left:12px;right:12px;display:flex;gap:10px;align-items:center}
+.sv-foot{position:absolute;bottom:40px;left:12px;right:12px;display:flex;gap:12px;align-items:center}
 .sv-foot div{flex:1;border:1px solid rgba(255,255,255,.6);border-radius:22px;padding:10px 16px;font-size:14px;color:rgba(255,255,255,.85)}
 .sv-foot span{font-size:22px}
-.story span{width:66px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.post{border-bottom:1px solid var(--line);padding-bottom:12px}
-.ph{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer}
-.ph .av{width:34px;height:34px;border-radius:50%;font-size:13px}
-.ph b{font-size:14px}
-.ph small{display:block;font-size:11.5px;color:var(--sub)}
-.pimg{aspect-ratio:1/1;display:grid;place-items:center;font-size:96px;position:relative;overflow:hidden}
-.pimg .cap{position:absolute;bottom:12px;left:14px;font-size:12px;background:rgba(0,0,0,.45);padding:3px 9px;border-radius:10px}
-.pact{display:flex;gap:16px;padding:10px 14px 4px;font-size:22px}
-.ptxt{padding:2px 14px;font-size:14px;line-height:1.55}
-.ptxt.sub{color:var(--sub);font-size:13px}
-.pcm{padding:4px 14px;font-size:14px;line-height:1.5}
-.pcm.creep b{color:#ff9aa5}
-.prof{padding:6px 16px 16px;display:flex;align-items:center;gap:22px}
-.prof .av{width:84px;height:84px;border-radius:50%;font-size:32px}
-.pstat{display:flex;gap:20px;text-align:center;font-size:13px}
-.pstat b{display:block;font-size:17px}
-.pbio{padding:0 16px 16px;font-size:14px;line-height:1.6}
-.locked{text-align:center;padding:50px 20px;color:var(--sub);border-top:1px solid var(--line)}
-.locked div{font-size:44px;margin-bottom:10px}
-.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;border-top:1px solid var(--line)}
-.pgrid div{aspect-ratio:1/1;display:grid;place-items:center;font-size:36px}
+.like{font-size:28px;line-height:1;padding:2px 4px;color:#fff;transition:transform .15s}
+.like.on{color:#ff3b5c}
+.like.pop{animation:likepop .45s}
+@keyframes likepop{40%{transform:scale(1.45)}}
+.bigheart{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%) scale(0);font-size:110px;color:#ff3b5c;pointer-events:none;text-shadow:0 6px 30px rgba(0,0,0,.4)}
+.bigheart.go{animation:bigheart .9s ease-out}
+@keyframes bigheart{30%{transform:translate(-50%,-50%) scale(1.1);opacity:1}100%{transform:translate(-50%,-60%) scale(1);opacity:0}}
 
 /* ===================== 유튜브 ===================== */
 .app-yt{background:#0f0f0f!important}
@@ -281,9 +294,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .chip{padding:7px 12px;border-radius:9px;background:#272727;font-size:13px;white-space:nowrap}
 .chip.on{background:#f1f1f1;color:#0f0f0f}
 .vid{margin-bottom:18px;cursor:pointer}
-.thumb{aspect-ratio:16/9;display:grid;place-items:center;font-size:64px;position:relative}
+.thumb{aspect-ratio:16/9;display:grid;place-items:center;font-size:64px;position:relative;background-size:cover;background-position:center 30%}
 .thumb .dur{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.8);font-size:12px;padding:2px 5px;border-radius:4px}
-.thumb .dur.live{background:#cc0000}
 .thumb .prog{position:absolute;left:0;bottom:0;height:3px;background:#ff1f1f}
 .vmeta{display:flex;gap:12px;padding:10px 12px 0}
 .vmeta .av{width:36px;height:36px;border-radius:50%;font-size:14px}
@@ -294,8 +306,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .hrow .mid{min-width:0}
 .hrow b{font-size:14px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hrow small{display:block;font-size:12px;color:var(--sub);margin-top:3px}
-.player{aspect-ratio:16/9;background:#000;display:grid;place-items:center;position:relative}
-.player .pl{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.15);display:grid;place-items:center;font-size:26px}
+.player{aspect-ratio:16/9;background:#000;display:grid;place-items:center;position:relative;background-size:cover;background-position:center 30%;font-size:64px}
+.player .pl{position:absolute;width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.45);display:grid;place-items:center;font-size:26px}
 .vtitle{padding:12px;font-size:17px;font-weight:700;line-height:1.4}
 .vinfo{padding:0 12px 12px;font-size:12.5px;color:var(--sub)}
 .cmt{display:flex;gap:10px;padding:10px 12px}
@@ -306,7 +318,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* ===================== 인터넷 ===================== */
 .app-web{background:#101219!important}
 .sbox{margin:18px 16px;padding:13px 18px;border-radius:26px;background:#1f2230;color:#7d8299;font-size:15px;display:flex;gap:10px}
-.weblogo{text-align:center;font-size:34px;font-weight:800;margin-top:30px;letter-spacing:-1px;background:linear-gradient(90deg,#5fb6ff,#9a7bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.weblogo{text-align:center;font-size:34px;font-weight:800;margin-top:30px;letter-spacing:-1px;background:linear-gradient(90deg,#ff86b0,#9a7bff);-webkit-background-clip:text;background-clip:text;color:transparent}
 .shortcuts{display:grid;grid-template-columns:repeat(4,1fr);padding:8px 16px 10px;text-align:center;font-size:11.5px;color:var(--sub);gap:8px}
 .shortcuts div div{width:52px;height:52px;margin:0 auto 6px;border-radius:16px;background:#1f2230;display:grid;place-items:center;font-size:24px}
 .res{padding:14px 16px;border-bottom:1px solid var(--line)}
@@ -326,44 +338,42 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .tgl.on{background:#34c759}
 .tgl.on::after{left:22px}
 
-/* ===================== 정답 선택 / 엔딩 ===================== */
+/* ===================== 정답 고르기 / 엔딩 ===================== */
 .modal{position:absolute;inset:0;z-index:65;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:.3s}
 .modal.show{opacity:1;pointer-events:auto}
-.sheet{width:100%;background:#1b1c24;border-radius:26px 26px 0 0;padding:24px 18px 44px;transform:translateY(40px);transition:.3s}
+.sheet{width:100%;background:#1d1b26;border-radius:26px 26px 0 0;padding:24px 18px 44px;transform:translateY(40px);transition:.3s}
 .modal.show .sheet{transform:none}
 .sheet h3{font-size:20px;text-align:center}
 .msub{text-align:center;color:var(--sub);font-size:13px;margin-top:6px}
 .gl{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
-.gb{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border-radius:16px;background:#262833;font-size:15px}
-.gb:active{background:#343748}
+.gb{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border-radius:16px;background:#2a2735;font-size:14.5px}
+.gb .av{width:54px;height:54px}
+.gb:active{background:#3a3648}
 .gb:disabled{opacity:.25;text-decoration:line-through}
-.ghint{margin-top:18px;background:#14151c;border-radius:12px;padding:12px 14px;font-size:13.5px;color:#c3c7d8}
-.ghint summary{cursor:pointer;color:var(--sub)}
-.ghint ul{margin:10px 0 0 18px;line-height:1.9}
-.gcancel{width:100%;margin-top:16px;padding:13px;border-radius:14px;background:#262833}
-.end{position:absolute;inset:0;z-index:80;background:#000;display:none;flex-direction:column;justify-content:center;padding:40px 32px;text-align:center}
+.gcancel{width:100%;margin-top:16px;padding:13px;border-radius:14px;background:#2a2735}
+.end{position:absolute;inset:0;z-index:80;background:#000;display:none;flex-direction:column;justify-content:center;padding:40px 32px;text-align:center;overflow:hidden}
 .end.show{display:flex}
-.elines{display:flex;flex-direction:column;gap:18px}
-.el{font-size:17px;line-height:1.6;color:#e7e9f3;animation:fadein 1s}
-.end.bad .el{color:#ffb4b4}
-.el.ding{font-size:30px;font-weight:700;color:#fff!important;letter-spacing:4px}
+.end-bg{position:absolute;inset:0;background-size:cover;background-position:center 25%;opacity:0;transition:opacity 2.2s;filter:brightness(.4)}
+.end.reveal .end-bg{opacity:1}
+.end.bad .end-bg{filter:brightness(.3) grayscale(1)}
+.end.bad .etitle{color:#9aa0b4}
+.elines,.efin{position:relative;z-index:1}
+.elines{display:flex;flex-direction:column;gap:16px}
+.el{font-size:17px;line-height:1.6;color:#fff;animation:fadein 1s;text-shadow:0 2px 12px rgba(0,0,0,.6);word-break:keep-all}
 @keyframes fadein{from{opacity:0;transform:translateY(8px)}}
-.flash{animation:flash .9s}
-@keyframes flash{0%,40%{background:#fff}100%{background:#000}}
-.efin{margin-top:50px;animation:fadein 1.4s}
-.etitle{font-size:40px;font-weight:200;letter-spacing:8px}
-.end.bad .etitle{color:#ff4d4d}
-.ewho{color:var(--sub);margin-top:16px;line-height:1.7}
-.ewho b{color:#fff;font-size:20px}
-.efin button{margin-top:34px;padding:13px 34px;border-radius:24px;border:1px solid rgba(255,255,255,.3)}
+.efin{margin-top:46px;animation:fadein 1.4s}
+.etitle{font-size:40px;font-weight:200;letter-spacing:8px;color:#ffd1e1}
+.ewho{color:#d9d3ea;margin-top:16px;line-height:1.7;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.ewho b{color:#fff;font-size:22px}
+.efin button{margin-top:30px;padding:13px 34px;border-radius:24px;border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.25)}
 </style>
 </head>
 <body>
 
 <div class="intro">
   <h1>11:30</h1>
-  <p>밤 11시 30분.<br>모르는 누군가에게서 연락이 왔다.<br>폰 속 앱을 뒤져서<br>그 사람이 누구인지 알아내자.</p>
-  <small>· 연락한 사람은 게임마다 6명 중 무작위로 바뀝니다.<br>· 카카오톡의 「너 누구야?」로 정답을 고르세요. 기회는 3번입니다.</small>
+  <p>밤 11시 30분.<br>모르는 누군가에게서 연락이 왔다.<br>"나 기억나?"<br><br>나를 좋아하는 사람은 누구일까?</p>
+  <small>· 인스타 스토리를 구경하고, 마음이 가는 스토리에 ♡를 눌러보세요.<br>· 폰 속 앱에서 단서를 모아 「너 누구야?」로 정답을 고르세요. 기회는 3번입니다.</small>
 </div>
 
 <div class="phone" id="phone">
@@ -379,8 +389,22 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       </span>
     </div>
 
+    <!-- 화면 0: 이름 입력 -->
+    <section id="start" class="view wall active">
+      <div class="hill"></div>
+      <div class="start">
+        <div class="st-title">11:30</div>
+        <div class="st-sub">밤 11시 30분,<br>누군가에게서 연락이 왔다.</div>
+        <form id="nameForm">
+          <input id="nameInput" maxlength="6" placeholder="이름을 입력하세요" autocomplete="off">
+          <button type="submit">시작하기</button>
+        </form>
+        <div class="st-hint">등장인물들이 이 이름으로 당신을 불러요</div>
+      </div>
+    </section>
+
     <!-- 화면 1: 잠금화면 -->
-    <section id="lock" class="view wall active">
+    <section id="lock" class="view wall">
       <div class="hill"></div>
       <div class="lock-top">
         <div class="lock-ic">🔒</div>
@@ -389,7 +413,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       </div>
       <div class="notis">
         <div class="noti" data-open="kakao">
-          <div class="ni ic-kakao" style="transform:scale(.62);width:62px;height:62px;margin:-12px;border-radius:16px"></div>
+          <div class="ni ic-kakao mini"></div>
           <div class="nb">
             <div class="nh"><b>카카오톡</b><span>1분 전</span></div>
             <div class="nt">알림 2개</div>
@@ -401,7 +425,14 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
           <div class="nb">
             <div class="nh"><b>부재중 전화</b><span>2시간 전</span></div>
             <div class="nt">부재중 전화 1통</div>
-            <div class="np">발신번호 표시제한</div>
+            <div class="np">엄마</div>
+          </div>
+        </div>
+        <div class="noti" data-open="insta">
+          <div class="ni ic-insta mini"></div>
+          <div class="nb">
+            <div class="nh"><b>Instagram</b><span>방금</span></div>
+            <div class="np">js.jay님 외 5명이 새 스토리를 올렸습니다.</div>
           </div>
         </div>
       </div>
@@ -425,8 +456,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <div class="hill"></div>
       <div class="widget">
         <div class="w1">🌙 서울</div>
-        <div class="w2">9°</div>
-        <div class="w3">맑음 · 새벽 3시부터 짙은 안개</div>
+        <div class="w2">12°</div>
+        <div class="w3">맑음 · 별이 잘 보이는 밤</div>
       </div>
       <div class="grid" id="grid"></div>
       <div class="dock" id="dock"></div>
@@ -436,10 +467,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <section id="app" class="view"></section>
 
     <div class="homebar" id="homebar"><i></i></div>
+    <div class="sv" id="sv"></div>
     <div class="banner" id="banner"></div>
     <div class="modal" id="modal"></div>
     <div class="end" id="end"></div>
-    <div class="sv" id="sv"></div>
     <div class="toast" id="toast"></div>
   </div>
 </div>
@@ -447,53 +478,106 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <script>
 /* ===================== 유틸 ===================== */
 const $ = s => document.querySelector(s);
-const rand = a => a[Math.floor(Math.random() * a.length)];
-const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-const r4 = () => String(1000 + Math.floor(Math.random() * 9000));
-const batchim = w => { const c = w.charCodeAt(w.length - 1) - 0xAC00; return c >= 0 && c % 28 !== 0; };
-const ida = w => w + (batchim(w) ? '이었다' : '였다');
+const batchim = w => { const c = w.charCodeAt(w.length - 1) - 0xAC00; return c >= 0 && c <= 11171 && c % 28 !== 0; };
+const josa = (w, a, b) => w + (batchim(w) ? a : b);
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-/* ===================== 등장인물 ===================== */
-const NAMES = ['희서', '서진', '민지', '준혁', '도윤', '지안'];
-const HANDLE = { 희서: 'heeseo.__', 서진: 'seojin_0412', 민지: 'minji.day', 준혁: 'jun.hyuk', 도윤: 'doyoon_k', 지안: 'jian.log' };
-const COLOR = { 희서: '#7b5cff', 서진: '#2fb37a', 민지: '#ff6f9f', 준혁: '#3d8bff', 도윤: '#ff9f3d', 지안: '#1fb5c9' };
-const avatar = (n, color, cls = '') => `<div class="av ${cls}" style="background:${color || COLOR[n] || '#444'}">${n[0]}</div>`;
-
-/*
-  추리 구조: 연락한 사람은 아래 세 조건을 모두 만족하는 유일한 사람이다.
-   T  '그날'(3년 전 별빛펜션)에 같이 있었다            → 메모
-   N  오후 9:30에 전화를 걸 수 있었다(알리바이 없음)     → 카톡/인스타/유튜브
-   K  내 새 번호를 알고 있다                              → 문자(번호 변경 단체문자)
-  나머지 5명은 서로 다른 조합을 받아서 최소 한 조건씩 어긋난다.
+/* ===================== 등장인물 =====================
+   순서는 인스타 스토리 순서와 같다 (사진도 이 순서). 모두 플레이어에게 호감이 있다.
+   hints: 익명 채팅에서 하나씩 주는 힌트. 각 힌트는 폰 속 다른 앱의 정보와 이어진다.
 */
-const ALIBI_KINDS = ['flight', 'concert', 'live', 'night'];
-let S;
+/* 정답을 맞힌 뒤의 고백 → 플레이어의 선택 → 엔딩 대사 */
+const CONFESS = ['드디어 알아차렸구나 기다렸어.', '나 사실 널 처음 볼 때부터 좋아했어...', '너도 날 좋아해?'];
+const ANSWER_YES = '나도 널 좋아해..';
+const ANSWER_NO = '미안...';
+const REPLY_YES = c => ['진짜..?', '하... 다행이다.', `내가 앞으로 진짜 잘할게 ${c}`, '늦은 시간 연락해서 미안 내일 아침에 너 집으로 갈게♡'];
+const REPLY_NO = ['아...', '미안 내가 너무 갑작스럽게 연락했지. 내 생각만 해버렸다.', '충분히 이해하고 괜찮아 잘 자'];
+const CHARS = [
+  {
+    handle: 'js.jay', name: '박종성', label: '종성', role: '소꿉친구', bio: '🎸 기타 치는 사람 | 박종성',
+    intro: ['ㅎㅎ 비밀', '힌트 줄게. 맞혀봐'],
+    hints: [
+      '우리 진짜 오래 봤잖아. 네가 기억도 못 할 만큼 어릴 때부터.',
+      '오늘 새 곡 연습하다가 네 생각나서 연락했어 🎸',
+      '어릴 때 놀이터에서 너 그네 타다 넘어졌을 때, 업고 집까지 데려다준 거 기억나?',
+    ],
+  },
+  {
+    handle: 'psh', name: '박성훈', label: '성훈 선배', role: '아는 선배', bio: '📚 | 박성훈',
+    intro: ['음… 비밀이야 ㅎㅎ', '대신 힌트 줄게'],
+    hints: [
+      '학교에서 마주칠 때마다 인사해 주는 거, 그거 하루 종일 생각나.',
+      '저번에 과제 도와준 거, 사실 핑계였어. 너랑 얘기하고 싶어서.',
+      '나는 너를 그냥 후배라고 생각한 적 한 번도 없어.',
+    ],
+  },
+  {
+    handle: 'sunoo_', name: '김선우', label: '선우', role: '베프', bio: '☀️ 떡볶이 러버 | 김선우',
+    intro: ['히히 비밀 🤫', '맞혀봐! 힌트 줄게'],
+    hints: [
+      '너랑 나는 말 안 해도 통하잖아 ㅎㅎ',
+      '내일 떡볶이 먹자고 한 거… 사실 그냥 너 보고 싶어서였어 🥺',
+      '베프 말고, 다른 이름으로 불리고 싶어.',
+    ],
+  },
+  {
+    handle: 'jake', name: '심재윤', label: '재윤', role: '엄마 친구 아들', bio: '✈️ back in Seoul | 심재윤',
+    intro: ['Secret 🤫', '힌트 줄게'],
+    hints: [
+      '한국 돌아온 지 얼마 안 됐는데, 제일 먼저 생각난 게 너였어.',
+      '어릴 때 엄마들 모임 있을 때마다 우리 둘이 같이 놀았잖아.',
+      'I really missed you… 아, 한국말로 할게 ㅋㅋ 많이 보고 싶었어.',
+    ],
+  },
+  {
+    handle: 'ni_ki', name: '리키', label: '리키', role: '츤데레', bio: '.',
+    intro: ['…알아서 맞혀', '힌트는 줄게'],
+    hints: [
+      '…그냥. 생각나서.',
+      '오늘 편의점에서 네가 좋아하는 딸기우유 보이길래 사뒀어. 남아서 그런 거야.',
+      '늦게 다니지 마. 걱정되니까. …아니, 그냥.',
+    ],
+  },
+  {
+    handle: 'jungw0n', name: '양정원', label: '정원 오빠', role: '친한 오빠', bio: '🌿 | 양정원',
+    intro: ['ㅎㅎ 누굴까?', '힌트 줄게 😊'],
+    hints: [
+      '오늘도 고생 많았지? 푹 쉬었으면 좋겠다 😊',
+      '비 오던 날 우산 씌워서 집 앞까지 데려다준 거, 기억나?',
+      '네가 「오빠」라고 불러주는 거, 그게 제일 좋아.',
+    ],
+  },
+];
+const UNKNOWN = '(알 수 없음)';
+const photo = i => `background-image:url(${STORY_IMG[i]})`;
+const avatar = (txt, color, cls = '') => `<div class="av ${cls}" style="background-color:${color || '#555'}">${txt[0]}</div>`;
+const avatarPh = (i, cls = '') => `<div class="av ph ${cls}" style="${photo(i)}"></div>`;
+const avatarOf = (who, cls = '') => {
+  const i = CHARS.findIndex(c => c.label === who || c.handle === who || c.name === who);
+  if (i >= 0) return avatarPh(i, cls);
+  if (who === UNKNOWN) return avatar('?', '#4a4a56', cls);
+  return avatar(who, who === '엄마' ? '#d98b6a' : '#5b6475', cls);
+};
 
-function newGame() {
-  const culprit = rand(NAMES);
-  const codes = shuffle(['000', '001', '010', '011', '100', '101', '110']).slice(0, 5);
-  const P = { [culprit]: { T: 1, N: 1, K: 1 } };
-  shuffle(NAMES.filter(n => n !== culprit)).forEach((n, i) => {
-    const c = codes[i];
-    P[n] = { T: +c[0], N: +c[1], K: +c[2] };
-  });
-  const alibi = {};
-  const kinds = shuffle(ALIBI_KINDS);
-  shuffle(NAMES.filter(n => !P[n].N)).forEach((n, i) => alibi[kinds[i]] = n);
-  const nums = {};
-  NAMES.forEach(n => nums[n] = `010-${r4()}-${r4()}`);
-  const cls = shuffle(NAMES);
+/* ===================== 게임 상태 ===================== */
+let S;
+function newGame(name) {
   S = {
-    culprit, P, alibi, nums,
-    trip: shuffle(NAMES.filter(n => P[n].T)),
-    knows: shuffle(NAMES.filter(n => P[n].K)),
-    cls,
+    name,
+    culprit: null,        // 스토리에 가장 먼저 ♡를 누른 사람의 번호
+    liked: new Set(), seenStories: new Set(),
     badges: { kakao: 2, phone: 1 },
-    unread: { unknown: 2, sms: 1 },
-    extra: [], tries: 3, wrong: [], over: false,
-    pending: null, unlocked: false, timers: [], fails: 0, seenStories: new Set(),
+    unread: { sunoo: 2, sms: 1 },
+    unknown: [], unknownUnread: 0, arrived: false,
+    step: 0, typing: false, busy: false, newCount: 0,
+    tries: 3, wrong: [], over: false,
+    revealed: false, phase: 'guess',   // guess → answer(고백에 대답) → done
+    pending: null, fails: 0, timers: [],
   };
 }
+const call = () => josa(S.name, '아', '야');   // 지민아 / 미지야
+const unknownName = () => S.revealed ? CHARS[S.culprit].name : UNKNOWN;
+const wait = ms => new Promise(r => S.timers.push(setTimeout(r, ms)));
 
 /* ===================== 화면 전환 ===================== */
 let stack = [];
@@ -505,6 +589,7 @@ function show(id) {
 }
 function goHome() { $('#sv').classList.remove('show'); stack = []; renderHome(); show('home'); }
 function openApp(app, page, arg) {
+  $('#sv').classList.remove('show');
   if (S.badges[app]) { S.badges[app] = 0; renderHome(); }
   stack = [{ app, page: PAGES[app].start, arg: null }];
   if (page) stack.push({ app, page, arg });
@@ -513,6 +598,10 @@ function openApp(app, page, arg) {
 function go(page, arg) { stack.push({ app: cur().app, page, arg }); renderApp(); }
 function tab(page) { stack[stack.length - 1] = { app: cur().app, page, arg: null }; renderApp(); }
 function back() { if (stack.length > 1) { stack.pop(); renderApp(); } else goHome(); }
+const inApp = (app, page, arg) => {
+  const c = cur();
+  return $('#app').classList.contains('active') && c && c.app === app && (!page || c.page === page) && (!arg || c.arg === arg);
+};
 
 function renderApp() {
   const c = cur();
@@ -532,8 +621,28 @@ function toast(t) {
   const el = $('#toast'); el.textContent = t; el.classList.add('show');
   clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 1800);
 }
+let bannerT;
+function banner(icon, title, text, onClick) {
+  const b = $('#banner');
+  b.innerHTML = `${icon}<div class="nb"><div class="nh"><b>${title}</b><span>지금</span></div><div class="np">${text}</div></div>`;
+  b.classList.add('show');
+  b.onclick = () => { b.classList.remove('show'); onClick && onClick(); };
+  clearTimeout(bannerT); bannerT = setTimeout(() => b.classList.remove('show'), 4200);
+}
 
-/* ===================== 잠금화면 ===================== */
+/* ===================== 화면 0: 이름 입력 ===================== */
+$('#nameForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const inp = $('#nameInput');
+  const name = inp.value.trim().replace(/[<>&"]/g, '');
+  if (!name) { inp.classList.remove('shake'); void inp.offsetWidth; inp.classList.add('shake'); inp.focus(); return; }
+  inp.blur();
+  newGame(name);
+  renderHome();
+  show('lock');
+});
+
+/* ===================== 화면 1: 잠금화면 ===================== */
 function makeStars() {
   document.querySelectorAll('.wall').forEach(w => {
     const s = document.createElement('div'); s.className = 'stars';
@@ -546,13 +655,8 @@ function makeStars() {
     w.prepend(s);
   });
 }
-
-let downY = null;
-$('#lock').addEventListener('pointerdown', e => downY = e.clientY);
-$('#lock').addEventListener('pointerup', e => {
-  if (downY === null) return;
+$('#lock').addEventListener('click', e => {
   const noti = e.target.closest('.noti');
-  downY = null;
   toPass(noti ? noti.dataset.open : null);
 });
 
@@ -581,13 +685,9 @@ $('#keypad').addEventListener('click', e => {
 });
 function checkCode() {
   if (code === '0000') {
-    S.unlocked = true;
     renderHome(); show('home');
-    startTimers();
-    if (S.pending) {
-      const app = S.pending;
-      setTimeout(() => app === 'kakao' ? openApp('kakao', 'chat', 'unknown') : openApp(app), 450);
-    }
+    const app = S.pending;
+    if (app) setTimeout(() => app === 'kakao' ? openApp('kakao', 'chat', 'sunoo') : openApp(app), 450);
     return;
   }
   S.fails++;
@@ -597,12 +697,12 @@ function checkCode() {
   code = ''; setTimeout(dots, 250);
 }
 
-/* ===================== 홈 화면 ===================== */
+/* ===================== 화면 2: 홈 화면 ===================== */
 const HOME_APPS = [['web', '인터넷'], ['kakao', '카카오톡'], ['insta', '인스타'], ['yt', '유튜브']];
 const DOCK_APPS = [['phone', '전화'], ['sms', '문자'], ['memo', '메모'], ['settings', '설정']];
 const ICON_TXT = { web: '🌐', phone: '📞', settings: '⚙️' };
 function iconHTML([id, label]) {
-  const b = S.badges[id] ? `<span class="badge">${S.badges[id]}</span>` : '';
+  const b = S && S.badges[id] ? `<span class="badge">${S.badges[id]}</span>` : '';
   return `<button class="app-ic" data-app="${id}">${b}<div class="ic ic-${id}">${ICON_TXT[id] || ''}</div><span class="lb">${label}</span></button>`;
 }
 function renderHome() {
@@ -624,6 +724,8 @@ $('#app').addEventListener('click', e => {
   else if (t.hasAttribute('data-back')) back();
   else if (t.dataset.toast) toast(t.dataset.toast);
   else if (t.dataset.act === 'guess') openGuess();
+  else if (t.dataset.act === 'talk') talk();
+  else if (t.dataset.act === 'yes' || t.dataset.act === 'no') answer(t.dataset.act === 'yes');
   else if (t.hasAttribute('data-tg')) { t.classList.toggle('on'); toast('지금은 설정을 바꿀 수 없어요'); }
 });
 
@@ -632,94 +734,188 @@ const head = (title, right = '') => `<header class="ah"><button class="ab" data-
 const tabs = (items, on) => `<nav class="tabs">${items.map(([icon, label, page]) =>
   `<button class="tab ${page === on ? 'on' : ''}" ${page ? `data-tab="${page}"` : `data-toast="준비 중인 기능입니다"`}><b>${icon}</b>${label}</button>`).join('')}</nav>`;
 const sys = text => ({ t: 'sys', text });
-const them = (name, text, time, cls = '') => ({ t: 'them', name, text, time, cls });
-const me = (text, time) => ({ t: 'me', text, time });
+const them = (name, text, time = '오후 11:30') => ({ t: 'them', name, text, time });
+const me = (text, time = '오후 11:30') => ({ t: 'me', text, time });
 
 /* ===================== 카카오톡 ===================== */
-const UNKNOWN = '(알 수 없음)';
-function unknownMsgs() {
-  return [
-    sys('2025년 10월 30일 목요일'),
-    them(UNKNOWN, '아직 안 자?', '오후 11:29'),
-    them(UNKNOWN, '그날 일, 기억나?', '오후 11:30'),
-    ...S.extra,
-  ];
-}
 function chatData(id) {
-  const [a, b, c, d] = S.cls;
   switch (id) {
-    case 'unknown': return { title: UNKNOWN, msgs: unknownMsgs(), guess: true };
-    case 'flight': {
-      const n = S.alibi.flight;
-      return { title: n, msgs: [sys('2025년 10월 30일 목요일'), me('출장 오늘 가는 거지?', '오후 8:40'), them(n, '응 나 지금 비행기 탑승 ✈️', '오후 9:12'), them(n, '이륙하면 폰 꺼야 돼서 내일 아침에 도착하면 연락할게!', '오후 9:13'), me('조심히 다녀와~', '오후 9:15')] };
-    }
-    case 'mom': return { title: '엄마', msgs: [sys('2025년 10월 30일 목요일'), them('엄마', '밥은 먹었니?', '오후 10:05'), me('응 먹었어', '오후 10:09'), them('엄마', '일찍 자라 🙏', '오후 10:12')] };
-    case 'team': return { title: '기획팀', msgs: [sys('2025년 10월 30일 목요일'), them('김팀장', '다들 오늘 고생 많았어요', '오후 9:40'), them('김팀장', '내일 회의 10시로 변경입니다', '오후 9:47'), them('박대리', '넵 알겠습니다!', '오후 9:48')] };
-    case 'class': return { title: '고3 2반 우리끼리 🌙', msgs: [sys('2025년 9월 14일 일요일'), them(a, '다들 살아있냐 ㅋㅋㅋ', '오후 8:02'), them(b, '동창회 언제 해?', '오후 8:05'), them(c, '연말에 하자', '오후 8:06'), me('ㅇㅋ 나도 연말 좋아', '오후 8:10'), them(d, '그럼 12월에 날 잡자', '오후 8:13')] };
+    case 'unknown': return { title: unknownName(), msgs: [sys('2025년 10월 30일 목요일'), ...S.unknown] };
+    case 'sunoo': return { title: '선우', msgs: [sys('2025년 10월 30일 목요일'), me('오늘 진짜 피곤하다 ㅠㅠ', '오후 10:02'), them('선우', '고생했어 ㅠㅠ 일찍 자', '오후 10:03'), them('선우', `${call()} 내일 떡볶이 먹으러 갈래? 🍢`, '오후 11:28'), them('선우', '아 그리고 인스타 봤어? 다들 스토리 올렸던데 ㅋㅋ', '오후 11:29')] };
+    case 'mom': return { title: '엄마', msgs: [sys('2025년 10월 30일 목요일'), them('엄마', '재윤이 유학 끝나고 한국 들어왔대~', '오후 9:30'), them('엄마', '어릴 때 엄마 모임 때마다 같이 놀던 재윤이 기억나지? 연락 한번 해 봐', '오후 9:31'), them('엄마', '전화는 왜 안 받아~ 일찍 자라 🙏', '오후 9:32')] };
+    case 'jw': return { title: '정원 오빠', msgs: [sys('2025년 10월 30일 목요일'), me('오빠 저번에 빌린 우산 다음에 꼭 돌려줄게요!', '오후 10:31'), them('정원 오빠', '천천히 줘도 돼 ㅎㅎ', '오후 10:35'), them('정원 오빠', '오늘 고생 많았지? 푹 쉬어 😊', '오후 10:40')] };
+    case 'sh': return { title: '성훈 선배', msgs: [sys('2025년 10월 30일 목요일'), them('성훈 선배', '과제 자료 보내줬어~', '오후 8:10'), them('성훈 선배', '막히는 거 있으면 언제든지 물어봐', '오후 8:11'), me('감사합니다 선배 ㅠㅠ 다음에 커피 살게요!', '오후 8:15'), them('성훈 선배', 'ㅎㅎ 그래 그럼 약속', '오후 8:16')] };
+    case 'nk': return { title: '리키', msgs: [sys('2025년 10월 30일 목요일'), me('어디야?', '오후 9:50'), them('리키', '집', '오후 9:54'), me('아까 편의점에서 너 본 것 같은데', '오후 9:55'), them('리키', 'ㅇ', '오후 9:58'), them('리키', '늦게 다니지 마', '오후 9:58')] };
+    case 'jay': return { title: '종성', msgs: [sys('2025년 10월 30일 목요일'), them('종성', '새 기타 샀다 🎸', '오후 7:20'), them('종성', '나중에 소리 들어볼래?', '오후 7:20'), me('오 대박 들려줘!!', '오후 7:31'), them('종성', 'ㅋㅋ 새 곡 다 만들면 제일 먼저 들려줄게', '오후 7:33')] };
   }
+}
+function kakaoRows() {
+  const rows = [];
+  if (S.arrived) {
+    const last = [...S.unknown].reverse().find(m => m.t !== 'sys');
+    rows.push({ id: 'unknown', name: unknownName(), who: unknownName(), last: last ? last.text : '', time: '오후 11:30', unread: S.unknownUnread });
+  }
+  rows.push(
+    { id: 'sunoo', name: '선우', who: '선우', last: '아 그리고 인스타 봤어? 다들 스토리 올렸던데 ㅋㅋ', time: '오후 11:29', unread: S.unread.sunoo },
+    { id: 'jw', name: '정원 오빠', who: '정원 오빠', last: '오늘 고생 많았지? 푹 쉬어 😊', time: '오후 10:40' },
+    { id: 'nk', name: '리키', who: '리키', last: '늦게 다니지 마', time: '오후 9:58' },
+    { id: 'mom', name: '엄마', who: '엄마', last: '전화는 왜 안 받아~ 일찍 자라 🙏', time: '오후 9:32' },
+    { id: 'sh', name: '성훈 선배', who: '성훈 선배', last: 'ㅎㅎ 그래 그럼 약속', time: '오후 8:16' },
+    { id: 'jay', name: '종성', who: '종성', last: 'ㅋㅋ 새 곡 다 만들면 제일 먼저 들려줄게', time: '오후 7:33' },
+  );
+  return rows;
 }
 const PAGES = {};
 PAGES.kakao = {
   start: 'list',
   list() {
-    const u = unknownMsgs();
-    const rows = [
-      { id: 'unknown', name: UNKNOWN, av: avatar('?', '#3a3a44'), last: u[u.length - 1].text, time: '오후 11:30', unread: S.unread.unknown },
-      { id: 'mom', name: '엄마', av: avatar('엄', '#d98b6a'), last: '일찍 자라 🙏', time: '오후 10:12' },
-      { id: 'team', name: '기획팀 <em>5</em>', av: avatar('기', '#5b6475'), last: '내일 회의 10시로 변경입니다', time: '오후 9:47' },
-    ];
-    if (S.alibi.flight) rows.push({ id: 'flight', name: S.alibi.flight, av: avatar(S.alibi.flight), last: '이륙하면 폰 꺼야 돼서 내일 아침에 도착하면 연락할게!', time: '오후 9:13' });
-    rows.push({ id: 'class', name: '고3 2반 우리끼리 🌙 <em>7</em>', av: avatar('2', '#4a3b6b'), last: '그럼 12월에 날 잡자', time: '9월 14일' });
     return head('채팅', '<span>🔍</span><span>💬</span>') +
-      `<div class="scroll">${rows.map(r => `<div class="row" data-go="chat:${r.id}">${r.av}<div class="mid"><div class="t1">${r.name}</div><div class="t2">${r.last}</div></div><div class="side">${r.time}${r.unread ? `<span class="un">${r.unread}</span>` : ''}</div></div>`).join('')}</div>` +
+      `<div class="scroll">${kakaoRows().map(r => `<div class="row" data-go="chat:${r.id}">${avatarOf(r.who)}<div class="mid"><div class="t1">${r.name}</div><div class="t2">${esc(r.last)}</div></div><div class="side">${r.time}${r.unread ? `<span class="un">${r.unread}</span>` : ''}</div></div>`).join('')}</div>` +
       tabs([['👤', '친구'], ['💬', '채팅', 'list'], ['🎬', '오픈채팅'], ['🛍', '쇼핑'], ['⋯', '더보기']], 'list');
   },
   chat(id) {
     const d = chatData(id);
-    if (id === 'unknown') S.unread.unknown = 0;
+    if (id === 'unknown') S.unknownUnread = 0;
+    if (id === 'sunoo') S.unread.sunoo = 0;
     let prev = null;
-    const body = d.msgs.map((m, i) => {
+    let body = d.msgs.map((m, i) => {
       const isNew = id === 'unknown' && i >= d.msgs.length - S.newCount;
       if (m.t === 'sys') { prev = null; return `<div class="ksys">${m.text}</div>`; }
-      if (m.t === 'me') { prev = null; return `<div class="km me">${m.time ? `<span class="kt">${m.time}</span>` : ''}<div class="kb">${m.text}</div></div>`; }
-      const cont = prev === m.name; prev = m.name;
-      const av = m.name === UNKNOWN ? avatar('?', '#3a3a44') : avatar(m.name, m.name === '엄마' ? '#d98b6a' : m.name.length > 2 ? '#5b6475' : null);
-      return `<div class="km ${cont ? 'cont' : ''} ${isNew ? 'new' : ''}">${av}<div><div class="kn">${m.name}</div><div class="kb">${m.text}</div></div>${m.time ? `<span class="kt">${m.time}</span>` : ''}</div>`;
+      if (m.t === 'me') { prev = null; return `<div class="km me ${isNew ? 'new' : ''}"><span class="kt">${m.time}</span><div class="kb">${esc(m.text)}</div></div>`; }
+      const who = m.name === UNKNOWN ? unknownName() : m.name;
+      const cont = prev === who; prev = who;
+      return `<div class="km ${cont ? 'cont' : ''} ${isNew ? 'new' : ''}">${avatarOf(who)}<div><div class="kn">${who}</div><div class="kb">${esc(m.text)}</div></div><span class="kt">${m.time}</span></div>`;
     }).join('');
     S.newCount = 0;
-    const foot = d.guess && !S.over
-      ? `<div class="kfoot"><button class="kguess" data-act="guess">너 누구야?</button></div>`
-      : `<div class="kfoot"><div class="kinput">메시지를 입력하세요</div></div>`;
+    if (id === 'unknown' && S.typing) body += `<div class="km typing ${prev === unknownName() ? 'cont' : ''}">${avatarOf(unknownName())}<div><div class="kn">${unknownName()}</div><div class="kb"><i></i><i></i><i></i></div></div></div>`;
+    const foot = id === 'unknown' ? chipsHTML() : `<div class="kfoot"><div class="kinput">메시지를 입력하세요</div></div>`;
     return head(d.title, '<span>🔍</span><span>☰</span>') + `<div class="scroll">${body}</div>` + foot;
   },
 };
+
+/* ===================== 익명 채팅: "나 기억나?" ===================== */
+const TALK = ['누구세요…?', '힌트 하나만 더 줘', '마지막 힌트!'];
+function chipsHTML() {
+  if (S.phase === 'answer') return `<div class="kfoot ${S.busy ? 'busy' : ''}"><button class="chipb main" data-act="yes">${ANSWER_YES}</button><button class="chipb" data-act="no">${ANSWER_NO}</button></div>`;
+  if (S.over) return `<div class="kfoot"><div class="kinput">대화가 끝났습니다</div></div>`;
+  const talkBtn = S.step < TALK.length ? `<button class="chipb" data-act="talk">${TALK[S.step]}</button>` : '';
+  return `<div class="kfoot ${S.busy ? 'busy' : ''}">${talkBtn}<button class="chipb main" data-act="guess">너 누구야?</button></div>`;
+}
+function refreshUnknown() {
+  if (inApp('kakao', 'chat', 'unknown') || inApp('kakao', 'list')) renderApp();
+}
+function pushUnknown(m) {
+  S.unknown.push(m);
+  if (inApp('kakao', 'chat', 'unknown')) { S.newCount = 1; renderApp(); return; }
+  if (m.t === 'them') {
+    S.unknownUnread++; S.badges.kakao++;
+    renderHome(); refreshUnknown();
+    banner('<div class="ni ic-kakao mini"></div>', unknownName(), esc(m.text), () => openApp('kakao', 'chat', 'unknown'));
+  }
+}
+/* 상대가 입력 중(•••) 표시를 보여준 뒤 메시지를 하나씩 보낸다 */
+async function themSay(lines) {
+  const g = S;
+  for (const l of lines) {
+    await wait(450); if (S !== g) return false;
+    S.typing = true; refreshUnknown();
+    await wait(800 + Math.min(l.length * 28, 1400)); if (S !== g) return false;
+    S.typing = false; pushUnknown(them(UNKNOWN, l));
+  }
+  return true;
+}
+/* 첫 ♡를 누르고 조금 뒤 도착하는 연락 */
+async function arrive() {
+  const g = S;
+  await wait(3500); if (S !== g) return;
+  S.arrived = true;
+  pushUnknown(them(UNKNOWN, call()));
+  await wait(1600); if (S !== g) return;
+  pushUnknown(them(UNKNOWN, '나 기억나?'));
+}
+async function talk() {
+  if (S.busy || S.over || S.step >= TALK.length) return;
+  const c = CHARS[S.culprit];
+  const step = S.step++;
+  S.busy = true;
+  pushUnknown(me(TALK[step]));
+  const lines = step === 0 ? [...c.intro, c.hints[0]] : step === 1 ? [c.hints[1]] : [c.hints[2], '이제 알겠지?'];
+  if (!await themSay(lines)) return;
+  S.busy = false; refreshUnknown();
+}
+
+/* ===================== 정답 고르기 ===================== */
+function openGuess() {
+  if (S.busy || S.over) return;
+  const m = $('#modal');
+  m.innerHTML = `<div class="sheet"><h3>너 누구야?</h3><p class="msub">남은 기회 ${S.tries}번</p>
+    <div class="gl">${CHARS.map((c, i) => `<button class="gb" data-pick="${i}" ${S.wrong.includes(i) ? 'disabled' : ''}>${avatarPh(i, 'round')}<span>${c.label}</span></button>`).join('')}</div>
+    <button class="gcancel" data-close>닫기</button></div>`;
+  m.classList.add('show');
+}
+$('#modal').addEventListener('click', e => {
+  const p = e.target.closest('[data-pick]');
+  if (p && !p.disabled) { closeModal(); pick(+p.dataset.pick); return; }
+  if (e.target.closest('[data-close]') || e.target.id === 'modal') closeModal();
+});
+const closeModal = () => $('#modal').classList.remove('show');
+
+async function pick(i) {
+  const g = S;
+  S.busy = true;
+  pushUnknown(me(`혹시… ${CHARS[i].label}?`));
+  if (i === S.culprit) {
+    S.over = true;
+    if (!await themSay(CONFESS.slice(0, 1))) return;
+    S.revealed = true;                       // 채팅방 이름이 그 사람 이름으로 바뀐다
+    renderHome(); refreshUnknown();
+    if (!await themSay(CONFESS.slice(1))) return;
+    S.phase = 'answer'; S.busy = false; refreshUnknown();
+    return;
+  }
+  S.wrong.push(i); S.tries--;
+  if (!await themSay(['아닌데...'])) return;
+  if (S.tries === 0) {
+    S.over = true; S.busy = false; refreshUnknown();
+    await wait(1100); if (S !== g) return;
+    ending('missed');
+    return;
+  }
+  S.busy = false; refreshUnknown();
+}
+/* 고백에 대한 대답: 나도 널 좋아해 → 해피엔딩 / 미안 → 배드엔딩 */
+async function answer(yes) {
+  if (S.busy || S.phase !== 'answer') return;
+  const g = S;
+  S.busy = true; S.phase = 'done';
+  pushUnknown(me(yes ? ANSWER_YES : ANSWER_NO));
+  if (!await themSay(yes ? REPLY_YES(call()) : REPLY_NO)) return;
+  S.busy = false; refreshUnknown();
+  await wait(1600); if (S !== g) return;
+  ending(yes ? 'happy' : 'bad');
+}
+
 /* ===================== 전화 ===================== */
 const PHONE_TABS = [['⭐', '즐겨찾기'], ['🕘', '최근 기록', 'recent'], ['👥', '연락처', 'contacts'], ['⌨️', '키패드', 'keypad']];
 PAGES.phone = {
   start: 'recent',
   recent() {
     const calls = [
-      ['발신번호 표시제한', '휴대전화 · 부재중', '오후 9:30', true, 'hidden'],
-      ['엄마', '휴대전화 · 발신', '오후 6:02'],
-      ['김팀장', '휴대전화 · 수신', '오후 2:20'],
-      ['동네치킨', '발신', '어제'],
-      [S.cls[4], '휴대전화 · 수신', '10월 2일'],
-      ['스팸 의심', '수신 거부', '9월 28일'],
+      ['엄마', '휴대전화 · 부재중', '오후 9:30', true],
+      ['정원 오빠', '휴대전화 · 수신 (12분)', '어제'],
+      ['선우', '휴대전화 · 발신 (48분)', '어제'],
+      ['재윤', '휴대전화 · 수신 (3분) · 새 번호', '10월 27일'],
+      ['성훈 선배', '휴대전화 · 발신', '10월 24일'],
+      ['종성', '휴대전화 · 수신', '10월 20일'],
     ];
-    return head('최근 기록', '<span>편집</span>') + `<div class="scroll">` + calls.map(([n, t, time, miss, id]) =>
-      `<div class="row" ${id ? `data-go="info:${id}"` : `data-toast="지금 이 시간에 전화하긴 좀…"`}><div class="mid"><div class="t1 ${miss ? 'missed' : ''}">${n}</div><div class="t2">${t}</div></div><div class="side">${time}</div></div><div class="hr" style="margin-left:16px"></div>`).join('') +
+    return head('최근 기록', '<span>편집</span>') + `<div class="scroll">` + calls.map(([n, t, time, miss]) =>
+      `<div class="row" data-toast="지금 이 시간에 전화하긴 좀…">${avatarOf(n, 'round')}<div class="mid"><div class="t1 ${miss ? 'missed' : ''}">${n}</div><div class="t2">${t}</div></div><div class="side">${time}</div></div>`).join('') +
       `</div>` + tabs(PHONE_TABS, 'recent');
   },
-  info() {
-    return head('') + `<div class="scroll"><div class="callinfo">${avatar('?', '#3a3a44', 'round')}<h2>발신번호 표시제한</h2><p>번호를 확인할 수 없습니다</p></div>
-      <div class="ctable"><div><span>날짜</span>오늘</div><div><span>시간</span>오후 9:30</div><div><span>유형</span><b class="missed">부재중 전화</b></div><div><span>벨 울린 시간</span>23초</div></div>
-      <p style="text-align:center;color:var(--sub);font-size:13px;padding:0 30px;line-height:1.6">이 시간에 전화할 수 있었던 사람은 누구일까?</p></div>`;
-  },
   contacts() {
-    const list = [...NAMES.map(n => [n, S.nums[n]]), ['김팀장', '010-3321-0090'], ['동네치킨', '031-555-1234'], ['엄마', '010-5823-7714']]
-      .sort((x, y) => x[0].localeCompare(y[0], 'ko'));
-    return head('연락처', '<span>＋</span>') + `<div class="scroll"><div class="row" data-toast="내 번호: 010-2030-1130">${avatar('나', '#555', 'round')}<div class="mid"><div class="t1">나</div><div class="t2">내 카드</div></div></div>` +
-      list.map(([n, num]) => `<div class="row" data-toast="${num}">${avatar(n, COLOR[n] || '#555', 'round')}<div class="mid"><div class="t1">${n}</div><div class="t2">${num}</div></div></div>`).join('') +
+    const list = [...CHARS.map(c => [c.label, c.role]), ['엄마', '']].sort((x, y) => x[0].localeCompare(y[0], 'ko'));
+    return head('연락처', '<span>＋</span>') + `<div class="scroll"><div class="row" data-toast="내 번호: 010-2030-1130">${avatar('나', '#555', 'round')}<div class="mid"><div class="t1">${esc(S.name)}</div><div class="t2">내 카드</div></div></div>` +
+      list.map(([n, role]) => `<div class="row" data-toast="지금 이 시간에 전화하긴 좀…">${avatarOf(n, 'round')}<div class="mid"><div class="t1">${n}</div><div class="t2">${role}</div></div></div>`).join('') +
       `</div>` + tabs(PHONE_TABS, 'contacts');
   },
   keypad() {
@@ -730,37 +926,26 @@ PAGES.phone = {
 };
 
 /* ===================== 문자 ===================== */
-const CREEP_NUM = '010-4821-1130';
 function smsList() {
   return [
     { id: 'dawn', from: '1588-1255', last: '[Web발신] 새벽배송 상품이 출고되었습니다. 내일 오전 7시 전 도착 예정', time: '오후 10:52' },
-    { id: 'creep', from: CREEP_NUM, last: '새 번호 맞지? 아까 전화 왜 안 받아.', time: '오후 10:47', unread: S.unread.sms },
     { id: 'auth', from: '1599-0001', last: '[Web발신] [모바일뱅킹] 인증번호 [482913]를 입력해 주세요.', time: '오후 9:58' },
-    { id: 'card', from: '1588-8100', last: '[Web발신] ○○카드 승인 12,800원 편의점 일시불', time: '어제' },
-    { id: 'group', from: `엄마, ${S.knows[0]} 외 ${S.knows.length - 1}명`, last: '나 번호 바꿨어! 이 번호로 저장해줘 🙏', time: '10월 12일' },
+    { id: 'card', from: '1588-8100', last: '[Web발신] ○○카드 승인 4,800원 편의점 일시불', time: '오후 9:41' },
+    { id: 'jake', from: '010-4821-0915', last: 'Hey! 재윤이야 ㅎㅎ 한국 번호 새로 만들었어. 저장해 줘!', time: '10월 27일', unread: S.unread.sms },
   ];
 }
 PAGES.sms = {
   start: 'list',
   list() {
     return head('메시지', '<span>✏️</span>') + `<div class="scroll">` + smsList().map(m =>
-      `<div class="row" data-go="thread:${m.id}">${m.unread ? '<span class="dot"></span>' : '<span style="width:9px"></span>'}${avatar(m.from[0] === '0' || m.from[0] === '1' ? '#' : m.from, '#3b3d4a', 'round')}<div class="mid"><div class="t1">${m.from}</div><div class="t2">${m.last}</div></div><div class="side">${m.time}</div></div>`).join('') + `</div>`;
+      `<div class="row" data-go="thread:${m.id}">${m.unread ? '<span class="dot"></span>' : '<span style="width:9px"></span>'}${avatar('#', '#3b3d4a', 'round')}<div class="mid"><div class="t1">${m.from}</div><div class="t2">${m.last}</div></div><div class="side">${m.time}</div></div>`).join('') + `</div>`;
   },
   thread(id) {
     const m = smsList().find(x => x.id === id);
     let body = `<div class="stime">${m.time}</div><div class="sb">${m.last}</div>`;
-    if (id === 'creep') {
+    if (id === 'jake') {
       S.unread.sms = 0;
-      body = `<div class="stime">오늘 오후 10:47</div><div class="sb creep">새 번호 맞지?</div><div class="sb creep">아까 전화 왜 안 받아.</div><div class="stime" style="margin-top:30px">이 번호는 연락처에 없습니다</div>`;
-    }
-    if (id === 'group') {
-      const replier = S.knows[S.knows.length - 1];
-      body = `<div class="recv">받는 사람 <b>${S.knows.length + 1}명</b><br><b>엄마, ${S.knows.join(', ')}</b></div>
-        <div class="stime">2025년 10월 12일 오후 8:03</div>
-        <div class="sb me">나 번호 바꿨어! 이 번호로 저장해줘 🙏</div>
-        <div class="sb me">다른 사람한텐 아직 말하지 말고 ㅎㅎ</div>
-        <div class="sname">엄마</div><div class="sb">알았다</div>
-        <div class="sname">${replier}</div><div class="sb">ㅇㅋ 저장!</div>`;
+      body = `<div class="stime">10월 27일 오후 2:14</div><div class="sb">Hey! 재윤이야 ㅎㅎ</div><div class="sb">한국 번호 새로 만들었어. 저장해 줘!</div><div class="sb">3년 만에 돌아오니까 다 신기하다 ㅋㅋ</div><div class="sb me">헐 재윤이?? 완전 오랜만이다!</div><div class="sb">ㅎㅎ 조만간 밥 먹자</div>`;
     }
     return head(m.from) + `<div class="scroll">${body}</div><div class="kfoot" style="background:#0f1016"><div class="kinput">문자 메시지</div></div>`;
   },
@@ -769,12 +954,11 @@ PAGES.sms = {
 /* ===================== 메모 ===================== */
 function memos() {
   return [
-    { id: 'shop', title: '장보기', date: '오늘', body: '우유\n계란\n라면\n건전지 (손전등용)' },
-    { id: 'num', title: '번호 바꿈', date: '2025. 10. 12.', body: '새 번호 → 010-2030-1130\n\n꼭 필요한 사람한테만 문자로 알려주기.\n단톡방엔 절대 올리지 말 것.' },
-    { id: 'trip', title: '별빛펜션 1박 🏕', date: '2022. 10. 27.', body: `10/30(일) ~ 10/31(월)\n별빛펜션 (산 중턱, 버스 종점에서 도보 40분)\n\n같이 가는 사람:\n나, ${S.trip.join(', ')}\n\n회비 3만 원씩 → 나한테\n준비물: 고기, 랜턴, 보드게임, 담요` },
-    { id: 'that', title: '…', date: '2022. 10. 31.', body: '그날 일은 아무한테도 말하지 않기로 했다.\n\n밤 11시 30분.\n\n잊자.' },
-    { id: 'pw', title: '할 일', date: '2025. 9. 2.', body: '- 폰 비밀번호 바꾸기 (아직 초기값 0000…)\n- 보험 서류 내기\n- 동창회 날짜 정하기' },
-    { id: 'bucket', title: '2025 버킷리스트', date: '2025. 1. 1.', body: '1. 운동 꾸준히\n2. 혼자 여행 가기\n3. 연락 끊긴 친구들한테 먼저 연락하기' },
+    { id: 'todo', title: '이번 주 할 일', date: '오늘', body: '- 정원 오빠 우산 돌려주기 ☂️\n- 성훈 선배한테 커피 사기 (과제 도와줌)\n- 리키한테 편의점 우유값 갚기\n- 엄마가 재윤이네 반찬 갖다주래' },
+    { id: 'photo', title: '어릴 때 사진 정리', date: '2025. 10. 18.', body: '앨범 정리하다가 발견 ㅋㅋㅋ\n\n- 다섯 살, 놀이터 그네 앞에서 종성이랑\n  (넘어져서 울고 있음 ㅋㅋ 종성이가 업어줬다고 엄마가 그랬음)\n- 엄마 모임에서 재윤이랑 케이크 먹는 사진\n- 초등학교 운동회' },
+    { id: 'bff', title: '선우랑 버킷리스트 💛', date: '2025. 9. 3.', body: '1. 떡볶이 맛집 10군데 도장깨기 (3/10)\n2. 같이 바다 보러 가기\n3. MBTI 똑같은 기념으로 사진 찍기 ㅋㅋ\n\n말 안 해도 통하는 사이 🤝' },
+    { id: 'shop', title: '장보기', date: '2025. 10. 29.', body: '딸기우유\n라면\n샴푸' },
+    { id: 'pw', title: '메모', date: '2025. 9. 2.', body: '폰 비밀번호 바꾸기 (아직 0000…)' },
   ];
 }
 PAGES.memo = {
@@ -789,151 +973,134 @@ PAGES.memo = {
   },
 };
 
-/* ===================== 인스타 ===================== */
+/* ===================== 인스타: 피드 ===================== */
 function instaPosts() {
-  const posts = [];
-  if (S.alibi.concert) {
-    const n = S.alibi.concert;
-    posts.push({ who: n, time: '오후 9:24', img: ['linear-gradient(160deg,#2b0f45,#c2185b)', '🎤', '공연장 A구역'], likes: 87, text: '드디어 콘서트 시작!! 끝날 때까지 폰 무음 🔇', cmt: [['minji.day', '부럽다ㅠㅠ'], ['daily_cafe', '즐공!']] });
-  }
-  posts.push({ who: 'daily_cafe', time: '5시간 전', img: ['linear-gradient(160deg,#6b4226,#d9a066)', '☕'], likes: 128, text: '오늘의 원두 · 에티오피아 예가체프' });
-  if (S.alibi.night) {
-    const n = S.alibi.night;
-    posts.push({ who: n, time: '오후 9:02', img: ['linear-gradient(160deg,#0f3d3e,#2a9d8f)', '🏥', '병동 휴게실'], likes: 41, text: '야간 근무 시작 🌙 내일 아침까지 폰은 사물함에!', cmt: [['jun.hyuk', '화이팅'], ['seojin_0412', '고생해 ㅠ']] });
-  }
-  posts.push({ who: 'me', time: '3년 전', img: ['radial-gradient(circle at 50% 120%,#1b2a5a,#05060f 70%)', '🌌', '별빛펜션'], likes: 31, text: '별이 진짜 많았던 밤', cmt: [['heeseo.__', '다들 아직 기억하고 있지? 그날 11시 30분.', true, '3일 전']] });
-  posts.push({ who: 'seoul.night', time: '1일 전', img: ['linear-gradient(160deg,#141e30,#243b55)', '🌃'], likes: 2410, text: '오늘 밤 한강 야경' });
-  posts.push({ who: 'foodie.kim', time: '2일 전', img: ['linear-gradient(160deg,#ff9a3c,#ff4b2b)', '🍜'], likes: 512, text: '비 오는 날엔 역시 라멘' });
-  return posts;
-}
-const nameOf = h => Object.keys(HANDLE).find(n => HANDLE[n] === h);
-const handleOf = w => w === 'me' ? 'my.night_' : HANDLE[w] || w;
-function instaAv(w) {
-  const n = w === 'me' ? '나' : NAMES.includes(w) ? w : nameOf(w);
-  return avatar(n || w, n && COLOR[n] ? COLOR[n] : '#555');
+  return [
+    { who: 0, time: '40분 전', img: ['linear-gradient(160deg,#2b1d14,#8a5a3c)', '🎸', '합주실'], likes: 214, text: '새 곡 연습 중. 언젠가 제일 먼저 들려주고 싶은 사람이 있음', cmt: [['sunoo_', '오 누군데 누군데 ㅋㅋ'], ['js.jay', '비밀']] },
+    { who: 4, time: '2시간 전', img: ['linear-gradient(160deg,#ffd1dc,#ff8fab)', '🍓🥛', '편의점'], likes: 388, text: '.', cmt: [['sunoo_', '누구 주려고 산 거야 ㅋㅋㅋ'], ['ni_ki', '아님']] },
+    { who: 2, time: '5시간 전', img: ['linear-gradient(160deg,#ff9a3c,#ff4b2b)', '🍢', '단골 떡볶이집'], likes: 301, text: '떡볶이는 역시 베프랑 먹어야 제맛 💛', cmt: [['js.jay', '나도 불러라']] },
+    { who: 1, time: '6시간 전', img: ['linear-gradient(160deg,#1f2a44,#4b6584)', '📚', '중앙도서관'], likes: 276, text: '도서관 마감까지 ✍️ 다들 과제 화이팅', cmt: [['jake', '형 진짜 성실하다 ㅋㅋ']] },
+    { who: 5, time: '1일 전', img: ['linear-gradient(160deg,#3a4f63,#8fa9bf)', '☔', '집 가는 길'], likes: 245, text: '비 오는 날엔 우산 하나면 충분해', cmt: [['ni_ki', '?'], ['jungw0n', 'ㅎㅎ']] },
+    { who: 3, time: '3일 전', img: ['linear-gradient(160deg,#9bd0ff,#4d7cff)', '✈️', '인천국제공항'], likes: 532, text: 'Finally home 🇰🇷 3년 만이다', cmt: [['jungw0n', '재윤아 환영해!'], ['psh', '밥 한번 먹자']] },
+  ];
 }
 const INSTA_TABS = [['🏠', '홈', 'feed'], ['🔍', '검색'], ['🎬', '릴스'], ['🛍', '쇼핑'], ['👤', '프로필']];
 PAGES.insta = {
   start: 'feed',
   feed() {
-    const stories = `<div class="story" data-toast="아직 올린 스토리가 없습니다"><div class="ring seen">${instaAv('me')}</div><span>내 스토리</span></div>` +
-      STORIES.map((st, i) => `<div class="story" data-story="${i}"><div class="ring ${S.seenStories.has(i) ? 'seen' : ''}"><div class="av photo" style="background:url(${STORY_IMG[i]})"></div></div><span>${st.handle}</span></div>`).join('');
+    const stories = `<div class="story" data-toast="아직 올린 스토리가 없습니다"><div class="ring seen">${avatar('나', '#555', 'round')}</div><span>내 스토리</span></div>` +
+      CHARS.map((c, i) => `<div class="story" data-story="${i}"><div class="ring ${S.seenStories.has(i) ? 'seen' : ''}">${avatarPh(i, 'round')}</div><span>${c.handle}</span></div>`).join('');
     const posts = instaPosts().map(p => {
-      const sub = NAMES.includes(p.who) ? `${p.who} · ${p.time}` : p.time;
-      const cm = (p.cmt || []).map(([h, t, creep, tm]) => `<div class="pcm ${creep ? 'creep' : ''}" ${nameOf(h) ? `data-go="profile:${nameOf(h)}"` : ''}><b>${h}</b> ${t}${tm ? ` <span style="color:var(--sub);font-size:12px">${tm}</span>` : ''}</div>`).join('');
-      return `<article class="post"><div class="ph" ${NAMES.includes(p.who) ? `data-go="profile:${p.who}"` : ''}>${instaAv(p.who)}<div><b>${handleOf(p.who)}</b><small>${sub}</small></div></div>
-        <div class="pimg" style="background:${p.img[0]}">${p.img[1]}${p.img[2] ? `<span class="cap">📍 ${p.img[2]}</span>` : ''}</div>
-        <div class="pact">♡ 💬 ➤</div><div class="ptxt"><b>좋아요 ${p.likes.toLocaleString()}개</b></div>
-        <div class="ptxt"><b>${handleOf(p.who)}</b> ${p.text}</div>${cm}</article>`;
+      const c = CHARS[p.who];
+      const cm = p.cmt.map(([h, t]) => `<div class="pcm"><b>${h}</b> ${t}</div>`).join('');
+      return `<article class="post"><div class="ph-h" data-go="profile:${p.who}">${avatarPh(p.who, 'round')}<div><b>${c.handle}</b><small>${p.time}</small></div></div>
+        <div class="pimg" style="background:${p.img[0]}">${p.img[1]}<span class="cap">📍 ${p.img[2]}</span></div>
+        <div class="pact">♡ 💬 ➤</div><div class="ptxt"><b>좋아요 ${p.likes}개</b></div>
+        <div class="ptxt"><b>${c.handle}</b> ${p.text}</div>${cm}</article>`;
     }).join('');
     return head('<span class="logo-insta">Instagram</span>', '<span>♡</span><span>✉️</span>') + `<div class="scroll"><div class="stories">${stories}</div>${posts}</div>` + tabs(INSTA_TABS, 'feed');
   },
-  profile(n) {
-    const bios = { 희서: '…', 서진: '🌿 식물 키우는 중', 민지: '여행 📷 | 서울', 준혁: '야근 전문가', 도윤: '🏀 / 공대생', 지안: '기록하는 사람 ✍️' };
-    const priv = n === '희서';
-    const emo = ['🌊', '🍰', '🎧', '🌸', '🚲', '🌙'];
-    return head(HANDLE[n]) + `<div class="scroll"><div class="prof">${avatar(n, null, 'round')}<div class="pstat"><div><b>${priv ? 0 : 6}</b>게시물</div><div><b>${priv ? 12 : 214}</b>팔로워</div><div><b>${priv ? 3 : 198}</b>팔로잉</div></div></div>
-      <div class="pbio"><b>${n}</b><br>${bios[n]}</div>` +
-      (priv ? `<div class="locked"><div>🔒</div>비공개 계정입니다</div>` : `<div class="pgrid">${emo.map((e, i) => `<div style="background:hsl(${(i * 57 + n.charCodeAt(0)) % 360},35%,22%)">${e}</div>`).join('')}</div>`) + `</div>`;
+  profile(i) {
+    const c = CHARS[i];
+    const post = instaPosts().find(p => p.who === +i);
+    return head(c.handle) + `<div class="scroll"><div class="prof">${avatarPh(i, 'round')}<div class="pstat"><div><b>12</b>게시물</div><div><b>1,204</b>팔로워</div><div><b>198</b>팔로잉</div></div></div>
+      <div class="pbio"><b>${c.name}</b><br>${c.bio}</div>
+      <div class="pgrid"><div style="${photo(i)}"></div><div style="background:${post.img[0]}">${post.img[1]}</div>${['🌙', '🎧', '☁️', '🌿'].map((e, k) => `<div style="background:hsl(${(k * 67 + i * 40) % 360},30%,22%)">${e}</div>`).join('')}</div></div>`;
   },
 };
 
-/* 스토리: js.jay부터 차례대로, 화면을 한 번 누르면 다음 사람의 스토리로 넘어간다 */
-const STORIES = [
-  { handle: 'js.jay', time: '1시간' },
-  { handle: 'psh', time: '2시간' },
-  { handle: 'sunoo_', time: '3시간' },
-  { handle: 'jake', time: '5시간' },
-  { handle: 'ni_ki', time: '6시간' },
-  { handle: 'jungw0n', time: '8시간' },
-];
+/* ===================== 인스타: 스토리 =====================
+   js.jay부터 차례대로 보여주고, 화면을 한 번 누르면 다음 사람으로 넘어간다.
+   ♡를 가장 먼저 누른 사람이 이번 게임의 "나를 좋아하는 사람"이 된다.
+*/
+const STORY_TIME = ['1시간', '2시간', '3시간', '5시간', '6시간', '8시간'];
 let storyIdx = -1;
 function openStory(i) {
-  if (i >= STORIES.length) { closeStory(); return; }
+  if (i >= CHARS.length) { closeStory(); return; }
   storyIdx = i;
   S.seenStories.add(i);
-  const st = STORIES[i];
   const sv = $('#sv');
-  sv.innerHTML = `<div class="sv-img" style="background-image:url(${STORY_IMG[i]})"></div><div class="sv-shade"></div>
-    <div class="sv-bars">${STORIES.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div>
-    <div class="sv-head"><div class="av" style="background:url(${STORY_IMG[i]})"></div><b>${st.handle}</b><small>${st.time}</small><button class="sv-x" data-close>×</button></div>
-    <div class="sv-foot"><div>메시지 보내기</div><span>♡</span><span>➤</span></div>`;
+  sv.innerHTML = `<div class="sv-img" style="${photo(i)}"></div><div class="sv-shade"></div><div class="sv-shade b"></div>
+    <div class="sv-bars">${CHARS.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div>
+    <div class="sv-head">${avatarPh(i)}<b>${CHARS[i].handle}</b><small>${STORY_TIME[i]}</small><button class="sv-x" data-close>×</button></div>
+    <div class="bigheart">♥</div>
+    <div class="sv-foot"><div>메시지 보내기</div><button class="like ${S.liked.has(i) ? 'on' : ''}" data-like>${S.liked.has(i) ? '♥' : '♡'}</button><span>➤</span></div>`;
   sv.classList.add('show');
 }
 function closeStory() {
   $('#sv').classList.remove('show');
   storyIdx = -1;
-  const c = cur();
-  if (c && c.app === 'insta' && c.page === 'feed') renderApp();
+  if (inApp('insta', 'feed')) renderApp();
+}
+function likeStory() {
+  const i = storyIdx;
+  const btn = $('#sv [data-like]');
+  if (S.liked.has(i)) { S.liked.delete(i); btn.classList.remove('on'); btn.textContent = '♡'; return; }
+  S.liked.add(i);
+  btn.classList.add('on'); btn.textContent = '♥';
+  btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+  const h = $('#sv .bigheart'); h.classList.remove('go'); void h.offsetWidth; h.classList.add('go');
+  if (S.culprit === null) { S.culprit = i; arrive(); }
 }
 $('#sv').addEventListener('click', e => {
   if (e.target.closest('[data-close]')) closeStory();
+  else if (e.target.closest('[data-like]')) likeStory();
   else openStory(storyIdx + 1);
 });
 
 /* ===================== 유튜브 ===================== */
 function videos() {
-  const v = [];
-  if (S.alibi.live) {
-    const n = S.alibi.live;
-    v.push({ id: 'live', title: '[LIVE] 밤 공부 같이 해요 📚 캠스터디 9시~10시 40분', ch: `${n}의 공부방`, chn: n, meta: '스트리밍 종료 · 2시간 전', dur: '1:40:12', bg: 'linear-gradient(160deg,#1c2541,#3a506b)', emo: '📚', cm: [['공부요정', '오늘 한 번도 자리 안 비우셨네요 ㄷㄷ'], ['수험생3', '9시 반쯤 집중력 미쳤다'], ['익명', `${n}님 폰 화면에 엎어두신 거 보고 반성함`]] });
-  }
-  v.push({ id: 'rain', title: '잠 안 올 때 듣는 빗소리 10시간 ☔', ch: '수면채널', meta: '조회수 230만회 · 1년 전', dur: '10:00:00', bg: 'linear-gradient(160deg,#16222a,#3a6073)', emo: '🌧', cm: [['밤샘러', '오늘도 이거 틀고 잡니다']] });
-  v.push({ id: 'case', title: '[실화] 산속 펜션에서 사라졌던 고등학생, 그날 밤 11시 30분에 무슨 일이', ch: '사건파일', meta: '조회수 12만회 · 2주 전', dur: '18:24', bg: 'linear-gradient(160deg,#0b0b0b,#3b0d0d)', emo: '🌲', prog: 100, cm: [['ㅇㅇ', '결국 새벽에 혼자 내려왔다던데… 같이 간 친구들은 뭐 했대?'], ['산골주민', '거기 별빛펜션 올해 폐업했어요'], ['익명', '나는 다 알고 있어.']] });
-  v.push({ id: 'cvs', title: '편의점 신상 털기 🍙 이번 주 1등은?', ch: '먹방TV', meta: '조회수 45만회 · 3일 전', dur: '12:07', bg: 'linear-gradient(160deg,#ff9966,#ff5e62)', emo: '🍙', cm: [['배고파', '새벽에 보면 안 됐다']] });
-  v.push({ id: 'fit', title: '10분 홈트레이닝 | 하루 10분이면 충분', ch: '핏걸', meta: '조회수 88만회 · 5개월 전', dur: '10:31', bg: 'linear-gradient(160deg,#11998e,#38ef7d)', emo: '🧘', cm: [['작심삼일', 'Day 3 출석']] });
-  v.push({ id: 'ghost', title: '밤 11시 30분에 절대 하면 안 되는 것 5가지', ch: '괴담채널', meta: '조회수 5.1만회 · 1개월 전', dur: '9:13', bg: 'linear-gradient(160deg,#000,#2c003e)', emo: '👁', cm: [['쫄보', '모르는 번호로 온 연락 답장하기… 이거 진짜임?']] });
-  return v;
+  return [
+    { id: 'cover', title: '[기타 커버] 밤에 혼자 듣기 좋은 노래 🎸', ch: '종성의 기타', chi: 0, meta: '조회수 1.2만회 · 1일 전', dur: '4:12', bg: photo(0), cm: [['sunoo_', '목소리까지 미쳤다 ㅠㅠ'], ['익명', '이 노래 누구 생각하면서 친 거예요?']] },
+    { id: 'vlog', title: '3년 만에 한국 귀국 브이로그 ✈️ | 공항에서 집까지', ch: 'Jake\'s day', chi: 3, meta: '조회수 8.4천회 · 3일 전', dur: '12:40', bg: 'linear-gradient(160deg,#9bd0ff,#4d7cff)', emo: '✈️', cm: [['jungw0n', '재윤이 드디어 왔구나 ㅎㅎ'], ['psh', '환영해!']] },
+    { id: 'play', title: '설레는 밤에 듣는 플레이리스트 💗 새벽 감성', ch: '밤의 라디오', meta: '조회수 54만회 · 2주 전', dur: '1:02:11', bg: 'linear-gradient(160deg,#2a1640,#ff86b0)', emo: '💗', cm: [['새벽감성', '지금 누구 생각하면서 듣는 중']] },
+    { id: 'tteok', title: '서울 떡볶이 맛집 TOP 10 🍢 베프랑 가기 좋은 곳', ch: '먹방TV', meta: '조회수 45만회 · 1개월 전', dur: '15:07', bg: 'linear-gradient(160deg,#ff9966,#ff5e62)', emo: '🍢', cm: [['떡순이', '3번 진짜 맛있어요']] },
+    { id: 'dance', title: '연습실 새벽 연습 🕺 (말 없음)', ch: 'nk', chi: 4, meta: '조회수 2.3만회 · 5일 전', dur: '3:28', bg: photo(4), cm: [['sunoo_', '왜 말이 없어 ㅋㅋㅋ'], ['ni_ki', '할 말 없음']] },
+  ];
 }
 /* 시청 기록에만 있는 영상 (홈 목록에는 안 나옴) */
 const HISTORY_ONLY = [
-  { id: 'vlog', title: '별빛펜션 가는 길 🚌 버스 종점에서 40분 등산 브이로그', ch: '주말여행러', meta: '조회수 3.4천회 · 3년 전', dur: '14:52', bg: 'linear-gradient(160deg,#0b1a2e,#2e4a3d)', emo: '🏕', prog: 100, cm: [['등산러', '밤에 저 갈림길은 진짜 위험함'], ['익명', '그날도 이 길로 올라갔지?']] },
-  { id: 'hide', title: '발신번호 표시제한 전화, 누가 건 건지 알아내는 3가지 방법', ch: '폰박사', meta: '조회수 21만회 · 1년 전', dur: '7:45', bg: 'linear-gradient(160deg,#232526,#414345)', emo: '📵', prog: 35, cm: [['폰박사', '정답: 그 시간에 전화를 걸 수 있었던 사람을 떠올려 보세요']] },
+  { id: 'signs', title: '좋아하는 사람한테만 하는 행동 7가지', ch: '연애 연구소', meta: '조회수 120만회 · 1년 전', dur: '8:45', bg: 'linear-gradient(160deg,#ff86b0,#a98bff)', emo: '💌', prog: 100, cm: [['ㅇㅇ', '5번 완전 내 얘기…']] },
+  { id: 'tsun', title: '츤데레 남자의 진심 알아보는 법', ch: '연애 연구소', meta: '조회수 33만회 · 8개월 전', dur: '6:02', bg: 'linear-gradient(160deg,#ffd1dc,#ff8fab)', emo: '🍓', prog: 60, cm: [['딸기우유', '말 대신 뭘 사다 주면 그게 진심임']] },
 ];
 const findVideo = id => [...videos(), ...HISTORY_ONLY].find(x => x.id === id);
+const thumbBg = v => v.bg.startsWith('background-image') ? v.bg : `background:${v.bg}`;
+const chAv = v => v.chi !== undefined ? avatarPh(v.chi, 'round') : avatar(v.ch, '#444', 'round');
 const YT_TABS = [['🏠', '홈', 'home'], ['⚡', 'Shorts'], ['➕', ''], ['📺', '구독'], ['📁', '보관함', 'history']];
 PAGES.yt = {
   start: 'home',
   home() {
-    const chips = ['전체', '음악', '실시간', '공부', '사건사고', 'ASMR'].map((c, i) => `<span class="chip ${i ? '' : 'on'}">${c}</span>`).join('');
-    const list = videos().map(v => `<div class="vid" data-go="watch:${v.id}"><div class="thumb" style="background:${v.bg}">${v.emo}<span class="dur ${v.id === 'live' ? 'live' : ''}">${v.id === 'live' ? '다시보기 ' + v.dur : v.dur}</span>${v.prog ? `<span class="prog" style="width:${v.prog}%"></span>` : ''}</div>
-      <div class="vmeta">${avatar(v.chn || v.ch, v.chn ? null : '#444', 'round')}<div><b>${v.title}</b><small>${v.ch} · ${v.meta}</small></div></div></div>`).join('');
-    return head('<span class="logo-yt"><i></i>YouTube</span>', '<span>🔔</span><span>🔍</span>') + `<div class="scroll"><div class="chips">${chips}</div>${list}</div>` +
-      tabs(YT_TABS, 'home');
+    const chips = ['전체', '음악', '기타 커버', '브이로그', '먹방', '플레이리스트'].map((c, i) => `<span class="chip ${i ? '' : 'on'}">${c}</span>`).join('');
+    const list = videos().map(v => `<div class="vid" data-go="watch:${v.id}"><div class="thumb" style="${thumbBg(v)}">${v.emo || ''}<span class="dur">${v.dur}</span></div>
+      <div class="vmeta">${chAv(v)}<div><b>${v.title}</b><small>${v.ch} · ${v.meta}</small></div></div></div>`).join('');
+    return head('<span class="logo-yt"><i></i>YouTube</span>', '<span>🔔</span><span>🔍</span>') + `<div class="scroll"><div class="chips">${chips}</div>${list}</div>` + tabs(YT_TABS, 'home');
   },
   /* 보관함 → 시청 기록 */
   history() {
-    const hist = [
-      ['hide', '오늘 · 오후 11:31'],
-      ['case', '오늘 · 이 영상을 7번 시청함'],
-      ['vlog', '어제 · 오전 2:14'],
-      ['ghost', '10월 25일'],
-      ['rain', '10월 22일'],
-    ];
-    if (S.alibi.live) hist.splice(2, 0, ['live', `오늘 · 오후 9:31 (${S.alibi.live}의 공부방 실시간)`]);
+    const hist = [['cover', '오늘 · 오후 11:12 · 이 영상을 5번 시청함'], ['signs', '오늘 · 오후 10:48'], ['tsun', '어제'], ['vlog', '10월 27일'], ['play', '10월 25일']];
     const rows = hist.map(([id, when]) => {
       const v = findVideo(id);
-      return `<div class="hrow" data-go="watch:${id}"><div class="thumb hthumb" style="background:${v.bg}">${v.emo}<span class="dur">${v.dur}</span>${v.prog ? `<span class="prog" style="width:${v.prog}%"></span>` : ''}</div>
+      return `<div class="hrow" data-go="watch:${id}"><div class="thumb hthumb" style="${thumbBg(v)}">${v.emo || ''}<span class="dur">${v.dur}</span><span class="prog" style="width:${v.prog || 100}%"></span></div>
         <div class="mid"><b>${v.title}</b><small>${v.ch}</small><small>${when}</small></div></div>`;
     }).join('');
     return head('시청 기록', '<span>🔍</span><span>⋮</span>') + `<div class="scroll"><div class="sec">최근 시청한 동영상</div>${rows}</div>` + tabs(YT_TABS, 'history');
   },
   watch(id) {
     const v = findVideo(id);
-    return head('') + `<div class="scroll"><div class="player" style="background:${v.bg}"><div class="pl">▶</div></div>
+    return head('') + `<div class="scroll"><div class="player" style="${thumbBg(v)}">${v.emo || ''}<div class="pl">▶</div></div>
       <div class="vtitle">${v.title}</div><div class="vinfo">${v.meta}</div>
-      <div class="vmeta" style="padding-bottom:14px;border-bottom:1px solid var(--line)">${avatar(v.chn || v.ch, v.chn ? null : '#444', 'round')}<div><b>${v.ch}</b><small>구독자 ${v.chn ? '1,204' : '38.2만'}명</small></div></div>
+      <div class="vmeta" style="padding-bottom:14px;border-bottom:1px solid var(--line)">${chAv(v)}<div><b>${v.ch}</b><small>구독자 ${v.chi !== undefined ? '1,204' : '38.2만'}명</small></div></div>
       <div class="sec">댓글 ${v.cm.length}</div>
-      ${v.cm.map(([u, t]) => `<div class="cmt">${avatar(u, '#3a3a44', 'round')}<div><small>@${u}</small><p>${t}</p></div></div>`).join('')}</div>`;
+      ${v.cm.map(([u, t]) => `<div class="cmt">${avatarOf(u, 'round')}<div><small>@${u}</small><p>${t}</p></div></div>`).join('')}</div>`;
   },
 };
 
 /* ===================== 인터넷 ===================== */
 const SEARCHES = [
-  ['발신번호 표시제한 알아내는 법', [['고객센터 FAQ', '발신번호 표시제한 전화, 번호 확인이 가능한가요?', '수사기관 요청 등 특별한 경우가 아니면 발신번호 표시제한 전화의 번호는 확인할 수 없습니다.'], ['○○지식인', '모르는 번호로 밤에 전화가 와요', '받지 마세요. 정 궁금하면 그 시간에 전화할 수 있었던 사람을 떠올려 보세요.']]],
-  ['별빛펜션', [['○○군 소식', '별빛펜션, 올해 3월 폐업', '산 중턱에 있던 별빛펜션이 운영을 종료했다. 3년 전 가을 투숙객 실종 소동 이후 손님이 끊긴 것으로 알려졌다.'], ['여행 블로그', '별빛펜션 후기 (2022)', '버스 종점에서 40분 걸어 올라가야 함. 밤엔 랜턴 필수! 산책로가 갈림길이라 길 잃기 쉬워요.']]],
-  ['3년 전 오늘', [['포토 서비스', '3년 전 오늘의 추억', '2022년 10월 30일 사진 14장이 있습니다.'], ['커뮤니티', '3년 전 오늘 뭐 했는지 기억함?', '나는 기억하고 싶지 않은 날이 있음…']]],
-  ['새벽에 모르는 사람한테 카톡', [['○○지식인', '(알 수 없음)으로 카톡이 와요', '상대가 탈퇴했거나 친구가 아닌 경우 "알 수 없음"으로 보일 수 있습니다.'], ['커뮤니티', '모르는 사람이 "기억나?"라고 보내면', '아는 사람임. 무조건.']]],
+  ['나 기억나 답장 뭐라고 해', [['○○지식인', '모르는 사람이 "나 기억나?"라고 보냈어요', '보통은 예전부터 알던 사람이에요. 대화 속 힌트를 잘 보세요!'], ['커뮤니티', '"나 기억나?"는 고백 전 단계다 vs 아니다', '댓글 1,024개 · 무조건 고백 전 단계임 ㅋㅋ']]],
+  ['좋아하는 사람한테 하는 행동', [['연애 칼럼', '좋아하면 나오는 행동 BEST 5', '1. 사소한 걸 기억한다 2. 핑계를 만들어 연락한다 3. 걱정을 한다 4. 뭔가를 챙겨준다 5. 호칭에 신경 쓴다']]],
+  ['츤데레 특징', [['백과사전', '츤데레', '겉으로는 무뚝뚝하지만 속으로는 다정한 성격. 말보다 행동으로 마음을 보여주는 경우가 많다.']]],
+  ['소꿉친구랑 연애', [['커뮤니티', '소꿉친구가 갑자기 남자로 보일 때', '어릴 때 일을 꺼내면 신호임 ㅋㅋ']]],
 ];
 PAGES.web = {
   start: 'home',
@@ -956,7 +1123,7 @@ PAGES.settings = {
     const r = (ic, bg, t, right, attr = '') => `<div class="row" ${attr}><div class="sic" style="background:${bg}">${ic}</div><div class="mid"><div class="t1" style="font-weight:400">${t}</div></div>${right}</div>`;
     const ch = '<span class="chev">›</span>';
     return head('설정') + `<div class="scroll">
-      <div class="group">${r('🙂', '#555', '<b>나</b><br><span style="font-size:13px;color:var(--sub)">010-2030-1130 · 2025.10.12 변경</span>', ch, 'data-go="about"')}</div>
+      <div class="group">${r('🙂', '#555', `<b>${esc(S.name)}</b><br><span style="font-size:13px;color:var(--sub)">010-2030-1130</span>`, ch, 'data-go="about"')}</div>
       <div class="group">
         ${r('✈️', '#ff9500', '에어플레인 모드', '<span class="tgl" data-tg></span>')}
         ${r('📶', '#0a84ff', 'Wi-Fi', '<span style="color:var(--sub)">Home_5G ›</span>', 'data-toast="Home_5G에 연결됨"')}
@@ -975,121 +1142,59 @@ PAGES.settings = {
   },
   blocked() {
     return head('차단된 연락처') + `<div class="scroll"><div class="group">
-      <div class="row"><div class="mid"><div class="t1" style="font-weight:400">010-5517-0319</div><div class="t2">2022.10.31 차단</div></div></div>
-      </div><div class="sec" style="line-height:1.6">${CREEP_NUM}은(는) 차단되어 있지 않습니다.</div></div>`;
+      <div class="row"><div class="mid"><div class="t1" style="font-weight:400">070-8012-3345</div><div class="t2">광고 전화 · 2025.6.3 차단</div></div></div>
+      </div></div>`;
   },
   about() {
-    return head('휴대전화 정보') + `<div class="scroll"><div class="ctable"><div><span>이름</span>나의 휴대전화</div><div><span>내 번호</span>010-2030-1130</div><div><span>번호 변경일</span>2025. 10. 12.</div><div><span>이전 번호</span>010-7741-0629 (해지)</div><div><span>저장 공간</span>98.2GB / 128GB</div></div></div>`;
+    return head('휴대전화 정보') + `<div class="scroll"><div class="ctable"><div><span>이름</span>${esc(S.name)}의 휴대전화</div><div><span>내 번호</span>010-2030-1130</div><div><span>저장 공간</span>98.2GB / 128GB</div></div></div>`;
   },
 };
 
-/* ===================== 정답 고르기 ===================== */
-function openGuess() {
-  const m = $('#modal');
-  m.innerHTML = `<div class="sheet"><h3>너 누구야?</h3><p class="msub">남은 기회 ${S.tries}번</p>
-    <div class="gl">${NAMES.map(n => `<button class="gb" data-pick="${n}" ${S.wrong.includes(n) ? 'disabled' : ''}>${avatar(n, null, 'round')}<span>${n}</span></button>`).join('')}</div>
-    <details class="ghint"><summary>🧠 생각 정리하기</summary><ul>
-      <li>그 사람은 <b>'그날'</b>을 알고 있다. → 그날 같이 있었던 사람은?</li>
-      <li>오후 9:30에 나에게 <b>전화를 걸 수 있었다</b>. → 그 시간에 바빴던 사람은?</li>
-      <li>내 <b>새 번호</b>로 문자를 보냈다. → 새 번호를 아는 사람은?</li></ul></details>
-    <button class="gcancel" data-close>닫기</button></div>`;
-  m.classList.add('show');
-}
-$('#modal').addEventListener('click', e => {
-  const p = e.target.closest('[data-pick]');
-  if (p && !p.disabled) { closeModal(); pick(p.dataset.pick); return; }
-  if (e.target.closest('[data-close]') || e.target.id === 'modal') closeModal();
-});
-const closeModal = () => $('#modal').classList.remove('show');
-
-function pick(n) {
-  if (n === S.culprit) {
-    S.over = true;
-    S.extra.push(me(`${n}, 너지?`, '오후 11:30'));
-    S.newCount = 1; refreshChat();
-    S.timers.push(setTimeout(() => ending(true), 1200));
-    return;
-  }
-  S.wrong.push(n); S.tries--;
-  S.extra.push(me(`${n}?`, '오후 11:30'));
-  const replies = ['아닌데...'];
-  replies.forEach(t => S.extra.push(them(UNKNOWN, t, '오후 11:30')));
-  S.newCount = replies.length + 1; refreshChat();
-  if (S.tries === 0) { S.over = true; S.timers.push(setTimeout(() => ending(false), 1600)); }
-}
-function refreshChat() {
-  const c = cur();
-  if ($('#app').classList.contains('active') && c && c.app === 'kakao') renderApp();
-}
-
-/* ===================== 실시간 메시지 연출 ===================== */
-function startTimers() {
-  if (S.timersStarted) return;
-  S.timersStarted = true;
-  [[70000, '왜 대답 안 해?'], [150000, '보고 있는 거 알아.']].forEach(([ms, text]) => S.timers.push(setTimeout(() => {
-    if (S.over) return;
-    S.extra.push(them(UNKNOWN, text, '오후 11:30'));
-    const c = cur();
-    const inChat = $('#app').classList.contains('active') && c && c.app === 'kakao' && c.page === 'chat' && c.arg === 'unknown';
-    if (inChat) { S.newCount = 1; renderApp(); return; }
-    S.unread.unknown++; S.badges.kakao++;
-    renderHome();
-    if ($('#app').classList.contains('active') && c && c.app === 'kakao') renderApp();
-    banner(text);
-  }, ms)));
-}
-let bannerT;
-function banner(text) {
-  const b = $('#banner');
-  b.innerHTML = `<div class="ni ic-kakao" style="transform:scale(.62);width:62px;height:62px;margin:-12px;border-radius:16px"></div><div class="nb"><div class="nh"><b>${UNKNOWN}</b><span>지금</span></div><div class="np">${text}</div></div>`;
-  b.classList.add('show');
-  b.onclick = () => { b.classList.remove('show'); openApp('kakao', 'chat', 'unknown'); };
-  clearTimeout(bannerT); bannerT = setTimeout(() => b.classList.remove('show'), 4500);
-}
-
 /* ===================== 엔딩 ===================== */
-function ending(good) {
-  const c = S.culprit;
+/* type: happy(고백 수락) / bad(고백 거절) / missed(3번 다 틀림) */
+function ending(type) {
+  const i = S.culprit, c = CHARS[i];
   const e = $('#end');
-  e.className = 'end show ' + (good ? 'good' : 'bad');
-  e.innerHTML = '<div class="elines"></div>';
+  e.className = 'end show ' + type + (type === 'happy' ? ' reveal' : '');
+  e.innerHTML = `<div class="end-bg" style="${photo(i)}"></div><div class="elines"></div>`;
   const L = e.querySelector('.elines');
-  const lines = good
-    ? [`맞아. 나야, ${c}.`, '3년 전 오늘, 밤 11시 30분.', '다들 아무 일 없었던 것처럼 살더라.', '그래도 너만은 기억해 줄 줄 알았어.', '…이제 자도 돼. 잘 자.']
-    : ['끝까지 모르는구나.', '괜찮아.', '지금 너희 집 문 앞이야.', 'DING'];
-  let i = 0;
+  const lines = {
+    happy: [`내일 아침, ${josa(c.name, '이', '가')} 온다.`, '오늘 밤은 잠이 안 올 것 같다.'],
+    bad: ['그날 밤, 더 이상 연락은 오지 않았다.'],
+    missed: ['…끝까지 못 알아보네 ㅎㅎ', '괜찮아.', '내일 직접 말해줄게.'],
+  }[type];
+  let k = 0;
   const step = () => {
-    if (i >= lines.length) { finish(); return; }
-    const t = lines[i++];
+    if (k >= lines.length) { finish(); return; }
     const d = document.createElement('div');
-    d.className = 'el' + (t === 'DING' ? ' ding' : '');
-    d.textContent = t === 'DING' ? '띵동—' : t;
-    if (t === 'DING') { e.classList.remove('flash'); void e.offsetWidth; e.classList.add('flash'); }
+    d.className = 'el'; d.textContent = lines[k++];
     L.appendChild(d);
-    S.timers.push(setTimeout(step, 1500));
+    S.timers.push(setTimeout(step, 1700));
   };
   const finish = () => {
+    e.classList.add('reveal');
     const f = document.createElement('div');
     f.className = 'efin';
-    f.innerHTML = `<div class="etitle">${good ? 'THE END' : 'BAD END'}</div>
-      <div class="ewho">밤 11시 30분에 연락한 사람은<br><b>${c}</b>${ida(c).slice(c.length)}.</div>
+    const title = { happy: 'HAPPY END', bad: 'BAD END', missed: 'THE END' }[type];
+    f.innerHTML = `<div class="etitle">${title}</div>
+      <div class="ewho">${esc(josa(S.name, '을', '를'))} 좋아하는 사람은<br><b>${c.name}</b><br><span style="font-size:13px">${c.role} · @${c.handle}</span></div>
       <button data-restart>다시 하기</button>`;
     e.appendChild(f);
   };
-  S.timers.push(setTimeout(step, 700));
+  S.timers.push(setTimeout(step, 900));
 }
 $('#end').addEventListener('click', e => { if (e.target.closest('[data-restart]')) restart(); });
 
 function restart() {
   S.timers.forEach(clearTimeout);
-  $('#sv').classList.remove('show');
-  newGame();
+  S = null;
   $('#end').className = 'end';
+  $('#sv').classList.remove('show');
   $('#banner').classList.remove('show');
+  closeModal();
   $('#phint').textContent = '';
   stack = [];
-  renderHome();
-  show('lock');
+  show('start');
 }
 
 /* ===================== PC 화면 크기 맞춤 ===================== */
@@ -1111,10 +1216,8 @@ const STORY_IMG = [
 ];
 
 /* ===================== 시작 ===================== */
-newGame();
 makeStars();
 buildKeypad();
-renderHome();
 fit();
 </script>
 </body>
