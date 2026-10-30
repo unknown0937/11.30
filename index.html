@@ -483,8 +483,14 @@ const josa = (w, a, b) => w + (batchim(w) ? a : b);
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 /* ===================== 등장인물 =====================
-   순서는 인스타 스토리 순서와 같다 (사진도 이 순서). 모두 플레이어에게 호감이 있다.
-   hints: 익명 채팅에서 하나씩 주는 힌트. 각 힌트는 폰 속 다른 앱의 정보와 이어진다.
+   순서는 인스타 스토리 순서와 같다 (사진도 이 순서).
+   여섯 명 모두 플레이어에게 호감이 있지만, 스토리에 가장 먼저 ♡를 받은 사람이 "모르는 번호"로 연락한다.
+
+   추리 구조: 아래 세 가지 특징의 조합이 사람마다 모두 다르다.
+     old   어릴 때부터 알던 사이인가        → 연락처 · 메모
+     laugh 평소에 ㅋㅋ를 쓰나 ㅎㅎ를 쓰나    → 카톡 · 인스타 댓글 · 문자
+     out   지금(밤 11:30) 밖에 있나          → 각자에게 「지금 뭐 해?」라고 물어보기
+   익명 채팅의 힌트 3개가 각각 하나씩 알려주고, 말투(ㅋㅋ/ㅎㅎ)는 익명 메시지에도 그대로 묻어난다.
 */
 /* 정답을 맞힌 뒤의 고백 → 플레이어의 선택 → 엔딩 대사 */
 const CONFESS = ['드디어 알아차렸구나 기다렸어.', '나 사실 널 처음 볼 때부터 좋아했어...', '너도 날 좋아해?'];
@@ -492,62 +498,78 @@ const ANSWER_YES = '나도 널 좋아해..';
 const ANSWER_NO = '미안...';
 const REPLY_YES = c => ['진짜..?', '하... 다행이다.', `내가 앞으로 진짜 잘할게 ${c}`, '늦은 시간 연락해서 미안 내일 아침에 너 집으로 갈게♡'];
 const REPLY_NO = ['아...', '미안 내가 너무 갑작스럽게 연락했지. 내 생각만 해버렸다.', '충분히 이해하고 괜찮아 잘 자'];
+
 const CHARS = [
   {
-    handle: 'js.jay', name: '박종성', label: '종성', role: '소꿉친구', bio: '🎸 기타 치는 사람 | 박종성',
-    intro: ['ㅎㅎ 비밀', '힌트 줄게. 맞혀봐'],
-    hints: [
-      '우리 진짜 오래 봤잖아. 네가 기억도 못 할 만큼 어릴 때부터.',
-      '오늘 새 곡 연습하다가 네 생각나서 연락했어 🎸',
-      '어릴 때 놀이터에서 너 그네 타다 넘어졌을 때, 업고 집까지 데려다준 거 기억나?',
-    ],
+    chat: 'jay', handle: 'js.jay', name: '박종성', label: '종성', role: '소꿉친구', since: '소꿉친구 · 유치원 때부터', bio: '🎸 기타 치는 사람 | 박종성',
+    old: true, laugh: 'ㅋㅋ', out: true,
+    replies: {
+      now: ['합주 끝나고 집 걸어가는 중 ㅋㅋ', '밤공기 좋다. 너도 창문 한번 열어봐'],
+      day: ['새 곡 거의 다 만들었어 ㅋㅋ', '다 되면 너한테 제일 먼저 들려줄게'],
+      you: ['나? 아닌데 ㅋㅋ', '누가 연락했는데? …신경 쓰이네'],
+      youGuilty: ['…어? 아니 ㅋㅋ', '누가 연락했는데?'],
+    },
   },
   {
-    handle: 'psh', name: '박성훈', label: '성훈 선배', role: '아는 선배', bio: '📚 | 박성훈',
-    intro: ['음… 비밀이야 ㅎㅎ', '대신 힌트 줄게'],
-    hints: [
-      '학교에서 마주칠 때마다 인사해 주는 거, 그거 하루 종일 생각나.',
-      '저번에 과제 도와준 거, 사실 핑계였어. 너랑 얘기하고 싶어서.',
-      '나는 너를 그냥 후배라고 생각한 적 한 번도 없어.',
-    ],
+    chat: 'sh', handle: 'psh', name: '박성훈', label: '성훈 선배', role: '아는 선배', since: '동아리 선배 · 올해 3월에 처음 만남', bio: '📚 | 박성훈',
+    old: false, laugh: 'ㅎㅎ', out: true,
+    replies: {
+      now: ['도서관 마감해서 이제 집 가는 길이야 ㅎㅎ', '너는 아직 안 잤어? 일찍 자야지'],
+      day: ['과제하느라 정신없었는데, 네 연락 오니까 좋다 ㅎㅎ'],
+      you: ['아니? 나는 아닌데 ㅎㅎ', '혹시 무슨 일 있으면 바로 말해'],
+      youGuilty: ['어…? 아니야 ㅎㅎ', '무슨 일 있으면 말해'],
+    },
   },
   {
-    handle: 'sunoo_', name: '김선우', label: '선우', role: '베프', bio: '☀️ 떡볶이 러버 | 김선우',
-    intro: ['히히 비밀 🤫', '맞혀봐! 힌트 줄게'],
-    hints: [
-      '너랑 나는 말 안 해도 통하잖아 ㅎㅎ',
-      '내일 떡볶이 먹자고 한 거… 사실 그냥 너 보고 싶어서였어 🥺',
-      '베프 말고, 다른 이름으로 불리고 싶어.',
-    ],
+    chat: 'sunoo', handle: 'sunoo_', name: '김선우', label: '선우', role: '베프', since: '베프 · 중학교 입학식 때부터', bio: '☀️ 떡볶이 러버 | 김선우',
+    old: true, laugh: 'ㅎㅎ', out: true,
+    replies: {
+      now: ['편의점 가는 중! 갑자기 아이스크림 땡겨서 ㅎㅎ', '너 좋아하는 것도 사다 줄까? 🥺'],
+      day: ['내일 너랑 떡볶이 먹을 생각에 하루 종일 기분 좋았어 ㅎㅎ'],
+      you: ['엥 아닌데? ㅎㅎ', '누구야 누구야 나한테만 말해줘 🥺'],
+      youGuilty: ['어…? 아 아니 ㅎㅎ', '누군데? 🥺'],
+    },
   },
   {
-    handle: 'jake', name: '심재윤', label: '재윤', role: '엄마 친구 아들', bio: '✈️ back in Seoul | 심재윤',
-    intro: ['Secret 🤫', '힌트 줄게'],
-    hints: [
-      '한국 돌아온 지 얼마 안 됐는데, 제일 먼저 생각난 게 너였어.',
-      '어릴 때 엄마들 모임 있을 때마다 우리 둘이 같이 놀았잖아.',
-      'I really missed you… 아, 한국말로 할게 ㅋㅋ 많이 보고 싶었어.',
-    ],
+    chat: 'jk', handle: 'jake', name: '심재윤', label: '재윤', role: '엄마 친구 아들', since: '엄마 친구 아들 · 아기 때부터', bio: '✈️ back in Seoul | 심재윤',
+    old: true, laugh: 'ㅎㅎ', out: false,
+    replies: {
+      now: ['집이야 ㅎㅎ 시차 적응 중이라 잠이 안 와', '누워서 네 생각하면서 뒹굴뒹굴'],
+      day: ['한국 음식 다 맛있어서 행복했어 ㅎㅎ', '다음엔 너랑 같이 먹고 싶다'],
+      you: ['Me? 아니 ㅎㅎ', '누가 연락했는데? 조금 질투 나네'],
+      youGuilty: ['Uh…? 아니야 ㅎㅎ', '누가 연락했는데?'],
+    },
   },
   {
-    handle: 'ni_ki', name: '리키', label: '리키', role: '츤데레', bio: '.',
-    intro: ['…알아서 맞혀', '힌트는 줄게'],
-    hints: [
-      '…그냥. 생각나서.',
-      '오늘 편의점에서 네가 좋아하는 딸기우유 보이길래 사뒀어. 남아서 그런 거야.',
-      '늦게 다니지 마. 걱정되니까. …아니, 그냥.',
-    ],
+    chat: 'nk', handle: 'ni_ki', name: '니키', label: '니키', role: '츤데레', since: '같은 수업 · 이번 학기에 처음 만남', bio: '.',
+    old: false, laugh: 'ㅋㅋ', out: false,
+    replies: {
+      now: ['집', '…너는 왜 안 자. 빨리 자 ㅋㅋ'],
+      day: ['그냥 그랬어', '…너 연락 와서 좀 나아졌어. 아니 그냥 ㅋㅋ'],
+      you: ['아니 ㅋㅋ', '누군데. …신경 쓰이게'],
+      youGuilty: ['…아니 ㅋㅋ', '왜'],
+    },
   },
   {
-    handle: 'jungw0n', name: '양정원', label: '정원 오빠', role: '친한 오빠', bio: '🌿 | 양정원',
-    intro: ['ㅎㅎ 누굴까?', '힌트 줄게 😊'],
-    hints: [
-      '오늘도 고생 많았지? 푹 쉬었으면 좋겠다 😊',
-      '비 오던 날 우산 씌워서 집 앞까지 데려다준 거, 기억나?',
-      '네가 「오빠」라고 불러주는 거, 그게 제일 좋아.',
-    ],
+    chat: 'jw', handle: 'jungw0n', name: '양정원', label: '정원 오빠', role: '친한 오빠', since: '알바 같이 한 오빠 · 작년 겨울에 처음 만남', bio: '🌿 | 양정원',
+    old: false, laugh: 'ㅎㅎ', out: false,
+    replies: {
+      now: ['집에서 책 읽고 있었어 ㅎㅎ', '너는 오늘 피곤했을 텐데 얼른 쉬어 😊'],
+      day: ['좋았어 ㅎㅎ 근데 네 연락 받으니까 더 좋다'],
+      you: ['아니? 오빠는 아닌데 ㅎㅎ', '누가 연락했어? 걱정되네'],
+      youGuilty: ['어…? 아니야 ㅎㅎ', '누가 연락했는데?'],
+    },
   },
 ];
+/* 익명 채팅의 힌트: 연락한 사람의 특징에 따라 정해진다 */
+const anonHints = c => [
+  c.old ? '우리 진짜 오래 알았잖아. 어릴 때부터.' : '우리 알게 된 지 얼마 안 됐잖아. 근데 처음 본 날부터 계속 신경 쓰였어.',
+  c.out ? '나 지금 밖이야. 집 가는 길에 네 생각나서 연락했어.' : '나 지금 집이야. 누워서 네 생각만 하는 중.',
+  `내 말투 잘 보면 알 텐데 ${c.laugh}`,
+];
+/* 다른 사람들에게 물어볼 수 있는 질문 */
+const QUESTIONS = [['now', '지금 뭐 해?'], ['day', '오늘 하루 어땠어?'], ['you', '혹시 방금 나한테 연락했어?']];
+const charOfChat = id => CHARS.findIndex(c => c.chat === id);
 const UNKNOWN = '(알 수 없음)';
 const photo = i => `background-image:url(${STORY_IMG[i]})`;
 const avatar = (txt, color, cls = '') => `<div class="av ${cls}" style="background-color:${color || '#555'}">${txt[0]}</div>`;
@@ -568,8 +590,8 @@ function newGame(name) {
     liked: new Set(), seenStories: new Set(),
     badges: { kakao: 2, phone: 1 },
     unread: { sunoo: 2, sms: 1 },
-    unknown: [], unknownUnread: 0, arrived: false,
-    step: 0, typing: false, busy: false, newCount: 0,
+    extra: {}, newCount: {}, touched: {}, clock: 0, asked: {}, arrived: false,
+    step: 0, typing: null, busy: false,
     tries: 3, wrong: [], over: false,
     revealed: false, phase: 'guess',   // guess → answer(고백에 대답) → done
     pending: null, fails: 0, timers: [],
@@ -716,9 +738,10 @@ $('#homebar').addEventListener('click', goHome);
 
 /* 앱 화면 안의 클릭 처리 */
 $('#app').addEventListener('click', e => {
-  const t = e.target.closest('[data-go],[data-tab],[data-back],[data-toast],[data-act],[data-tg],[data-story]');
+  const t = e.target.closest('[data-go],[data-tab],[data-back],[data-toast],[data-act],[data-tg],[data-story],[data-ask]');
   if (!t) return;
   if (t.dataset.story) openStory(+t.dataset.story);
+  else if (t.dataset.ask) ask(cur().arg, t.dataset.ask);
   else if (t.dataset.go) { const [p, ...a] = t.dataset.go.split(':'); go(p, a.join(':')); }
   else if (t.dataset.tab) tab(t.dataset.tab);
   else if (t.hasAttribute('data-back')) back();
@@ -738,110 +761,133 @@ const them = (name, text, time = '오후 11:30') => ({ t: 'them', name, text, ti
 const me = (text, time = '오후 11:30') => ({ t: 'me', text, time });
 
 /* ===================== 카카오톡 ===================== */
-function chatData(id) {
+const TODAY = '2025년 10월 30일 목요일';
+/* 채팅방마다 원래 있던 대화 (오늘 밤 새로 오가는 메시지는 S.extra에 쌓인다) */
+function baseChat(id) {
   switch (id) {
-    case 'unknown': return { title: unknownName(), msgs: [sys('2025년 10월 30일 목요일'), ...S.unknown] };
-    case 'sunoo': return { title: '선우', msgs: [sys('2025년 10월 30일 목요일'), me('오늘 진짜 피곤하다 ㅠㅠ', '오후 10:02'), them('선우', '고생했어 ㅠㅠ 일찍 자', '오후 10:03'), them('선우', `${call()} 내일 떡볶이 먹으러 갈래? 🍢`, '오후 11:28'), them('선우', '아 그리고 인스타 봤어? 다들 스토리 올렸던데 ㅋㅋ', '오후 11:29')] };
-    case 'mom': return { title: '엄마', msgs: [sys('2025년 10월 30일 목요일'), them('엄마', '재윤이 유학 끝나고 한국 들어왔대~', '오후 9:30'), them('엄마', '어릴 때 엄마 모임 때마다 같이 놀던 재윤이 기억나지? 연락 한번 해 봐', '오후 9:31'), them('엄마', '전화는 왜 안 받아~ 일찍 자라 🙏', '오후 9:32')] };
-    case 'jw': return { title: '정원 오빠', msgs: [sys('2025년 10월 30일 목요일'), me('오빠 저번에 빌린 우산 다음에 꼭 돌려줄게요!', '오후 10:31'), them('정원 오빠', '천천히 줘도 돼 ㅎㅎ', '오후 10:35'), them('정원 오빠', '오늘 고생 많았지? 푹 쉬어 😊', '오후 10:40')] };
-    case 'sh': return { title: '성훈 선배', msgs: [sys('2025년 10월 30일 목요일'), them('성훈 선배', '과제 자료 보내줬어~', '오후 8:10'), them('성훈 선배', '막히는 거 있으면 언제든지 물어봐', '오후 8:11'), me('감사합니다 선배 ㅠㅠ 다음에 커피 살게요!', '오후 8:15'), them('성훈 선배', 'ㅎㅎ 그래 그럼 약속', '오후 8:16')] };
-    case 'nk': return { title: '리키', msgs: [sys('2025년 10월 30일 목요일'), me('어디야?', '오후 9:50'), them('리키', '집', '오후 9:54'), me('아까 편의점에서 너 본 것 같은데', '오후 9:55'), them('리키', 'ㅇ', '오후 9:58'), them('리키', '늦게 다니지 마', '오후 9:58')] };
-    case 'jay': return { title: '종성', msgs: [sys('2025년 10월 30일 목요일'), them('종성', '새 기타 샀다 🎸', '오후 7:20'), them('종성', '나중에 소리 들어볼래?', '오후 7:20'), me('오 대박 들려줘!!', '오후 7:31'), them('종성', 'ㅋㅋ 새 곡 다 만들면 제일 먼저 들려줄게', '오후 7:33')] };
+    case 'unknown': return [];
+    case 'sunoo': return [me('오늘 진짜 피곤하다 ㅠㅠ', '오후 10:02'), them('선우', '고생했어 ㅠㅠ 일찍 자 ㅎㅎ', '오후 10:03'), them('선우', `${call()} 내일 떡볶이 먹으러 갈래? 🍢`, '오후 11:28'), them('선우', '아 그리고 인스타 봤어? 다들 스토리 올렸던데 ㅎㅎ', '오후 11:29')];
+    case 'mom': return [them('엄마', '재윤이 유학 끝나고 한국 들어왔대~', '오후 9:30'), them('엄마', '아기 때부터 엄마 모임 때마다 같이 놀던 재윤이 기억나지? 연락 한번 해 봐', '오후 9:31'), them('엄마', '전화는 왜 안 받아~ 일찍 자라 🙏', '오후 9:32')];
+    case 'jw': return [me('오빠 저번에 빌린 우산 다음에 꼭 돌려줄게요!', '오후 10:31'), them('정원 오빠', '천천히 줘도 돼 ㅎㅎ', '오후 10:35'), them('정원 오빠', '오늘 고생 많았지? 푹 쉬어 😊', '오후 10:40')];
+    case 'sh': return [them('성훈 선배', '과제 자료 보내줬어~', '오후 8:10'), them('성훈 선배', '막히는 거 있으면 언제든지 물어봐', '오후 8:11'), me('감사합니다 선배 ㅠㅠ 다음에 커피 살게요!', '오후 8:15'), them('성훈 선배', 'ㅎㅎ 그래 그럼 약속', '오후 8:16')];
+    case 'nk': return [me('어디야?', '오후 9:50'), them('니키', '집', '오후 9:54'), me('아까 편의점에서 너 본 것 같은데', '오후 9:55'), them('니키', 'ㅋㅋ 잘못 봤겠지', '오후 9:58'), them('니키', '늦게 다니지 마', '오후 9:58')];
+    case 'jay': return [them('종성', '새 기타 샀다 🎸', '오후 7:20'), them('종성', '나중에 소리 들어볼래?', '오후 7:20'), me('오 대박 들려줘!!', '오후 7:31'), them('종성', 'ㅋㅋ 새 곡 다 만들면 제일 먼저 들려줄게', '오후 7:33')];
+    case 'jk': return [them('재윤', '카톡 새로 깔았어 ㅎㅎ 이제 여기로 연락해!', '오후 6:05'), me('오 환영! 한국 온 거 축하해', '오후 6:20'), them('재윤', '고마워 ㅎㅎ 조만간 밥 먹자', '오후 6:22')];
   }
 }
+const CHAT_TITLE = { sunoo: '선우', mom: '엄마', jw: '정원 오빠', sh: '성훈 선배', nk: '니키', jay: '종성', jk: '재윤' };
+const chatTitle = id => id === 'unknown' ? unknownName() : CHAT_TITLE[id];
+const chatMsgs = id => [sys(TODAY), ...baseChat(id), ...(S.extra[id] || [])];
+const DEFAULT_ORDER = ['sunoo', 'jw', 'nk', 'mom', 'sh', 'jay', 'jk'];
 function kakaoRows() {
-  const rows = [];
-  if (S.arrived) {
-    const last = [...S.unknown].reverse().find(m => m.t !== 'sys');
-    rows.push({ id: 'unknown', name: unknownName(), who: unknownName(), last: last ? last.text : '', time: '오후 11:30', unread: S.unknownUnread });
-  }
-  rows.push(
-    { id: 'sunoo', name: '선우', who: '선우', last: '아 그리고 인스타 봤어? 다들 스토리 올렸던데 ㅋㅋ', time: '오후 11:29', unread: S.unread.sunoo },
-    { id: 'jw', name: '정원 오빠', who: '정원 오빠', last: '오늘 고생 많았지? 푹 쉬어 😊', time: '오후 10:40' },
-    { id: 'nk', name: '리키', who: '리키', last: '늦게 다니지 마', time: '오후 9:58' },
-    { id: 'mom', name: '엄마', who: '엄마', last: '전화는 왜 안 받아~ 일찍 자라 🙏', time: '오후 9:32' },
-    { id: 'sh', name: '성훈 선배', who: '성훈 선배', last: 'ㅎㅎ 그래 그럼 약속', time: '오후 8:16' },
-    { id: 'jay', name: '종성', who: '종성', last: 'ㅋㅋ 새 곡 다 만들면 제일 먼저 들려줄게', time: '오후 7:33' },
-  );
-  return rows;
+  const ids = [...(S.arrived ? ['unknown'] : []), ...DEFAULT_ORDER];
+  /* 방금 대화한 방이 위로 올라온다 */
+  ids.sort((a, b) => (S.touched[b] || 0) - (S.touched[a] || 0));
+  return ids.map(id => {
+    const last = [...chatMsgs(id)].reverse().find(m => m.t !== 'sys');
+    return { id, name: chatTitle(id), last: last ? last.text : '', time: last ? last.time : '', unread: S.unread[id] || 0 };
+  });
 }
 const PAGES = {};
 PAGES.kakao = {
   start: 'list',
   list() {
     return head('채팅', '<span>🔍</span><span>💬</span>') +
-      `<div class="scroll">${kakaoRows().map(r => `<div class="row" data-go="chat:${r.id}">${avatarOf(r.who)}<div class="mid"><div class="t1">${r.name}</div><div class="t2">${esc(r.last)}</div></div><div class="side">${r.time}${r.unread ? `<span class="un">${r.unread}</span>` : ''}</div></div>`).join('')}</div>` +
+      `<div class="scroll">${kakaoRows().map(r => `<div class="row" data-go="chat:${r.id}">${avatarOf(r.name)}<div class="mid"><div class="t1">${r.name}</div><div class="t2">${esc(r.last)}</div></div><div class="side">${r.time}${r.unread ? `<span class="un">${r.unread}</span>` : ''}</div></div>`).join('')}</div>` +
       tabs([['👤', '친구'], ['💬', '채팅', 'list'], ['🎬', '오픈채팅'], ['🛍', '쇼핑'], ['⋯', '더보기']], 'list');
   },
   chat(id) {
-    const d = chatData(id);
-    if (id === 'unknown') S.unknownUnread = 0;
-    if (id === 'sunoo') S.unread.sunoo = 0;
+    const msgs = chatMsgs(id);
+    S.unread[id] = 0;
     let prev = null;
-    let body = d.msgs.map((m, i) => {
-      const isNew = id === 'unknown' && i >= d.msgs.length - S.newCount;
+    let body = msgs.map((m, i) => {
+      const isNew = i >= msgs.length - (S.newCount[id] || 0);
       if (m.t === 'sys') { prev = null; return `<div class="ksys">${m.text}</div>`; }
       if (m.t === 'me') { prev = null; return `<div class="km me ${isNew ? 'new' : ''}"><span class="kt">${m.time}</span><div class="kb">${esc(m.text)}</div></div>`; }
       const who = m.name === UNKNOWN ? unknownName() : m.name;
       const cont = prev === who; prev = who;
       return `<div class="km ${cont ? 'cont' : ''} ${isNew ? 'new' : ''}">${avatarOf(who)}<div><div class="kn">${who}</div><div class="kb">${esc(m.text)}</div></div><span class="kt">${m.time}</span></div>`;
     }).join('');
-    S.newCount = 0;
-    if (id === 'unknown' && S.typing) body += `<div class="km typing ${prev === unknownName() ? 'cont' : ''}">${avatarOf(unknownName())}<div><div class="kn">${unknownName()}</div><div class="kb"><i></i><i></i><i></i></div></div></div>`;
-    const foot = id === 'unknown' ? chipsHTML() : `<div class="kfoot"><div class="kinput">메시지를 입력하세요</div></div>`;
-    return head(d.title, '<span>🔍</span><span>☰</span>') + `<div class="scroll">${body}</div>` + foot;
+    S.newCount[id] = 0;
+    if (S.typing === id) {
+      const who = chatTitle(id);
+      body += `<div class="km typing ${prev === who ? 'cont' : ''}">${avatarOf(who)}<div><div class="kn">${who}</div><div class="kb"><i></i><i></i><i></i></div></div></div>`;
+    }
+    return head(chatTitle(id), '<span>🔍</span><span>☰</span>') + `<div class="scroll">${body}</div>` + chatFoot(id);
   },
 };
+/* 채팅방 하단: 익명 채팅은 힌트/정답 버튼, 여섯 명과의 채팅은 질문 버튼 */
+function chatFoot(id) {
+  if (id === 'unknown') return anonFoot();
+  if (charOfChat(id) < 0) return `<div class="kfoot"><div class="kinput">메시지를 입력하세요</div></div>`;
+  const asked = S.asked[id] || new Set();
+  const qs = QUESTIONS.filter(([q]) => !asked.has(q) && (q !== 'you' || S.arrived));
+  if (!qs.length) return `<div class="kfoot"><div class="kinput">메시지를 입력하세요</div></div>`;
+  return `<div class="kfoot ${S.busy ? 'busy' : ''}">${qs.map(([q, t]) => `<button class="chipb" data-ask="${q}">${t}</button>`).join('')}</div>`;
+}
+function refreshChat(id) {
+  if (inApp('kakao', 'chat', id) || inApp('kakao', 'list')) renderApp();
+}
+function pushMsg(id, m) {
+  (S.extra[id] = S.extra[id] || []).push(m);
+  S.touched[id] = ++S.clock;
+  if (inApp('kakao', 'chat', id)) { S.newCount[id] = 1; renderApp(); return; }
+  if (m.t === 'them') {
+    S.unread[id] = (S.unread[id] || 0) + 1; S.badges.kakao++;
+    renderHome(); refreshChat(id);
+    banner('<div class="ni ic-kakao mini"></div>', chatTitle(id), esc(m.text), () => openApp('kakao', 'chat', id));
+  }
+}
+/* 상대가 입력 중(•••) 표시를 보여준 뒤 메시지를 하나씩 보낸다 */
+async function themSay(id, lines) {
+  const g = S;
+  const name = id === 'unknown' ? UNKNOWN : CHAT_TITLE[id];
+  for (const l of lines) {
+    await wait(450); if (S !== g) return false;
+    S.typing = id; refreshChat(id);
+    await wait(800 + Math.min(l.length * 28, 1400)); if (S !== g) return false;
+    S.typing = null; pushMsg(id, them(name, l));
+  }
+  return true;
+}
+/* 여섯 명에게 질문하기 */
+async function ask(id, q) {
+  if (S.busy) return;
+  const c = CHARS[charOfChat(id)];
+  (S.asked[id] = S.asked[id] || new Set()).add(q);
+  S.busy = true;
+  pushMsg(id, me(QUESTIONS.find(x => x[0] === q)[1]));
+  const guilty = q === 'you' && charOfChat(id) === S.culprit;
+  if (!await themSay(id, c.replies[guilty ? 'youGuilty' : q])) return;
+  S.busy = false; refreshChat(id);
+}
 
 /* ===================== 익명 채팅: "나 기억나?" ===================== */
 const TALK = ['누구세요…?', '힌트 하나만 더 줘', '마지막 힌트!'];
-function chipsHTML() {
+function anonFoot() {
   if (S.phase === 'answer') return `<div class="kfoot ${S.busy ? 'busy' : ''}"><button class="chipb main" data-act="yes">${ANSWER_YES}</button><button class="chipb" data-act="no">${ANSWER_NO}</button></div>`;
   if (S.over) return `<div class="kfoot"><div class="kinput">대화가 끝났습니다</div></div>`;
   const talkBtn = S.step < TALK.length ? `<button class="chipb" data-act="talk">${TALK[S.step]}</button>` : '';
   return `<div class="kfoot ${S.busy ? 'busy' : ''}">${talkBtn}<button class="chipb main" data-act="guess">너 누구야?</button></div>`;
-}
-function refreshUnknown() {
-  if (inApp('kakao', 'chat', 'unknown') || inApp('kakao', 'list')) renderApp();
-}
-function pushUnknown(m) {
-  S.unknown.push(m);
-  if (inApp('kakao', 'chat', 'unknown')) { S.newCount = 1; renderApp(); return; }
-  if (m.t === 'them') {
-    S.unknownUnread++; S.badges.kakao++;
-    renderHome(); refreshUnknown();
-    banner('<div class="ni ic-kakao mini"></div>', unknownName(), esc(m.text), () => openApp('kakao', 'chat', 'unknown'));
-  }
-}
-/* 상대가 입력 중(•••) 표시를 보여준 뒤 메시지를 하나씩 보낸다 */
-async function themSay(lines) {
-  const g = S;
-  for (const l of lines) {
-    await wait(450); if (S !== g) return false;
-    S.typing = true; refreshUnknown();
-    await wait(800 + Math.min(l.length * 28, 1400)); if (S !== g) return false;
-    S.typing = false; pushUnknown(them(UNKNOWN, l));
-  }
-  return true;
 }
 /* 첫 ♡를 누르고 조금 뒤 도착하는 연락 */
 async function arrive() {
   const g = S;
   await wait(3500); if (S !== g) return;
   S.arrived = true;
-  pushUnknown(them(UNKNOWN, call()));
+  pushMsg('unknown', them(UNKNOWN, call()));
   await wait(1600); if (S !== g) return;
-  pushUnknown(them(UNKNOWN, '나 기억나?'));
+  pushMsg('unknown', them(UNKNOWN, '나 기억나?'));
 }
 async function talk() {
   if (S.busy || S.over || S.step >= TALK.length) return;
-  const c = CHARS[S.culprit];
+  const c = CHARS[S.culprit], h = anonHints(c);
   const step = S.step++;
   S.busy = true;
-  pushUnknown(me(TALK[step]));
-  const lines = step === 0 ? [...c.intro, c.hints[0]] : step === 1 ? [c.hints[1]] : [c.hints[2], '이제 알겠지?'];
-  if (!await themSay(lines)) return;
-  S.busy = false; refreshUnknown();
+  pushMsg('unknown', me(TALK[step]));
+  const lines = step === 0 ? [`${c.laugh} 비밀이야`, '힌트 줄게. 맞혀봐', h[0]] : step === 1 ? [h[1]] : [h[2], `이제 알겠지? ${c.laugh}`];
+  if (!await themSay('unknown', lines)) return;
+  S.busy = false; refreshChat('unknown');
 }
 
 /* ===================== 정답 고르기 ===================== */
@@ -863,34 +909,34 @@ const closeModal = () => $('#modal').classList.remove('show');
 async function pick(i) {
   const g = S;
   S.busy = true;
-  pushUnknown(me(`혹시… ${CHARS[i].label}?`));
+  pushMsg('unknown', me(`혹시… ${CHARS[i].label}?`));
   if (i === S.culprit) {
     S.over = true;
-    if (!await themSay(CONFESS.slice(0, 1))) return;
+    if (!await themSay('unknown', CONFESS.slice(0, 1))) return;
     S.revealed = true;                       // 채팅방 이름이 그 사람 이름으로 바뀐다
-    renderHome(); refreshUnknown();
-    if (!await themSay(CONFESS.slice(1))) return;
-    S.phase = 'answer'; S.busy = false; refreshUnknown();
+    renderHome(); refreshChat('unknown');
+    if (!await themSay('unknown', CONFESS.slice(1))) return;
+    S.phase = 'answer'; S.busy = false; refreshChat('unknown');
     return;
   }
   S.wrong.push(i); S.tries--;
-  if (!await themSay(['아닌데...'])) return;
+  if (!await themSay('unknown', ['아닌데...'])) return;
   if (S.tries === 0) {
-    S.over = true; S.busy = false; refreshUnknown();
+    S.over = true; S.busy = false; refreshChat('unknown');
     await wait(1100); if (S !== g) return;
     ending('missed');
     return;
   }
-  S.busy = false; refreshUnknown();
+  S.busy = false; refreshChat('unknown');
 }
 /* 고백에 대한 대답: 나도 널 좋아해 → 해피엔딩 / 미안 → 배드엔딩 */
 async function answer(yes) {
   if (S.busy || S.phase !== 'answer') return;
   const g = S;
   S.busy = true; S.phase = 'done';
-  pushUnknown(me(yes ? ANSWER_YES : ANSWER_NO));
-  if (!await themSay(yes ? REPLY_YES(call()) : REPLY_NO)) return;
-  S.busy = false; refreshUnknown();
+  pushMsg('unknown', me(yes ? ANSWER_YES : ANSWER_NO));
+  if (!await themSay('unknown', yes ? REPLY_YES(call()) : REPLY_NO)) return;
+  S.busy = false; refreshChat('unknown');
   await wait(1600); if (S !== g) return;
   ending(yes ? 'happy' : 'bad');
 }
@@ -913,7 +959,7 @@ PAGES.phone = {
       `</div>` + tabs(PHONE_TABS, 'recent');
   },
   contacts() {
-    const list = [...CHARS.map(c => [c.label, c.role]), ['엄마', '']].sort((x, y) => x[0].localeCompare(y[0], 'ko'));
+    const list = [...CHARS.map(c => [c.label, c.since]), ['엄마', '']].sort((x, y) => x[0].localeCompare(y[0], 'ko'));
     return head('연락처', '<span>＋</span>') + `<div class="scroll"><div class="row" data-toast="내 번호: 010-2030-1130">${avatar('나', '#555', 'round')}<div class="mid"><div class="t1">${esc(S.name)}</div><div class="t2">내 카드</div></div></div>` +
       list.map(([n, role]) => `<div class="row" data-toast="지금 이 시간에 전화하긴 좀…">${avatarOf(n, 'round')}<div class="mid"><div class="t1">${n}</div><div class="t2">${role}</div></div></div>`).join('') +
       `</div>` + tabs(PHONE_TABS, 'contacts');
@@ -945,7 +991,7 @@ PAGES.sms = {
     let body = `<div class="stime">${m.time}</div><div class="sb">${m.last}</div>`;
     if (id === 'jake') {
       S.unread.sms = 0;
-      body = `<div class="stime">10월 27일 오후 2:14</div><div class="sb">Hey! 재윤이야 ㅎㅎ</div><div class="sb">한국 번호 새로 만들었어. 저장해 줘!</div><div class="sb">3년 만에 돌아오니까 다 신기하다 ㅋㅋ</div><div class="sb me">헐 재윤이?? 완전 오랜만이다!</div><div class="sb">ㅎㅎ 조만간 밥 먹자</div>`;
+      body = `<div class="stime">10월 27일 오후 2:14</div><div class="sb">Hey! 재윤이야 ㅎㅎ</div><div class="sb">한국 번호 새로 만들었어. 저장해 줘!</div><div class="sb">3년 만에 돌아오니까 다 신기하다 ㅎㅎ</div><div class="sb me">헐 재윤이?? 완전 오랜만이다!</div><div class="sb">ㅎㅎ 조만간 밥 먹자</div>`;
     }
     return head(m.from) + `<div class="scroll">${body}</div><div class="kfoot" style="background:#0f1016"><div class="kinput">문자 메시지</div></div>`;
   },
@@ -954,8 +1000,9 @@ PAGES.sms = {
 /* ===================== 메모 ===================== */
 function memos() {
   return [
-    { id: 'todo', title: '이번 주 할 일', date: '오늘', body: '- 정원 오빠 우산 돌려주기 ☂️\n- 성훈 선배한테 커피 사기 (과제 도와줌)\n- 리키한테 편의점 우유값 갚기\n- 엄마가 재윤이네 반찬 갖다주래' },
-    { id: 'photo', title: '어릴 때 사진 정리', date: '2025. 10. 18.', body: '앨범 정리하다가 발견 ㅋㅋㅋ\n\n- 다섯 살, 놀이터 그네 앞에서 종성이랑\n  (넘어져서 울고 있음 ㅋㅋ 종성이가 업어줬다고 엄마가 그랬음)\n- 엄마 모임에서 재윤이랑 케이크 먹는 사진\n- 초등학교 운동회' },
+    { id: 'todo', title: '이번 주 할 일', date: '오늘', body: '- 정원 오빠 우산 돌려주기 ☂️\n- 성훈 선배한테 커피 사기 (과제 도와줌)\n- 니키한테 편의점 우유값 갚기\n- 엄마가 재윤이네 반찬 갖다주래' },
+    { id: 'photo', title: '어릴 때 사진 정리', date: '2025. 10. 18.', body: '앨범 정리하다가 발견 ㅋㅋㅋ\n\n- 다섯 살, 놀이터 그네 앞에서 종성이랑\n  (넘어져서 울고 있음 ㅋㅋ 종성이가 업어줬다고 엄마가 그랬음)\n- 아기 때 엄마 모임에서 재윤이랑 케이크 먹는 사진\n- 중학교 입학식, 선우랑 (이때부터 베프 💛)' },
+    { id: 'new', title: '최근에 알게 된 사람들', date: '2025. 10. 1.', body: '- 성훈 선배: 올해 3월 동아리에서 처음 만남. 친절함\n- 니키: 이번 학기 같은 수업. 말은 별로 없는데 은근 챙겨줌\n- 정원 오빠: 작년 겨울 카페 알바에서 처음 만남. 상냥함' },
     { id: 'bff', title: '선우랑 버킷리스트 💛', date: '2025. 9. 3.', body: '1. 떡볶이 맛집 10군데 도장깨기 (3/10)\n2. 같이 바다 보러 가기\n3. MBTI 똑같은 기념으로 사진 찍기 ㅋㅋ\n\n말 안 해도 통하는 사이 🤝' },
     { id: 'shop', title: '장보기', date: '2025. 10. 29.', body: '딸기우유\n라면\n샴푸' },
     { id: 'pw', title: '메모', date: '2025. 9. 2.', body: '폰 비밀번호 바꾸기 (아직 0000…)' },
@@ -976,12 +1023,12 @@ PAGES.memo = {
 /* ===================== 인스타: 피드 ===================== */
 function instaPosts() {
   return [
-    { who: 0, time: '40분 전', img: ['linear-gradient(160deg,#2b1d14,#8a5a3c)', '🎸', '합주실'], likes: 214, text: '새 곡 연습 중. 언젠가 제일 먼저 들려주고 싶은 사람이 있음', cmt: [['sunoo_', '오 누군데 누군데 ㅋㅋ'], ['js.jay', '비밀']] },
-    { who: 4, time: '2시간 전', img: ['linear-gradient(160deg,#ffd1dc,#ff8fab)', '🍓🥛', '편의점'], likes: 388, text: '.', cmt: [['sunoo_', '누구 주려고 산 거야 ㅋㅋㅋ'], ['ni_ki', '아님']] },
-    { who: 2, time: '5시간 전', img: ['linear-gradient(160deg,#ff9a3c,#ff4b2b)', '🍢', '단골 떡볶이집'], likes: 301, text: '떡볶이는 역시 베프랑 먹어야 제맛 💛', cmt: [['js.jay', '나도 불러라']] },
-    { who: 1, time: '6시간 전', img: ['linear-gradient(160deg,#1f2a44,#4b6584)', '📚', '중앙도서관'], likes: 276, text: '도서관 마감까지 ✍️ 다들 과제 화이팅', cmt: [['jake', '형 진짜 성실하다 ㅋㅋ']] },
+    { who: 0, time: '40분 전', img: ['linear-gradient(160deg,#2b1d14,#8a5a3c)', '🎸', '합주실'], likes: 214, text: '새 곡 연습 중. 언젠가 제일 먼저 들려주고 싶은 사람이 있음', cmt: [['sunoo_', '오 누군데 누군데 ㅎㅎ'], ['js.jay', '비밀 ㅋㅋ']] },
+    { who: 4, time: '2시간 전', img: ['linear-gradient(160deg,#ffd1dc,#ff8fab)', '🍓🥛', '편의점'], likes: 388, text: '.', cmt: [['sunoo_', '누구 주려고 산 거야 ㅎㅎ'], ['ni_ki', '아님 ㅋㅋ']] },
+    { who: 2, time: '5시간 전', img: ['linear-gradient(160deg,#ff9a3c,#ff4b2b)', '🍢', '단골 떡볶이집'], likes: 301, text: '떡볶이는 역시 베프랑 먹어야 제맛 💛', cmt: [['js.jay', '나도 불러라 ㅋㅋ']] },
+    { who: 1, time: '6시간 전', img: ['linear-gradient(160deg,#1f2a44,#4b6584)', '📚', '중앙도서관'], likes: 276, text: '도서관 마감까지 ✍️ 다들 과제 화이팅', cmt: [['jake', '형 진짜 성실하다 ㅎㅎ']] },
     { who: 5, time: '1일 전', img: ['linear-gradient(160deg,#3a4f63,#8fa9bf)', '☔', '집 가는 길'], likes: 245, text: '비 오는 날엔 우산 하나면 충분해', cmt: [['ni_ki', '?'], ['jungw0n', 'ㅎㅎ']] },
-    { who: 3, time: '3일 전', img: ['linear-gradient(160deg,#9bd0ff,#4d7cff)', '✈️', '인천국제공항'], likes: 532, text: 'Finally home 🇰🇷 3년 만이다', cmt: [['jungw0n', '재윤아 환영해!'], ['psh', '밥 한번 먹자']] },
+    { who: 3, time: '3일 전', img: ['linear-gradient(160deg,#9bd0ff,#4d7cff)', '✈️', '인천국제공항'], likes: 532, text: 'Finally home 🇰🇷 3년 만이다', cmt: [['jungw0n', '재윤아 환영해! ㅎㅎ'], ['psh', '밥 한번 먹자 ㅎㅎ']] },
   ];
 }
 const INSTA_TABS = [['🏠', '홈', 'feed'], ['🔍', '검색'], ['🎬', '릴스'], ['🛍', '쇼핑'], ['👤', '프로필']];
@@ -1051,11 +1098,11 @@ $('#sv').addEventListener('click', e => {
 /* ===================== 유튜브 ===================== */
 function videos() {
   return [
-    { id: 'cover', title: '[기타 커버] 밤에 혼자 듣기 좋은 노래 🎸', ch: '종성의 기타', chi: 0, meta: '조회수 1.2만회 · 1일 전', dur: '4:12', bg: photo(0), cm: [['sunoo_', '목소리까지 미쳤다 ㅠㅠ'], ['익명', '이 노래 누구 생각하면서 친 거예요?']] },
-    { id: 'vlog', title: '3년 만에 한국 귀국 브이로그 ✈️ | 공항에서 집까지', ch: 'Jake\'s day', chi: 3, meta: '조회수 8.4천회 · 3일 전', dur: '12:40', bg: 'linear-gradient(160deg,#9bd0ff,#4d7cff)', emo: '✈️', cm: [['jungw0n', '재윤이 드디어 왔구나 ㅎㅎ'], ['psh', '환영해!']] },
+    { id: 'cover', title: '[기타 커버] 밤에 혼자 듣기 좋은 노래 🎸', ch: '종성의 기타', chi: 0, meta: '조회수 1.2만회 · 1일 전', dur: '4:12', bg: photo(0), cm: [['sunoo_', '목소리까지 미쳤다 ㅎㅎ'], ['익명', '이 노래 누구 생각하면서 친 거예요?']] },
+    { id: 'vlog', title: '3년 만에 한국 귀국 브이로그 ✈️ | 공항에서 집까지', ch: 'Jake\'s day', chi: 3, meta: '조회수 8.4천회 · 3일 전', dur: '12:40', bg: 'linear-gradient(160deg,#9bd0ff,#4d7cff)', emo: '✈️', cm: [['jungw0n', '재윤이 드디어 왔구나 ㅎㅎ'], ['psh', '환영해! ㅎㅎ']] },
     { id: 'play', title: '설레는 밤에 듣는 플레이리스트 💗 새벽 감성', ch: '밤의 라디오', meta: '조회수 54만회 · 2주 전', dur: '1:02:11', bg: 'linear-gradient(160deg,#2a1640,#ff86b0)', emo: '💗', cm: [['새벽감성', '지금 누구 생각하면서 듣는 중']] },
     { id: 'tteok', title: '서울 떡볶이 맛집 TOP 10 🍢 베프랑 가기 좋은 곳', ch: '먹방TV', meta: '조회수 45만회 · 1개월 전', dur: '15:07', bg: 'linear-gradient(160deg,#ff9966,#ff5e62)', emo: '🍢', cm: [['떡순이', '3번 진짜 맛있어요']] },
-    { id: 'dance', title: '연습실 새벽 연습 🕺 (말 없음)', ch: 'nk', chi: 4, meta: '조회수 2.3만회 · 5일 전', dur: '3:28', bg: photo(4), cm: [['sunoo_', '왜 말이 없어 ㅋㅋㅋ'], ['ni_ki', '할 말 없음']] },
+    { id: 'dance', title: '연습실 새벽 연습 🕺 (말 없음)', ch: 'nk', chi: 4, meta: '조회수 2.3만회 · 5일 전', dur: '3:28', bg: photo(4), cm: [['sunoo_', '왜 말이 없어 ㅎㅎ'], ['ni_ki', '할 말 없음 ㅋㅋ']] },
   ];
 }
 /* 시청 기록에만 있는 영상 (홈 목록에는 안 나옴) */
@@ -1097,8 +1144,9 @@ PAGES.yt = {
 
 /* ===================== 인터넷 ===================== */
 const SEARCHES = [
-  ['나 기억나 답장 뭐라고 해', [['○○지식인', '모르는 사람이 "나 기억나?"라고 보냈어요', '보통은 예전부터 알던 사람이에요. 대화 속 힌트를 잘 보세요!'], ['커뮤니티', '"나 기억나?"는 고백 전 단계다 vs 아니다', '댓글 1,024개 · 무조건 고백 전 단계임 ㅋㅋ']]],
+  ['나 기억나 답장 뭐라고 해', [['○○지식인', '모르는 사람이 "나 기억나?"라고 보냈어요', '오래 알던 사람일 수도, 최근에 알게 된 사람일 수도 있어요. 대화 속 힌트를 하나씩 맞춰 보세요!'], ['커뮤니티', '"나 기억나?"는 고백 전 단계다 vs 아니다', '댓글 1,024개 · 무조건 고백 전 단계임 ㅋㅋ']]],
   ['좋아하는 사람한테 하는 행동', [['연애 칼럼', '좋아하면 나오는 행동 BEST 5', '1. 사소한 걸 기억한다 2. 핑계를 만들어 연락한다 3. 걱정을 한다 4. 뭔가를 챙겨준다 5. 호칭에 신경 쓴다']]],
+  ['카톡 말투로 누군지 알아내는 법', [['커뮤니티', '익명으로 연락 와도 말투는 못 숨긴다', 'ㅋㅋ 쓰는 사람은 익명이어도 ㅋㅋ 씀. ㅎㅎ 쓰는 사람은 ㅎㅎ 씀. 평소 대화랑 비교해 보세요.'], ['○○지식인', '지금 밖인지 집인지 물어보면 되나요?', '"지금 뭐 해?"라고 한 명씩 물어보면 생각보다 금방 좁혀져요.']]],
   ['츤데레 특징', [['백과사전', '츤데레', '겉으로는 무뚝뚝하지만 속으로는 다정한 성격. 말보다 행동으로 마음을 보여주는 경우가 많다.']]],
   ['소꿉친구랑 연애', [['커뮤니티', '소꿉친구가 갑자기 남자로 보일 때', '어릴 때 일을 꺼내면 신호임 ㅋㅋ']]],
 ];
