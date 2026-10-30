@@ -827,6 +827,15 @@ const TOPICS = {
     nk: [[() => myBday(), '…왜, 내가 모를 줄 알았어?']],
     jw: [[() => `${myBday()}이지 ㅎㅎ`, '그날은 비워 둘게 😊']],
   } },
+  /* "우리 저번 주에 뭐 했지?" — 재윤은 막 귀국해서 서운해한다 (호감도 -1) */
+  lastweek: { re: /(저번|지난) ?주/, delta: { jk: -1 }, lines: {
+    jay: [['너 우리 작업실 놀러왔잖아', '아 근데 너 삔 두고 가서 내가 지금 쓰고 있음ㅋㅋㅋ']],
+    sh: [['너가 내 자취방에 침입했잖아']],
+    sunoo: [['뭐긴 우리 수다 떨었지']],
+    jk: [['나 이제 한국 왔는데ㅠㅠ', '나 말고 누구 만난 거야']],
+    nk: [['같이 편의점 갔잖아']],
+    jw: [['알바 끝나고 같이 저녁 먹었지', '너무 좋았어']],
+  } },
   /* 생일: 오래 알던 선우·종성·재윤은 아직도 모르냐며 서운해한다 (호감도 -1), 나머지는 반가워한다 */
   birthday: { re: /생일|생신|몇 ?년생|나이/, delta: { jay: -1, sunoo: -1, jk: -1 }, lines: {
     jay: [['…야 우리 안 지 몇 년인데 아직도 내 생일 몰라?', '진짜 서운하다', '4월 20일. 이번엔 외워라 ㅋㅋ']],
@@ -1004,7 +1013,7 @@ const CUTE_SERIOUS = {
   nk: ['…', '진짜 왜 그래', '…설레잖아'],
   jw: ['…', '진짜 왜 그래…', '너 때문에 잠 다 깼어'],
 };
-const TOPIC_FIRST = ['myBirthday', 'birthday', 'crush', 'gf', 'thinkme', 'missme', 'pretty', 'date', 'hold', 'ideal', 'photo'];
+const TOPIC_FIRST = ['lastweek', 'myBirthday', 'birthday', 'crush', 'gf', 'thinkme', 'missme', 'pretty', 'date', 'hold', 'ideal', 'photo'];
 const TOPIC_ORDER = ['food', 'drink', 'scared', 'bored', 'angry', 'weather', 'study', 'music', 'media', 'meet', 'call', 'thanks', 'sorry', 'laugh', 'bye', 'ok', 'sad'];
 const topicOf = (t, order) => order.find(k => TOPICS[k].re.test(t));
 /* 플레이어 생일(잠금 비밀번호) → "3월 14일" */
