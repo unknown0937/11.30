@@ -606,7 +606,15 @@ const LATE_RIGHT = {
   jw: w => ['…응, 나야 ㅎㅎ', '못 맞출까 봐 사실 좀 무서웠어', `근데 ${w}… 걘 누구야..? 나보다 먼저 생각났구나`],
 };
 const WRONG = ['아닌데...', '진짜 모르는 거야..?'];
-const CONFESS = ['드디어 알아차렸구나 기다렸어.', '나 사실 널 처음 볼 때부터 좋아했어...', '너도 날 좋아해?'];
+/* 정체를 맞혔을 때: first = 처음 한 말, ask = 고백 끝에 묻는 말 (가운데는 FIRST_LOVE) */
+const CONFESS = {
+  jay: { first: ['…드디어 알아차렸네 ㅋㅋ 기다렸잖아'], ask: '…너는? 너도 나 좋아해?' },
+  sh: { first: ['드디어 알아차렸구나 ㅎㅎ 기다렸어'], ask: '너도 나 좋아해? ㅎㅎ' },
+  sunoo: { first: ['헐 드디어 알아차렸다아 🥺 기다렸단 말이야'], ask: '너두… 나 조아해? 🥺' },
+  jk: { first: ['드디어 알아차렸네 ㅋㅋ 엄청 기다렸어'], ask: '너도 나 좋아해?' },
+  nk: { first: ['…이제 알았냐', '기다렸어'], ask: '너도 나 좋아해?' },
+  jw: { first: ['드디어 알아차렸구나 ㅎㅎ 기다렸어'], ask: '너도 날 좋아해? ㅎㅎ' },
+};
 /* 고백할 때 각자 처음 만난 날을 떠올리며 "그때부터 쭉 좋아했어" (정답 맞혔을 때·호감도 20 고백 모두) */
 const FIRST_LOVE = {
   jay: ['꽃잎 날리던 그 놀이터에서 너 처음 본 날 기억나?', '나 사실 그날부터 쭉 좋아했어...'],
@@ -619,8 +627,24 @@ const FIRST_LOVE = {
 const ANSWER_YES = '나도 널 좋아해..';
 const ANSWER_NO = '미안...';
 /* 고백을 받아주면: 대사 → 그 사람의 침대 셀카(bed0~bed5, CHARS 순서) → 잘자 → 해피엔딩 */
-const REPLY_YES = (c, i) => ['진짜..?', '하... 다행이다.', `내가 앞으로 진짜 잘할게 ${c}`, '늦은 시간 연락해서 미안 내일 아침에 너 집으로 갈게♡', { img: `bed${i}` }, '잘자❤️ 내 꿈 꿔'];
-const REPLY_NO = ['아...', '미안 내가 너무 갑작스럽게 연락했지. 내 생각만 해버렸다.', '충분히 이해하고 괜찮아 잘 자'];
+/* 고백을 받아줬을 때 (c = 나를 부르는 말, b = 침대 셀카) / 거절했을 때 — 각자 말투로 */
+const REPLY_YES_BY = {
+  jay: (c, b) => ['…진짜?', '아 다행이다 ㅋㅋ 심장 터질 뻔했네', `앞으로 진짜 잘할게 ${c}`, '늦게 연락해서 미안. 내일 아침에 너네 집 앞으로 갈게', b, '잘 자 ㅋㅋ 내 꿈 꿔❤️'],
+  sh: (c, b) => ['진짜..?', '하… 다행이다 ㅎㅎ', `내가 앞으로 진짜 잘할게 ${c}`, '늦은 시간에 연락해서 미안. 내일 아침에 데리러 갈게♡', b, '잘자❤️ 내 꿈 꿔'],
+  sunoo: (c, b) => ['헐 진짜아..? 🥺', '하 다행이다아ㅠㅠ', `내가 앞으로 진짜 잘할게 ${c}`, '늦게 연락해서 미안해 내일 아침에 너네 집으로 갈게에♡', b, '잘자아❤️ 내 꿈 꿔야 해'],
+  jk: (c, b) => ['Really..? 진짜?', '하… 다행이다 ㅋㅋ', `내가 앞으로 진짜 잘할게 ${c}`, '늦게 연락해서 미안. 내일 아침에 너 집으로 갈게♡', b, '잘자❤️ 내 꿈 꿔'],
+  nk: (c, b) => ['…진짜지', '다행이다', `잘할게 ${c}`, '내일 아침에 데리러 갈게', b, '잘 자. 내 꿈 꿔❤️'],
+  jw: (c, b) => ['진짜..?', '하… 다행이다 ㅎㅎ', `내가 앞으로 진짜 잘할게 ${c}`, '늦은 시간에 연락해서 미안해. 내일 아침에 너 집으로 갈게♡', b, '잘자❤️ 내 꿈 꿔 😊'],
+};
+const REPLY_YES = (c, i) => REPLY_YES_BY[CHARS[i].chat](c, { img: `bed${i}` });
+const REPLY_NO_BY = {
+  jay: ['아...', '미안 ㅋㅋ 내가 너무 갑자기 연락했지', '괜찮아. 진짜 괜찮아 잘 자'],
+  sh: ['아...', '미안, 내가 너무 갑작스럽게 연락했지. 내 생각만 했다', '충분히 이해해. 괜찮아 잘 자'],
+  sunoo: ['아...', '미안 내가 너무 갑자기 연락했지ㅠㅠ', '괜찮아… 잘 자아'],
+  jk: ['아...', '미안, 내가 너무 갑자기 연락했지', '이해해. 괜찮아 잘 자'],
+  nk: ['…알았어', '미안 갑자기 연락해서', '잘 자'],
+  jw: ['아...', '미안 내가 너무 갑작스럽게 연락했지 ㅎㅎ', '충분히 이해해. 괜찮아 잘 자'],
+};
 
 const CHARS = [
   {
@@ -1748,11 +1772,11 @@ async function pickFlow(i) {
   if (i === S.culprit) {
     S.over = true;
     const first = S.wrong.length === 0;
-    if (!await themSay('unknown', first ? CONFESS.slice(0, 1) : LATE_RIGHT[c.chat](CHARS[S.wrong[0]].label).slice(0, 1))) return;
+    if (!await themSay('unknown', first ? CONFESS[c.chat].first : LATE_RIGHT[c.chat](CHARS[S.wrong[0]].label).slice(0, 1))) return;
     S.revealed = true;                       // 채팅방 이름이 그 사람 이름으로 바뀐다
     renderHome(); refreshChat('unknown');
     if (!first && !await themSay('unknown', LATE_RIGHT[c.chat](CHARS[S.wrong[0]].label).slice(1))) return;
-    if (!await themSay('unknown', [...FIRST_LOVE[c.chat], CONFESS[2]])) return;
+    if (!await themSay('unknown', [...FIRST_LOVE[c.chat], CONFESS[c.chat].ask])) return;
     S.phase = 'answer'; refreshChat('unknown');
     return;
   }
@@ -1775,7 +1799,7 @@ async function answerFlow(yes) {
   if (S.phase !== 'answer') return;
   const g = S;
   S.phase = 'done'; refreshChat('unknown');
-  if (!await themSay('unknown', yes ? REPLY_YES(call(), S.culprit) : REPLY_NO)) return;
+  if (!await themSay('unknown', yes ? REPLY_YES(call(), S.culprit) : REPLY_NO_BY[CHARS[S.culprit].chat])) return;
   await wait(1600); if (S !== g) return;
   if (yes) {
     S.over = true;
