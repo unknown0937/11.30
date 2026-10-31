@@ -711,7 +711,7 @@ const CHAT_STYLE = {
   },
   sunoo: {
     alias: ['선우', 'sunoo'],
-    special: [[/귀척/, ['아...', '응ㅠㅠㅠ'], -5], [/서인|seoin/i, ['서인이? 그냥 과 친구양 ㅎㅎ', '엥 혹시 질투하는 고야? 🥺', '헉 너무 귀여워어 ㅎㅎ 💛'], 'jealous']],
+    special: [[/귀척/, ['아...', '응ㅠㅠㅠ'], -5], [/떠누/, ['헐 떠누래 ㅎㅎ', '그렇게 불러주는 거 너무 좋아 🥺', '앞으로도 떠누라고 불러줘야 해애'], 'nick'], [/서인|seoin/i, ['서인이? 그냥 과 친구양 ㅎㅎ', '엥 혹시 질투하는 고야? 🥺', '헉 너무 귀여워어 ㅎㅎ 💛'], 'jealous']],
     hi: ['안뇽 ㅎㅎ 💛'], night: ['벌써 자게에? 🥺', '잘 자아 ㅎㅎ 내일 떡볶이 잊지 마'],
     flirt: [['헤헤 알고 이써 ㅎㅎ 💛', '근데 너가 더 귀여운 거 알지이?'], ['그런 말 하면 나 진짜 넘어간다아 ㅎㅎ'], ['히히 그럼 내일 떡볶이는 데이트로 할까아? 🥺']], again: ['아까 말해짜나 ㅎㅎ'],
     nudge: ['왜 안 읽엉 🥺', '나 삐질 거야아'],
@@ -1085,7 +1085,7 @@ function newGame(name) {
     badges: { kakao: 2, phone: 1 },
     unread: { sunoo: 2, sms: 1 },
     extra: {}, newCount: {}, touched: {}, clock: 0, asked: {}, arrived: false,
-    queue: {}, nudged: {}, nudgeT: {}, hold: {},
+    queue: {}, nudged: {}, nudgeT: {}, hold: {}, flirtLast: {}, flirtNudged: {},
     comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, chimed: {}, cmtDM: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, myBirthday: null, unblocked: false, likeWindow: null, calls: [], inCall: null, heartStory: {}, called: {}, askN: {}, askState: {}, dmGot: false, dmRead: false, dmUnread: 0, dmTimer: false, myStory: null, composeTag: null, memoOpen: new Set(), cuteN: {},
     step: 0, typing: null,
     tries: 3, wrong: [], over: false,
@@ -1381,6 +1381,7 @@ function enqueue(id, fn) {
 }
 /* 플레이어가 직접 입력한 메시지 보내기 */
 function send(id, text) {
+  if (id !== 'unknown') S.flirtLast[id] = LOVE_RE.test(text) || CUTE_RE.test(text) || intentOf(text) === 'flirt';
   pushMsg(id, me(text));
   enqueue(id, () => respond(id, text));
 }
@@ -1426,6 +1427,7 @@ async function respond(id, text) {
   if (sp) {
     const ok = await themSay(id, sp[1]);
     if (ok && sp[2] === 'jealous' && !S.jealous[id]) { S.jealous[id] = true; addAffection(ci); }
+    if (ok && sp[2] === 'nick' && !(S.nick = S.nick || {})[id]) { S.nick[id] = true; addAffection(ci); }   // 별명으로 불러주면 좋아함 (처음 한 번 +1)
     if (ok && typeof sp[2] === 'number') addAffection(ci, sp[2]);
     return ok;
   }
@@ -1482,17 +1484,28 @@ async function respond(id, text) {
   /* 키워드가 하나도 없으면 대답하지 않는다 */
 }
 /* 읽씹하면: 한참 안 읽은 채팅방에서 한 번 더 연락이 온다 */
+/* 플러팅해 놓고 대답을 안 읽으면 */
+const FLIRT_NUDGE = {
+  jay: ['야 넌 이런 멘트 해놓고 갑자기 사라지냐...', '사람 설레게 해놓고 ㅋㅋ'],
+  sh: ['그런 말 해놓고 갑자기 사라지면 어떡해 ㅎㅎ', '나 계속 신경 쓰이잖아'],
+  sunoo: ['헐 그런 말 해놓구 갑자기 사라지기야? 🥺', '나 혼자 설레구 있잖아ㅠㅠ'],
+  jk: ['넌 그런 멘트 하고 갑자기 사라지냐 ㅋㅋ', '나만 잠 못 자겠네'],
+  nk: ['그런 말 하고 사라지냐', '…뭐야 진짜'],
+  jw: ['그런 말 해놓고 갑자기 사라지기야? ㅎㅎ', '나 혼자 계속 생각나잖아'],
+};
 const NUDGE_MS = 10000;   // 안 읽으면 10초 뒤 재촉
 function scheduleNudge(id) {
-  if (S.nudged[id] || id === 'mom') return;
+  const flirt = () => S.flirtLast[id] && !S.flirtNudged[id];   // 플러팅해 놓고 안 읽으면 따로 한 번 더
+  if ((S.nudged[id] && !flirt()) || id === 'mom') return;
   clearTimeout(S.nudgeT[id]);   // 마지막 메시지부터 다시 센다
   const g = S;
   S.nudgeT[id] = setTimeout(() => {
     if (S !== g) return;
     S.nudgeT[id] = null;
     if (!S.unread[id] || S.hold[id] || (id === 'unknown' && S.over)) return;   // hold: 이어서 할 말이 남아 있음
-    S.nudged[id] = true;
-    const lines = id === 'unknown' ? [`자나?${CHARS[S.culprit].laugh}`] : CHAT_STYLE[id].nudge;
+    const f = flirt();
+    if (f) S.flirtNudged[id] = true; else if (S.nudged[id]) return; else S.nudged[id] = true;
+    const lines = id === 'unknown' ? [`자나?${CHARS[S.culprit].laugh}`] : f ? FLIRT_NUDGE[id] : CHAT_STYLE[id].nudge;
     enqueue(id, () => themSay(id, lines));
   }, NUDGE_MS);
   S.timers.push(S.nudgeT[id]);
