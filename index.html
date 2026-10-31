@@ -1439,6 +1439,20 @@ async function respond(id, text) {
       return ok;
     }
   }
+  /* "너 나 좋아하지?" → 각자 대답 (처음 한 번 호감도 +1). 성훈은 한 번 피했다가 대답을 재촉하면 "…좋아하지" */
+  const likeMe = async lines => {
+    const ok = await themSay(id, lines);
+    if (ok && !(S.likeMe = S.likeMe || {})[id]) { S.likeMe[id] = true; addAffection(ci); }
+    return ok;
+  };
+  if (id === 'sh' && S.shDodge) {
+    S.shDodge = false;
+    if (/말해|대답|빨리|얼른|뭐야|왜|궁금|진짜|그래서|좋아해|좋아하지|\?/.test(text)) return likeMe(['…좋아하지 ㅎㅎ']);
+  }
+  if (LIKE_ME_RE.test(text)) {
+    if (id === 'sh') { S.shDodge = true; return themSay(id, LIKE_ME.sh); }
+    return likeMe(LIKE_ME[id]);
+  }
   const asked = S.asked[id] = S.asked[id] || new Set();
   if (await askOut(id, ci, text)) return;
   /* 종성: "기타 소리 들려줄까?"에 좋다고 하거나, 기타 치는 거 보여 달라고 하면 기타 영상을 보낸다 */
@@ -1943,6 +1957,16 @@ const RIVAL_CUT = {
   jk: w => ['Wait 잠깐만', `${w}한테 고백받았어?`, '나 재윤이야. 알 수 없음 나였어', '나도 너 좋아해 ㅋㅋ 진심으로', '나랑 걔 중에 골라 줘'],
   nk: w => ['잠깐', `${w}한테 고백받았냐`, '나 니키야. 알 수 없음 나였어', '나도 너 좋아해', '골라'],
   jw: w => ['잠깐만', `혹시 ${w}한테 고백받았어?`, '나 정원이야 ㅎㅎ 알 수 없음 나였어', '나도 너 좋아해', '나랑 걔 중에 골라 줘'],
+};
+/* "너 나 좋아하지?" */
+const LIKE_ME_RE = /(나|날|나를)\s*좋아하(지|냐|니|잖|는\s*거|나|죠)|(나|날|나를)\s*좋아해\s*\?/;
+const LIKE_ME = {
+  jay: ['…싫어하겠냐'],
+  sh: ['아잇 왜 그런 걸 묻고 그러냐 ㅎㅎ'],
+  sunoo: ['많이 좋아하징 ㅎㅎ'],
+  jk: ['당연하지 ㅋㅋ'],
+  nk: ['지금도 연락하고 있잖아'],
+  jw: ['응 좋아해 ㅎㅎ'],
 };
 /* 질투하냐는 말에 질투 난다고 했을 때 */
 const JEALOUS_YES_RE = /질투|^(응|웅|어|ㅇㅇ|맞아|그래|당연|ㅇ)(?![가-힣])/;
