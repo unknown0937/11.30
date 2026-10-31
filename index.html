@@ -1898,23 +1898,23 @@ $('#call').addEventListener('click', e => {
 
 /* ===================== "사귀자" =====================
    1~3번째: 부끄러워함 (호감도 +1) → 4번째: "진심이야? 너 그 말 책임질 수 있어?"
-   → "응"이면 "그럼 사귀던가ㅋㅋ" (호감도 +5) */
+   → "응"이면 진짜 사귀지는 않고 설레하는 말(flutter) (호감도 +5). 그 뒤로 또 하면 설레하는 말만 */
 const ASK_OUT_RE = /사귀자|사귈래|사귀어 ?줘|사귀면 ?안 ?돼|사귀어 ?볼래|연애하자|우리 ?사귀/;
 const ASK_YES_RE = /^(응|웅|어|ㅇㅇ|그래|당연|진심|진짜|책임)|진심이야|책임질게|당연하지/;
 const ASK_NO_RE = /아니|장난|농담|ㄴㄴ|미안/;
 const ASK_OUT = {
   jay: { shy: [['…야 ㅋㅋ 갑자기 무슨 소리야'], ['아 진짜 ㅋㅋ 장난치지 마라', '…얼굴 빨개졌잖아'], ['…ㅋㅋ 너 계속 그러면 진짜 믿는다?']],
-    serious: ['…야', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['…ㅋㅋㅋ', '그럼 사귀던가ㅋㅋ'], no: ['ㅋㅋ 그럴 줄 알았다', '…아쉽네'], after: ['이미 사귀기로 한 거 아니었냐 ㅋㅋ'] },
+    serious: ['…야', '진심이야?', '너 그 말 책임질 수 있어?'], no: ['ㅋㅋ 그럴 줄 알았다', '…아쉽네'], flutter: [['…ㅋㅋ 아 진짜', '그렇게 사람 맘 가지고 노는 거 아니야...'], ['…야 이러면 진짜 같잖아...', '나 지금 좀 설렜어']] },
   sh: { shy: [['ㅎㅎ 뭐야 갑자기'], ['…농담이지? ㅎㅎ', '심장에 안 좋다'], ['자꾸 그러면 나 진짜 진지하게 받아들여 ㅎㅎ']],
-    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['ㅎㅎ', '그럼 사귀던가ㅎㅎ'], no: ['그치 ㅎㅎ 장난인 거 알았어', '…조금 아쉽다'], after: ['우리 이미 사귀기로 했잖아 ㅎㅎ'] },
+    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], no: ['그치 ㅎㅎ 장난인 거 알았어', '…조금 아쉽다'], flutter: [['…ㅎㅎ 그렇게 말하면', '진짜 같잖아...'], ['사람 맘 가지고 노는 거 아니야 ㅎㅎ', '…근데 진짜 좀 설레는데']] },
   sunoo: { shy: [['헉 뭐야아 🥺'], ['아 부끄러워어 ㅎㅎ', '그런 말 하지 마아'], ['너 자꾸 그러면 나 진짜 믿는다아? 🥺']],
-    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['…ㅎㅎ', '그럼 사귀던가'], no: ['칫 장난이었구낭', '나 좀 기대했는데에'], after: ['우리 이미 사귀는 거 아니야? ㅎㅎ 💛'] },
+    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], no: ['칫 장난이었구낭', '나 좀 기대했는데에'], flutter: [['…그렇게 사람 맘 가지고 노는 거 아니야...'], ['…이러면 진짜 같잖아', '나 진짜 좀 설레는데']] },
   jk: { shy: [['ㅋㅋ 뭐야 갑자기'], ['…농담이지? ㅋㅋ', '나 지금 좀 설렜는데'], ['너 자꾸 그러면 나 진심으로 받아들인다 ㅋㅋ']],
-    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['ㅋㅋㅋ', '그럼 사귀던가ㅋㅋ'], no: ['ㅋㅋ 그럴 줄 알았어', '아쉽다 진짜'], after: ['우리 이미 사귀기로 했잖아 ㅋㅋ'] },
+    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], no: ['ㅋㅋ 그럴 줄 알았어', '아쉽다 진짜'], flutter: [['…ㅋㅋ 이러면 진짜 같잖아...'], ['사람 맘 가지고 노는 거 아니야 ㅋㅋ', '…진짜 좀 설레는데']] },
   nk: { shy: [['뭐래'], ['장난치지 마', '부끄러우니까'], ['자꾸 그러면 진짜로 믿는다']],
-    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['…ㅋㅋ', '그럼 사귀던가ㅋㅋ'], no: ['…그럴 줄 알았어', '…아쉽네'], after: ['…이미 사귀기로 했잖아'] },
+    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], no: ['…그럴 줄 알았어', '…아쉽네'], flutter: [['…그렇게 사람 맘 가지고 노는 거 아니야'], ['…진짜 좀 설레는데']] },
   jw: { shy: [['ㅎㅎ 갑자기?'], ['…장난이지? ㅎㅎ', '나 지금 좀 당황했어'], ['자꾸 그러면 진짜 믿어 버린다 ㅎㅎ']],
-    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['ㅎㅎ', '그럼 사귀던가ㅎㅎ 😊'], no: ['ㅎㅎ 장난인 거 알았어', '조금 아쉽긴 하다'], after: ['우리 이미 사귀기로 한 거 아니었어? ㅎㅎ'] },
+    serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], no: ['ㅎㅎ 장난인 거 알았어', '조금 아쉽긴 하다'], flutter: [['ㅎㅎ 그렇게 말하면 진짜 같잖아...'], ['…진짜 좀 설레는데 ㅎㅎ', '사람 맘 가지고 노는 거 아니야']] },
 };
 /* 호감도 20 고백을 하는 사람이 (알 수 없음) 본인일 때, 고백 앞에 붙이는 말 */
 const SELF_REVEAL = {
@@ -1958,8 +1958,7 @@ const GUITAR = ['ㅋㅋ 잠깐만', { vid: 'guitar' }, '방금 쳐본 거야', '
 const GUITAR_PRAISE = /헐|멋있|멋지|멋져|좋다|좋아|설레|설렌|최고|대박|잘한다|잘 ?치|잘 ?쳐|감동|미쳤|짱|천재|듣기 ?좋|목소리|💗|❤|♡|♥/;
 const GUITAR_SHY = [['…아 뭐야 ㅋㅋ', '그렇게 말하면 좀 부끄럽잖아'], ['ㅋㅋ 진짜?', '…좀 부끄럽네..ㅋㅋ', '너 들으라고 친 거야'], ['아 몰라 ㅋㅋ', '칭찬 들으니까 괜히 쑥스럽네']];
 const GUITAR_AGAIN = ['또 듣고 싶어? ㅋㅋ', { vid: 'guitar' }, '이거 너만 들려주는 거다'];
-/* 사귀게 되면: 잠시 뒤 스토리에 하트를 올리고, 조금 더 뒤에 전화가 온다 */
-/* 사귀게 되면(고백을 받아줘도, "사귀자"로 사귀어도) 전화가 걸려 오고, 전화가 끝나면 스토리를 올린다.
+/* 고백을 받아주면 전화가 걸려 오고, 전화가 끝나면 스토리를 올린다.
    종성은 전화 뒤 유튜브 (jayLove), 재윤은 침대 셀카 → 전화 (jkLove) */
 const LOVE_CALL = {
   sh: ['자기 전에 목소리 듣고 싶어서 ㅎㅎ', '네가 내 여자친구라니 아직도 실감이 안 나', { pause: 3000 }, '사랑해', '(뚝)'],
@@ -1967,15 +1966,11 @@ const LOVE_CALL = {
   nk: ['…그냥', '목소리 듣고 싶어서', '아 몰라', { pause: 3000 }, '사랑해', '(뚝)'],
   jw: ['목소리 듣고 싶어서 전화했어 ㅎㅎ', '너가 내 여자친구라니 너무 좋아서 죽을 것 같아', { pause: 3500 }, '사랑해', '(뚝)'],
 };
-function loveCall(ci, dating) {
+function loveCall(ci) {
   const id = CHARS[ci].chat;
   if (id === 'jay') return jayLove();
-  if (id === 'jk') return jkLove(dating);
+  if (id === 'jk') return jkLove(false);
   incomingCall(ci, LOVE_CALL[id], () => heartStory(ci));
-}
-function startDating(ci) {
-  const g = S;
-  S.timers.push(setTimeout(() => { if (S === g) loveCall(ci, true); }, 5000));
 }
 /* 하트 스토리: 나를 태그한 하트 스토리. 정원은 친한 친구 스토리(초록 테두리)로 영상을 올린다.
    이 스토리에 "사랑해"로 답장하면 해피엔딩 */
@@ -2008,7 +2003,7 @@ function heartStory(ci) {
 function postLoveStory(ci, chat) {
   const g = S;
   S.loveStory = ci; S.loveChat = chat;
-  S.timers.push(setTimeout(() => { if (S === g) loveCall(ci, false); }, 2500));
+  S.timers.push(setTimeout(() => { if (S === g) loveCall(ci); }, 2500));
 }
 /* 종성은 스토리 대신: 전화 "내가 올린 영상 봐줘 … 널 생각하면서 녹음했어" → 유튜브에 영상 업로드.
    그 영상에 "사랑해" 댓글을 달면 해피엔딩 */
@@ -2042,17 +2037,18 @@ function storyReply(i, text) {
 }
 async function askOut(id, ci, text) {
   const a = ASK_OUT[id];
+  const flutter = () => a.flutter[Math.floor(Math.random() * a.flutter.length)];
   if (S.askState[id] === 'ask') {
+    /* "응"이라고 해도 진짜 사귀지는 않는다: 설레하기만 하고 호감도가 오른다 (진짜로 이어지는 건 고백 루트뿐) */
     if (ASK_YES_RE.test(text)) {
       S.askState[id] = 'done';
-      const ok = await themSay(id, a.yes);
-      if (ok) { addAffection(ci, 5); startDating(ci); }
+      if (await themSay(id, flutter())) addAffection(ci, 5);
       return true;
     }
     if (ASK_NO_RE.test(text)) { S.askState[id] = null; S.askN[id] = 0; await themSay(id, a.no); return true; }
   }
   if (!ASK_OUT_RE.test(text)) return false;
-  if (S.askState[id] === 'done') { await themSay(id, a.after); return true; }
+  if (S.askState[id] === 'done') { await themSay(id, flutter()); return true; }
   const n = S.askN[id] = (S.askN[id] || 0) + 1;
   if (n >= 4) { S.askState[id] = 'ask'; await themSay(id, a.serious); return true; }
   if (await themSay(id, a.shy[n - 1])) addAffection(ci);
