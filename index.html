@@ -1451,6 +1451,17 @@ async function respond(id, text) {
   }
   /* 호감도 15 이상에서 "고백해", "좋아한다고 해" 하고 재촉하면 "때가 되면" */
   if (S.affection[ci] >= 15 && CONFESS_ME_RE.test(text)) return themSay(id, CONFESS_ME[id]);
+  /* "여보" → 각자 반응 + "혹시 딴 사람한테 보내려던 건 아니지?" → 응: 다행 / 아니·잘못 보냄: 진지하게 질투 */
+  if (S.yeobo === id) {
+    S.yeobo = null;
+    if (/잘못|아니|ㄴㄴ|실수|다른 ?사람|딴 ?사람/.test(text)) return themSay(id, YEOBO[id].jealous);
+    if (/^(응|웅|ㅇㅇ|어|당연|맞아|그럼|너한테|너 ?밖에|너지|너야)/.test(text.trim())) return themSay(id, YEOBO[id].relief);
+  }
+  if (/여보(?!세)/.test(text)) {
+    const ok = await themSay(id, YEOBO[id].first);
+    if (ok) S.yeobo = id;
+    return ok;
+  }
   if (NOT_LIKE_RE.test(text)) return themSay(id, NOT_LIKE[id]);   // "나 싫어?", "나한테 관심 없어?"
   if (LIKE_ME_RE.test(text)) {
     if (S.affection[ci] >= 15) return likeMe(LIKE_ME_SERIOUS[id]);   // 호감도 15 이상: 웃음 없이 진지하게
@@ -1989,6 +2000,15 @@ const LIKE_ME_SERIOUS = {
   jk: ['응', '좋아해. 진심으로'],
   nk: ['…응', '좋아해'],
   jw: ['응 좋아해', '많이'],
+};
+/* "여보"라고 불렀을 때: first = 반응 + 확인 질문, relief = "응"(너한테 보낸 거 맞아), jealous = "아니/잘못 보냈다" */
+const YEOBO = {
+  jay: { first: ['???', '잘못 보낸 건가...?', '혹시 딴 사람한테 보내려던 건 아니지?'], relief: ['…ㅋㅋ 역시 나밖에 없지?'], jealous: ['…야 뭐야', '그럼 누구야?'] },
+  sh: { first: ['ㅎㅎ 이러니까 결혼한 것 같다', '근데 혹시 딴 사람한테 보내려던 건 아니지?'], relief: ['다행이네 그럼 ㅎㅎ'], jealous: ['…뭐야 그럼 누구야?', '나 말고 딴 남자 있어?'] },
+  sunoo: { first: ['응ㅎㅎ 왜?', '…근데 혹시 딴 사람한테 보내려던 건 아니지? 🥺'], relief: ['헤헤 역시 나밖에 없지? 💛'], jealous: ['…뭐야', '그럼 누구한테 보내려던 거야?'] },
+  jk: { first: ['ㅋㅋㅋ 뭐야 갑자기', '…혹시 딴 사람한테 보내려던 건 아니지?'], relief: ['ㅋㅋ 다행이네', '역시 나밖에 없지?'], jealous: ['…뭐야 그럼 누구야?', '나 말고 딴 남자 있는 거야?'] },
+  nk: { first: ['…뭐야', '딴 사람한테 보내려던 거 아니지'], relief: ['…다행이네'], jealous: ['…누구야', '나 말고 딴 남자 있어?'] },
+  jw: { first: ['ㅎㅎㅎ 응 여보', '…혹시 딴 사람한테 보내려던 건 아니지? ㅎㅎ'], relief: ['다행이다 ㅎㅎ 역시 나밖에 없지? 😊'], jealous: ['…응?', '그럼 누구한테 보내려던 거야', '나 말고 딴 남자 있어?'] },
 };
 /* "나 안 좋아?", "나 싫어?", "나한테 관심 없어?" */
 const NOT_LIKE_RE = /(나|날)\s*(안\s*좋아|싫어|싫지|싫구나|별로)|나한테\s*관심\s*(없|1도)|나\s*안\s*궁금/;
