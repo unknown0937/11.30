@@ -1428,6 +1428,20 @@ async function respond(id, text) {
   }
   /* 성까지 붙여 부르면 (예: 박종성!, 김선우 뭐해) 은근 서운해한다 */
   if (FULLNAME_HURT[id] && text.replace(/\s/g, '').startsWith(c.name)) return themSay(id, FULLNAME_HURT[id]);
+  /* 성훈은 "선배"라고 부르면 좋아함 / 처음 "오빠"라고 부르면 다들 설레함 (종성은 어색해하면서). 처음 한 번 호감도 +1 */
+  const once = S.callOnce = S.callOnce || {};
+  if (id === 'sh' && /선배/.test(text) && !once.sunbae) {
+    once.sunbae = true;
+    const ok = await themSay(id, ['ㅎㅎㅎ 선배라니', '그렇게 부르니까 기분 좋다', '한 번만 더 불러 줄래?']);
+    if (ok) addAffection(ci);
+    return ok;
+  }
+  if (/오빠/.test(text) && !once['oppa' + id] && !CHARS.some(o => o !== c && new RegExp(`${o.label}\\s*오빠`).test(text))) {
+    once['oppa' + id] = true;
+    const ok = await themSay(id, OPPA[id]);
+    if (ok) addAffection(ci);
+    return ok;
+  }
   /* 이름만 부르면 "왜" (예: 종성아, 니키야, 정원 오빠, 오빠~) */
   if (new RegExp(`^((${c.label})(아|야|이|이야)?\\s*)?(오빠|오빵)?[\\s~!?.ㅋㅎ]*$`).test(text.trim()) && /\S/.test(text.replace(/[~!?.ㅋㅎ\s]/g, ''))) {
     const L = CALL_BACK[id];
@@ -2452,6 +2466,15 @@ const JEALOUS_YES = {
   jk: [['ㅋㅋ 귀여워'], ['ㅋㅋ 걱정 마', '난 어차피 너 좋아하는데']],
   nk: [['ㅋㅋ 귀여워'], ['질투하지 마', '난 어차피 너 좋아하는데']],
   jw: [['귀여워 ㅎㅎ'], ['질투 안 해도 돼 ㅎㅎ', '난 어차피 너 좋아하는데 😊']],
+};
+/* 처음 "오빠"라고 불렀을 때 */
+const OPPA = {
+  jay: ['오빠?', '아 뭐야 어색하게 ㅋㅋ', '…근데 좀 좋네'],
+  sh: ['오빠? ㅎㅎㅎ', '선배보다 그게 더 좋은데?'],
+  sunoo: ['헐 오빠라고 불렀어?? 🥺', '한 번 더 불러 주라 ㅎㅎ'],
+  jk: ['ㅋㅋ 오빠?', '오 이거 좋다. 계속 그렇게 불러'],
+  nk: ['오빠…? ㅋㅋ', '아 뭐야 부끄럽게', '또 불러 줘'],
+  jw: ['오빠? ㅎㅎ', '갑자기 그렇게 부르니까 설레잖아 😊'],
 };
 /* 이름만 불렀을 때 */
 const CALL_BACK = {
