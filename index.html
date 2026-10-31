@@ -2173,13 +2173,33 @@ const EXTRA_OTHER = {
 /* 언제부터 좋아했냐고 물으면: 첫마디 + 처음 만난 날 (계절 힌트) */
 const EXTRA_SINCE = { jay: '…ㅋㅋ 그걸 꼭 말해야 되냐', sh: 'ㅎㅎ 글쎄', sunoo: '음… 아마 처음부터?', jk: 'ㅋㅋ 아주 오래전부터', nk: '…처음부터', jw: 'ㅎㅎ 꽤 오래됐어' };
 const SINCE_DAY = { jay: '…놀이터에서 처음 본 날?', sh: '동아리 환영회 날?', sunoo: '입학식 날?', jk: '엄마들 모임에서 처음 본 날?', nk: '첫 수업 날?', jw: '알바 첫날?' };
+/* 첫키스: no = 아직 안 했다, want = 호감도 15 이상이면 덧붙임, ask = 되묻기, relief = 나도 못 해봤다고 하면,
+   jealous = 해봤다고 하면, angry(x) = 그 상대가 x라고 하면, told(a) = a한테 "내가 너 첫키스"라고 했다는 걸 들은 x가 보내는 말 */
 const FIRST_KISS = {
-  jay: { no: ['…아직 안 했는데 ㅋㅋ', '왜 물어보냐'], want: '…근데 하고 싶은 사람은 있어' },
-  sh: { no: ['ㅎㅎ 아직 안 해봤어'], want: '근데 하고 싶은 사람은 있어' },
-  sunoo: { no: ['아직 안 해봤어 ㅎㅎ', '왜애? 궁금해? 🥺'], want: '…근데 하고 싶은 사람은 있어' },
-  jk: { no: ['ㅋㅋ 아직이야', '호주에서도 안 했어 진짜로'], want: '근데 하고 싶은 사람은 있어 ㅋㅋ' },
-  nk: { no: ['안 했어', '…왜'], want: '…하고 싶은 사람은 있고' },
-  jw: { no: ['아직 안 해봤어 ㅎㅎ'], want: '근데… 하고 싶은 사람은 있어' },
+  jay: { no: ['…아직 안 했는데 ㅋㅋ', '왜 물어보냐'], want: '…근데 하고 싶은 사람은 있어', ask: '…너는?',
+    relief: ['…ㅋㅋ 그렇구나', '…아니 그냥 다행이라고'], jealous: ['…뭐?', '진짜로?', '…누군데'],
+    angry: x => [`${x}? 걔랑?`, '하..', '…진짜 어이없네'],
+    told: a => [`야 너 ${a}한테 내가 너 첫키스라고 했다며?`, '…근데 난 기억이 없는데 ㅋㅋ', '아 뭐야 진짜ㅠㅠ'] },
+  sh: { no: ['ㅎㅎ 아직 안 해봤어'], want: '근데 하고 싶은 사람은 있어', ask: '너는? ㅎㅎ',
+    relief: ['ㅎㅎ 그렇구나', '왠지 좀 다행이다'], jealous: ['…아 그래?', '누구야'],
+    angry: x => [`${x}? 걔랑?`, '하..', '…좀 화나네'],
+    told: a => [`${josa(a, '이', '가')} 그러던데, 내가 네 첫키스라며? ㅎㅎ`, '근데 난 기억이 없는데 ㅎㅎ', '그럼 진짜로 내가 네 첫키스 해도 되나?'] },
+  sunoo: { no: ['아직 안 해봤어 ㅎㅎ', '왜애? 궁금해? 🥺'], want: '…근데 하고 싶은 사람은 있어', ask: '너는? 🥺',
+    relief: ['헤헤 다행이당 🥺', '아니 그냥 ㅎㅎ'], jealous: ['…진짜?', '누구랑'],
+    angry: x => [`${x}? 걔랑?`, '하..', '…나 지금 진짜 기분 별로야'],
+    told: a => [`헐 ${a}한테 내가 너 첫키스라고 했다며?? 🥺`, '근데 나 기억이 없는뎅 ㅎㅎ', '그럼… 진짜로 해도 돼? ㅎㅎ'] },
+  jk: { no: ['ㅋㅋ 아직이야', '호주에서도 안 했어 진짜로'], want: '근데 하고 싶은 사람은 있어 ㅋㅋ', ask: '너는?',
+    relief: ['ㅋㅋ 다행이다', '…아 그냥 그렇다고'], jealous: ['…뭐?', '누구랑 했는데'],
+    angry: x => [`${x}? 걔랑?`, '하..', '…장난이지?'],
+    told: a => [`ㅋㅋ ${a}한테 내가 너 첫키스라고 했다며?`, '근데 난 기억이 없는데 ㅋㅋ', '그럼 진짜로 내가 너 첫키스 해도 되나?'] },
+  nk: { no: ['안 했어', '…왜'], want: '…하고 싶은 사람은 있고', ask: '너는',
+    relief: ['…그래', '…다행이네'], jealous: ['…누구', '말해'],
+    angry: x => [`${x}? 걔랑?`, '하..', '…짜증나'],
+    told: a => [`${a}한테 내가 너 첫키스라고 했냐`, '…기억 없는데', '…뭐야 진짜'] },
+  jw: { no: ['아직 안 해봤어 ㅎㅎ'], want: '근데… 하고 싶은 사람은 있어', ask: '너는? ㅎㅎ',
+    relief: ['ㅎㅎ 그렇구나', '왠지 안심된다 😊'], jealous: ['…아', '누군지 물어봐도 돼?'],
+    angry: x => [`${x}? 걔랑?`, '하..', '…나 지금 좀 속상하다'],
+    told: a => [`${josa(a, '이', '가')} 그러던데, 내가 네 첫키스야? ㅎㅎ`, '근데 난 기억이 없는데 ㅎㅎ', '그럼… 진짜로 내가 해도 돼?'] },
 };
 /* 꿈 얘기 뒤에 "이상한 거", "비밀" 하면 살짝 부끄러워함 (처음 한 번 호감도 +1) */
 const DREAM_SHY = {
@@ -2251,8 +2271,47 @@ async function extraTalk(id, ci, c, text) {
   const o = CHARS.find(x => x !== c && new RegExp(`${x.label}(이|가|는|은|랑|이랑|하고|이는)?\\s*(어때|친해|알아\\?|어떤 ?(애|사람)|괜찮)`).test(text));
   if (o) return themSay(id, EXTRA_OTHER[id](o.label));
   if (/언제 ?부터.{0,6}좋아|언제 ?부터 ?(나|날)/.test(text)) return themSay(id, [EXTRA_SINCE[id], SINCE_DAY[id]]);
-  /* 첫키스 누구냐고 하면 다들 아직 안 했다고 함. 호감도 15 이상이면 "하고 싶은 사람은 있어" */
-  if (/첫 ?키스/.test(text)) return themSay(id, [...FIRST_KISS[id].no, ...(S.affection[ci] >= 15 ? [FIRST_KISS[id].want] : [])]);
+  /* 첫키스: 다들 아직 안 했다고 하고(15 이상이면 "하고 싶은 사람은 있어") "너는?" 되물음.
+     → 못 해봤다: 안도 (+1) / 해봤다: 진지하게 질투 → 이름을 대면 "걔랑?" 화남
+     → 5초 뒤 그 사람이 "내가 너 첫키스라며? 근데 난 기억이 없는데" (그 사람 호감도 +2) */
+  const fk = S.fk && S.fk.id === id ? S.fk : null;
+  if (fk) {
+    S.fk = null;
+    if (fk.stage === 'ask') {
+      if (/해 ?봤|했지|했어|있지|있어|당연/.test(text) && !/못|안 ?해|아직|없어/.test(text)) {
+        const ok = await themSay(id, FIRST_KISS[id].jealous);
+        if (ok) S.fk = { id, stage: 'who' };
+        return ok;
+      }
+      if (/아직|못|안 ?해|없어|처음|ㅠ|노노|ㄴㄴ|아니/.test(text)) {
+        const ok = await themSay(id, FIRST_KISS[id].relief);
+        const done = S.extraAff = S.extraAff || {};
+        if (ok && !done['fk' + id]) { done['fk' + id] = true; addAffection(ci); }
+        return ok;
+      }
+    } else {
+      const x = CHARS.find(o => o !== c && text.includes(o.label));
+      if (x) {
+        const ok = await themSay(id, FIRST_KISS[id].angry(x.label));
+        const xi = CHARS.indexOf(x), xid = x.chat, g = S;
+        if (ok && !rejectedChat(xid)) S.timers.push(setTimeout(() => {
+          if (S !== g) return;
+          enqueue(xid, async () => {
+            if (!await themSay(xid, FIRST_KISS[xid].told(c.label))) return;
+            const done = S.extraAff = S.extraAff || {};
+            if (!done['fktold' + xid]) { done['fktold' + xid] = true; addAffection(xi, 2); }
+          });
+        }, 5000));
+        return ok;
+      }
+      if (text.includes(c.label) || /^너|너잖아|너랑/.test(text.trim())) return themSay(id, ['…나?', '나 그런 기억 없는데..']);
+    }
+  }
+  if (/첫 ?키스/.test(text)) {
+    const ok = await themSay(id, [...FIRST_KISS[id].no, ...(S.affection[ci] >= 15 ? [FIRST_KISS[id].want] : []), FIRST_KISS[id].ask]);
+    if (ok) S.fk = { id, stage: 'ask' };
+    return ok;
+  }
   if (S.dreamAsk === id) {
     S.dreamAsk = null;
     if (/이상한|야시|야한|비밀|말 ?못|부끄|19|뭔가 ?좀/.test(text)) {
