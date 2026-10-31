@@ -757,7 +757,7 @@ const LOVE_TALK = {
   nk: { tease: ['뭐래', '장난치지 마'], serious: ['…', '그런 말 쉽게 하지 마', '진짜 설레니까'] },
   jw: { tease: ['ㅎㅎ 뭐래', '나 놀리는 거지?'], serious: ['…', '그렇게 말하면 내가 어떻게 해야 할지 모르겠잖아 ㅎㅎ', '…나도 같은 마음이면 어쩌려고'] },
 };
-const JAY_FLUTTER = [['…야', '자꾸 그러니까 진짜 설레잖아'], ['…아 몰라 ㅋㅋ', '심장 이상해졌어'], ['…너 진짜 왜 그래', '나 지금 얼굴 엄청 빨개']];
+const JAY_FLUTTER = [['…야', '자꾸 그러니까 진짜 설레잖아'], ['…아 몰라', '좀 부끄럽네..ㅋㅋ'], ['…너 진짜 왜 그래', '나 지금 얼굴 엄청 빨개']];
 const LOVE_RE = /좋아해|좋아한다|사랑해|좋아하는 ?것 ?같/;
 const SERIOUS_RE = /진짜|진심|진짠|장난 ?아니|농담 ?아니|ㄹㅇ|레알/;
 const CONFESS_AT = 20;   // 호감도가 이만큼(가득) 차야 고백한다
@@ -1085,7 +1085,7 @@ function newGame(name) {
     badges: { kakao: 2, phone: 1 },
     unread: { sunoo: 2, sms: 1 },
     extra: {}, newCount: {}, touched: {}, clock: 0, asked: {}, arrived: false,
-    queue: {}, nudged: {}, nudgeT: {},
+    queue: {}, nudged: {}, nudgeT: {}, hold: {},
     comments: {}, shContacted: false, affection: [0, 0, 0, 0, 0, 0], replied: {}, chimed: {}, cmtDM: {}, jealous: {}, flirted: {}, confess: {}, love: {}, topicN: {}, myBirthday: null, unblocked: false, likeWindow: null, calls: [], inCall: null, heartStory: {}, called: {}, askN: {}, askState: {}, dmGot: false, dmRead: false, dmUnread: 0, dmTimer: false, myStory: null, composeTag: null, memoOpen: new Set(), cuteN: {},
     step: 0, typing: null,
     tries: 3, wrong: [], over: false,
@@ -1400,10 +1400,18 @@ async function respond(id, text) {
   /* 종성: "기타 소리 들려줄까?"에 좋다고 하거나, 기타 치는 거 보여 달라고 하면 기타 영상을 보낸다 */
   if (id === 'jay') {
     const offered = S.guitarOffer; S.guitarOffer = false;
+    const played = S.guitarPlayed; S.guitarPlayed = false;
     if (GUITAR_ASK.test(text) || (offered && GUITAR_YES.test(text.trim()))) {
       const again = S.guitarSent; S.guitarSent = true;
       const ok = await themSay(id, again ? GUITAR_AGAIN : GUITAR);
       if (ok && !again) addAffection(ci);
+      if (ok) S.guitarPlayed = true;
+      return ok;
+    }
+    /* 기타 영상 바로 다음에 칭찬하면 쑥스러워한다 (호감도 +1) */
+    if (played && GUITAR_PRAISE.test(text)) {
+      const ok = await themSay(id, GUITAR_SHY[Math.floor(Math.random() * GUITAR_SHY.length)]);
+      if (ok) addAffection(ci);
       return ok;
     }
   }
@@ -1467,14 +1475,15 @@ async function respond(id, text) {
   /* 키워드가 하나도 없으면 대답하지 않는다 */
 }
 /* 읽씹하면: 한참 안 읽은 채팅방에서 한 번 더 연락이 온다 */
-const NUDGE_MS = 40000;
+const NUDGE_MS = 10000;   // 안 읽으면 10초 뒤 재촉
 function scheduleNudge(id) {
-  if (S.nudged[id] || S.nudgeT[id] || id === 'mom') return;
+  if (S.nudged[id] || id === 'mom') return;
+  clearTimeout(S.nudgeT[id]);   // 마지막 메시지부터 다시 센다
   const g = S;
   S.nudgeT[id] = setTimeout(() => {
     if (S !== g) return;
     S.nudgeT[id] = null;
-    if (!S.unread[id] || (id === 'unknown' && S.over)) return;
+    if (!S.unread[id] || S.hold[id] || (id === 'unknown' && S.over)) return;   // hold: 이어서 할 말이 남아 있음
     S.nudged[id] = true;
     const lines = id === 'unknown' ? [`자나?${CHARS[S.culprit].laugh}`] : CHAT_STYLE[id].nudge;
     enqueue(id, () => themSay(id, lines));
@@ -1490,8 +1499,11 @@ async function arrive() {
   S.arrived = true;
   pushMsg('unknown', them(UNKNOWN, `${call()}.`));
   /* 바로 답장이 없으면 10초쯤 기다렸다가 "나 알지?" (그 사이에 답장하면 생략) */
+  S.hold.unknown = true;
   await wait(10000); if (S !== g) return;
   if (!S.extra.unknown.some(m => m.t === 'me')) await themSay('unknown', ['나 알지?']);
+  S.hold.unknown = false;
+  if (S.unread.unknown) scheduleNudge('unknown');
   await wait(60000); if (S !== g) return;
   incomingCall('hidden');
 }
@@ -1577,7 +1589,7 @@ async function sideConfess(id) {
   if (!await themSay(id, [SIDE_CONFESS[id].pre])) return;
   S.confess[id] = 'preface';
   const g = S;
-  S.timers.push(setTimeout(() => { if (S === g && S.confess[id] === 'preface') enqueue(id, () => sideConfess2(id)); }, 20000));
+  S.timers.push(setTimeout(() => { if (S === g && S.confess[id] === 'preface') enqueue(id, () => sideConfess2(id)); }, 10000));
 }
 async function sideConfess2(id) {
   if (S.confess[id] !== 'preface' || S.over) return;
@@ -1644,7 +1656,14 @@ const COMMENT_DM = {
 async function shContact() {
   const g = S;
   await wait(2500); if (S !== g) return;
-  await themSay('sh', ['댓글 봤어 ㅎㅎ', `${call()} 아직 안 잤어?`, '엘베에서 찍은 건데 이상하게 나왔지 ㅎㅎ', '그래도 네가 봐줘서 좋다']);
+  const mine = () => (S.extra.sh || []).filter(m => m.t === 'me').length, before = mine();
+  S.hold.sh = true;
+  if (!await themSay('sh', ['댓글 봤어 ㅎㅎ', `${call()} 아직 안 잤어?`])) return;
+  /* 바로 답장이 없으면 10초쯤 기다렸다가 이어서 말한다 (그 사이에 답장하면 생략) */
+  await wait(10000); if (S !== g) return;
+  if (mine() === before) await themSay('sh', ['엘베에서 찍은 건데 이상하게 나왔지 ㅎㅎ', '그래도 네가 봐줘서 좋다']);
+  S.hold.sh = false;
+  if (S.unread.sh) scheduleNudge('sh');
 }
 
 /* 채팅 사진을 누르면 크게 보기 */
@@ -1817,6 +1836,8 @@ const ASK_OUT = {
 const GUITAR_ASK = /기타[^]*(보여|들려|듣고|쳐 ?줘|쳐 ?봐|쳐 ?주|연주)|(보여|들려)[^]*기타/;
 const GUITAR_YES = /^(응|웅|어|ㅇㅇ|ㅇㅋ|오키|좋아|좋지|좋은데|들려|듣고|당연|그래|콜|ㄱㄱ|고고|yes|ok|완전)/i;
 const GUITAR = ['ㅋㅋ 잠깐만', { vid: 'guitar' }, '방금 쳐본 거야', '어때? 별로면 그냥 말하지 마 ㅋㅋ'];
+const GUITAR_PRAISE = /헐|멋있|멋지|멋져|좋다|좋아|설레|설렌|최고|대박|잘한다|잘 ?치|잘 ?쳐|감동|미쳤|짱|천재|듣기 ?좋|목소리|💗|❤|♡|♥/;
+const GUITAR_SHY = [['…아 뭐야 ㅋㅋ', '그렇게 말하면 좀 부끄럽잖아'], ['ㅋㅋ 진짜?', '…좀 부끄럽네..ㅋㅋ', '너 들으라고 친 거야'], ['아 몰라 ㅋㅋ', '칭찬 들으니까 괜히 쑥스럽네']];
 const GUITAR_AGAIN = ['또 듣고 싶어? ㅋㅋ', { vid: 'guitar' }, '이거 너만 들려주는 거다'];
 /* 사귀게 되면: 잠시 뒤 스토리에 하트를 올리고, 조금 더 뒤에 전화가 온다 */
 const DATING_CALL = ['목소리 듣고 싶어서 전화했어', '너가 내 여자친구라니 너무 좋아서 죽을 것 같아', { pause: 3500 }, '사랑해', '(뚝)'];
