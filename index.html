@@ -738,14 +738,14 @@ const CHAT_STYLE = {
     nudge: ['많이 바쁜가 보다 ㅎㅎ', '천천히 봐도 괜찮아. 기다릴게 😊'],
   },
 };
-/* 호감도가 가득 차면(20) 하는 고백: pre(선톡 "바빠?") → 대답하면 confess → 대답 버튼, 거절했을 때(decline) */
+/* 호감도가 가득 차면(20) 하는 고백: pre(선톡 "혹시 지금 자?") → 대답하면 confess → 대답 버튼, 거절했을 때(decline) */
 const SIDE_CONFESS = {
-  jay: { pre: '바빠?', confess: c => ['아니 그냥…', '나 요즘 좀 이상해 ㅋㅋ', '너만 보면 자꾸 웃음 나고', '…나 너 좋아하는 것 같아', ...FIRST_LOVE.jay, '너는 어때?'], decline: ['아… 그렇구나 ㅋㅋ', '괜찮아. 말해줘서 고마워', '그래도 내일 또 연락한다?'] },
-  sh: { pre: '바빠?', confess: c => ['할 말이 있는데 잠깐 들어줄래?', '요즘 계속 네 생각만 나', '나 너 좋아하는 것 같아 ㅎㅎ', ...FIRST_LOVE.sh, '너도 같은 마음이야?'], decline: ['그렇구나 ㅎㅎ', '솔직하게 말해줘서 고마워', '불편해하지 말고 지금처럼 연락하자'] },
-  sunoo: { pre: '바빠아?', confess: c => ['나 진지하게 할 말 이써 🥺', '베프로 지내는 것도 좋은데…', '나 너 좋아하는 것 같아', ...FIRST_LOVE.sunoo, '너두… 나 조아해?'], decline: ['아… 그렇구낭 ㅎㅎ', '괜차나! 그래도 우리 베프인 건 변함없어 💛', '내일 떡볶이는 그대로 먹는 고다?'] },
-  jk: { pre: '바빠?', confess: c => ['한국 오고 나서 계속 생각했는데', '나 너 좋아하는 것 같아', ...FIRST_LOVE.jk, '너도 나 좋아해?'], decline: ['아… 그렇구나 ㅋㅋ', '괜찮아. 말해줘서 고마워', '그래도 밥은 같이 먹어 줄 거지?'] },
-  nk: { pre: '바빠?', confess: () => ['할 말 있어', '나 너 좋아하는 것 같아', ...FIRST_LOVE.nk, '너는?'], decline: ['그렇구나', '알겠어', '그래도 연락은 해'] },
-  jw: { pre: '바빠?', confess: c => ['진지하게 할 말이 있는데', '나 너 좋아하는 것 같아 ㅎㅎ', '동생으로 말고', ...FIRST_LOVE.jw, '너도 같은 마음이야?'], decline: ['그렇구나 ㅎㅎ', '괜찮아, 네 마음이 제일 중요해', '앞으로도 편하게 연락해 😊'] },
+  jay: { pre: '혹시 지금 자?', confess: c => ['아니 그냥…', '나 요즘 좀 이상해 ㅋㅋ', '너만 보면 자꾸 웃음 나고', '…나 너 좋아하는 것 같아', ...FIRST_LOVE.jay, '너는 어때?'], decline: ['아… 그렇구나 ㅋㅋ', '괜찮아. 말해줘서 고마워', '그래도 내일 또 연락한다?'] },
+  sh: { pre: '혹시 지금 자?', confess: c => ['할 말이 있는데 잠깐 들어줄래?', '요즘 계속 네 생각만 나', '나 너 좋아하는 것 같아 ㅎㅎ', ...FIRST_LOVE.sh, '너도 같은 마음이야?'], decline: ['그렇구나 ㅎㅎ', '솔직하게 말해줘서 고마워', '불편해하지 말고 지금처럼 연락하자'] },
+  sunoo: { pre: '혹시 지금 자?', confess: c => ['나 진지하게 할 말 이써 🥺', '베프로 지내는 것도 좋은데…', '나 너 좋아하는 것 같아', ...FIRST_LOVE.sunoo, '너두… 나 조아해?'], decline: ['아… 그렇구낭 ㅎㅎ', '괜차나! 그래도 우리 베프인 건 변함없어 💛', '내일 떡볶이는 그대로 먹는 고다?'] },
+  jk: { pre: '혹시 지금 자?', confess: c => ['한국 오고 나서 계속 생각했는데', '나 너 좋아하는 것 같아', ...FIRST_LOVE.jk, '너도 나 좋아해?'], decline: ['아… 그렇구나 ㅋㅋ', '괜찮아. 말해줘서 고마워', '그래도 밥은 같이 먹어 줄 거지?'] },
+  nk: { pre: '혹시 지금 자?', confess: () => ['할 말 있어', '나 너 좋아하는 것 같아', ...FIRST_LOVE.nk, '너는?'], decline: ['그렇구나', '알겠어', '그래도 연락은 해'] },
+  jw: { pre: '혹시 지금 자?', confess: c => ['진지하게 할 말이 있는데', '나 너 좋아하는 것 같아 ㅎㅎ', '동생으로 말고', ...FIRST_LOVE.jw, '너도 같은 마음이야?'], decline: ['그렇구나 ㅎㅎ', '괜찮아, 네 마음이 제일 중요해', '앞으로도 편하게 연락해 😊'] },
 };
 /* 플레이어가 "좋아해"라고 하면 처음엔 장난으로 받고(tease),
    이어서 "진짠데?"라고 하면 설레게 받아친다(serious). 두 번 다 호감도 +1 */
@@ -1330,6 +1330,7 @@ PAGES.kakao = {
 };
 /* 채팅방 하단: 직접 입력하는 칸. 익명 채팅에는 「너 누구야?」와 고백 대답 버튼도 있다 */
 function chatFoot(id) {
+  if (rejectedChat(id)) return `<div class="kfoot"><div class="kinput">미안해서 연락을 못하겠다...</div></div>`;
   if (id === 'unknown' && S.over && S.phase !== 'answer') return `<div class="kfoot"><div class="kinput">대화가 끝났습니다</div></div>`;
   let quick = '';
   if (id === 'unknown' && S.phase === 'answer') quick = `<button type="button" class="chipb main" data-act="yes">${ANSWER_YES}</button><button type="button" class="chipb" data-act="no">${ANSWER_NO}</button>`;
@@ -1356,6 +1357,7 @@ function pushMsg(id, m) {
 const rnd = (a, b) => a + Math.random() * (b - a);
 async function themSay(id, lines) {
   const g = S;
+  if (rejectedChat(id) && id !== 'unknown') return false;   // 거절한 사람은 더 연락하지 않는다
   const name = id === 'unknown' ? UNKNOWN : CHAT_TITLE[id];
   for (let k = 0; k < lines.length; k++) {
     const l = lines[k];
@@ -1502,7 +1504,7 @@ function scheduleNudge(id) {
   S.nudgeT[id] = setTimeout(() => {
     if (S !== g) return;
     S.nudgeT[id] = null;
-    if (!S.unread[id] || S.hold[id] || (id === 'unknown' && S.over)) return;   // hold: 이어서 할 말이 남아 있음
+    if (!S.unread[id] || S.hold[id] || (id === 'unknown' && unknownClosed())) return;   // hold: 이어서 할 말이 남아 있음
     const f = flirt();
     if (f) S.flirtNudged[id] = true; else if (S.nudged[id]) return; else S.nudged[id] = true;
     const lines = id === 'unknown' ? [`자나?${CHARS[S.culprit].laugh}`] : f ? FLIRT_NUDGE[id] : CHAT_STYLE[id].nudge;
@@ -1535,7 +1537,7 @@ async function respondUnknown(text) {
     if (/좋아|응|웅|그래|당연|나도|사랑/.test(text)) return answerFlow(true);
     return;
   }
-  if (S.over) return;
+  if (unknownClosed()) return;
   const i = nameIn(text);
   if (i >= 0) return pickFlow(i);
   if (/(내|나의|제) ?생일|나 ?생일/.test(text)) return themSay('unknown', [`${myBday()}. 내가 그걸 잊을 리가 ${c.laugh}`]);
@@ -1696,7 +1698,7 @@ $('#photo').addEventListener('click', () => $('#photo').classList.remove('show')
 
 /* ===================== 정답 고르기 ===================== */
 function openGuess() {
-  if (S.over) return;
+  if (unknownClosed()) return;
   const m = $('#modal');
   m.innerHTML = `<div class="sheet"><h3>너 누구야?</h3><p class="msub">남은 기회 ${S.tries}번 · 채팅에 이름을 직접 써도 돼요</p>
     <div class="gl">${CHARS.map((c, i) => `<button class="gb" data-pick="${i}" ${S.wrong.includes(i) ? 'disabled' : ''}>${avatarPh(i, 'round')}<span>${c.label}</span></button>`).join('')}</div>
@@ -1717,7 +1719,7 @@ $('#modal').addEventListener('click', e => {
 const closeModal = () => $('#modal').classList.remove('show');
 
 async function pickFlow(i) {
-  if (S.over) return;
+  if (unknownClosed()) return;
   const g = S, c = CHARS[S.culprit];
   if (i === S.culprit) {
     S.over = true;
@@ -1751,8 +1753,16 @@ async function answerFlow(yes) {
   S.phase = 'done'; refreshChat('unknown');
   if (!await themSay('unknown', yes ? REPLY_YES(call(), S.culprit) : REPLY_NO)) return;
   await wait(1600); if (S !== g) return;
-  if (yes) postLoveStory(S.culprit, 'unknown'); else ending('bad');
+  if (yes) { postLoveStory(S.culprit, 'unknown'); return; }
+  /* 거절하면 엔딩 없이 게임이 계속된다: 그 사람과는 더 연락할 수 없고,
+     다른 멤버의 호감도를 올려서 고백받거나(20) "사귀자"로 사귀는 길만 남는다 */
+  S.rejected = S.culprit; S.over = false;
+  refreshChat('unknown'); refreshChat(CHARS[S.rejected].chat);
+  toast('아직 밤은 길다… 다른 사람들과 얘기해 볼까');
 }
+/* 고백을 거절한 사람: 그 사람의 채팅방(익명 채팅 포함)은 더 이상 쓸 수 없다 */
+const rejectedChat = id => S.rejected != null && (id === 'unknown' || id === CHARS[S.rejected].chat);
+const unknownClosed = () => S.over || S.rejected != null;
 
 /* ===================== 전화 오는 연출 =====================
    - 멤버: 호감도가 처음 10이 되면 "목소리 듣고 싶어서" 전화 (받으면 호감도 +1)
@@ -1774,6 +1784,7 @@ const CALL_MISS = {
 function incomingCall(who, script, after) {
   const g = S;
   if (S.over && !after) return;
+  if (S.rejected != null && (who === 'hidden' || who === S.rejected)) return;
   if (S.inCall) { S.timers.push(setTimeout(() => { if (S === g) incomingCall(who, script, after); }, 15000)); return; }
   const hidden = who === 'hidden';
   S.inCall = { who, sec: 0, script, after };
