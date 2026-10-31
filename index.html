@@ -1451,6 +1451,7 @@ async function respond(id, text) {
   }
   /* 호감도 15 이상에서 "고백해", "좋아한다고 해" 하고 재촉하면 "때가 되면" */
   if (S.affection[ci] >= 15 && CONFESS_ME_RE.test(text)) return themSay(id, CONFESS_ME[id]);
+  if (NOT_LIKE_RE.test(text)) return themSay(id, NOT_LIKE[id]);   // "나 싫어?", "나한테 관심 없어?"
   if (LIKE_ME_RE.test(text)) {
     if (S.affection[ci] >= 15) return likeMe(LIKE_ME_SERIOUS[id]);   // 호감도 15 이상: 웃음 없이 진지하게
     if (id === 'sh') { S.shDodge = true; return themSay(id, LIKE_ME.sh); }
@@ -1988,6 +1989,16 @@ const LIKE_ME_SERIOUS = {
   jk: ['응', '좋아해. 진심으로'],
   nk: ['…응', '좋아해'],
   jw: ['응 좋아해', '많이'],
+};
+/* "나 안 좋아?", "나 싫어?", "나한테 관심 없어?" */
+const NOT_LIKE_RE = /(나|날)\s*(안\s*좋아|싫어|싫지|싫구나|별로)|나한테\s*관심\s*(없|1도)|나\s*안\s*궁금/;
+const NOT_LIKE = {
+  jay: ['…겠냐'],
+  sh: ['응', '장난장난'],
+  sunoo: ['헐 무슨 소리야ㅠㅠ', '나 너 엄청 좋아하는데에 🥺'],
+  jk: ['ㅋㅋ 그럴 리가 있냐', '말도 안 되는 소리 하지 마'],
+  nk: ['…그럼 내가 왜 연락하겠냐'],
+  jw: ['당연히 아니지 ㅎㅎ'],
 };
 /* 질투하냐는 말에 질투 난다고 했을 때 */
 const JEALOUS_YES_RE = /질투|^(응|웅|어|ㅇㅇ|맞아|그래|당연|ㅇ)(?![가-힣])/;
