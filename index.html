@@ -1331,7 +1331,7 @@ PAGES.kakao = {
 /* 채팅방 하단: 직접 입력하는 칸. 익명 채팅에는 「너 누구야?」와 고백 대답 버튼도 있다 */
 function chatFoot(id) {
   if (rejectedChat(id)) return `<div class="kfoot"><div class="kinput">미안해서 연락을 못하겠다...</div></div>`;
-  if (id === 'unknown' && S.over && S.phase !== 'answer') return `<div class="kfoot"><div class="kinput">대화가 끝났습니다</div></div>`;
+  if (id === 'unknown' && unknownClosed() && S.phase !== 'answer') return `<div class="kfoot"><div class="kinput">대화가 끝났습니다</div></div>`;
   let quick = '';
   if (id === 'unknown' && S.phase === 'answer') quick = `<button type="button" class="chipb main" data-act="yes">${ANSWER_YES}</button><button type="button" class="chipb" data-act="no">${ANSWER_NO}</button>`;
   else if (id === 'unknown') quick = `<button type="button" class="chipb main" data-act="guess">너 누구야?</button>`;
@@ -1599,8 +1599,8 @@ function addAffection(who, n = 1) {
     const g = S;
     S.timers.push(setTimeout(() => { if (S === g) incomingCall(who); }, 6000));
   }
-  /* 호감도가 가득 차면, ♡를 받은 사람(익명으로 연락하는 사람)이 아니어도 먼저 고백한다 */
-  if (S.affection[who] >= CONFESS_AT && who !== S.culprit && !S.confess[id] && !S.over) {
+  /* 호감도가 가득 차면 먼저 고백한다. (알 수 없음) 본인이면 고백하면서 정체도 밝힌다 */
+  if (S.affection[who] >= CONFESS_AT && !rejectedChat(id) && !S.confess[id] && !S.over) {
     S.confess[id] = 'pending';
     const g = S;
     S.timers.push(setTimeout(() => { if (S === g) enqueue(id, () => sideConfess(id)); }, 3000));
@@ -1616,8 +1616,26 @@ async function sideConfess(id) {
 async function sideConfess2(id) {
   if (S.confess[id] !== 'preface' || S.over) return;
   S.confess[id] = 'telling';
-  if (!await themSay(id, SIDE_CONFESS[id].confess(call()))) return;
+  const ci = charOfChat(id), self = ci === S.culprit && !unknownClosed();
+  if (self) { S.revealed = true; S.phase = 'done'; renderHome(); refreshChat('unknown'); }
+  if (!await themSay(id, [...(self ? SELF_REVEAL[id] : []), ...SIDE_CONFESS[id].confess(call())])) return;
   S.confess[id] = 'answer'; refreshChat(id);
+  /* 다른 사람이 고백하면 (알 수 없음)이 다급하게 끼어들어 정체를 밝히고 고백한다 → 둘 중 한 명을 고른다 */
+  if (!self && S.culprit != null && S.arrived && !unknownClosed()) {
+    const g = S;
+    S.rival = id;
+    S.timers.push(setTimeout(() => { if (S === g) enqueue('unknown', () => rivalCut(id)); }, 2500));
+  }
+}
+async function rivalCut(id) {
+  if (S.confess[id] !== 'answer' || unknownClosed()) return;
+  S.revealed = true; S.phase = 'cut'; renderHome(); refreshChat('unknown');
+  if (!await themSay('unknown', RIVAL_CUT[CHARS[S.culprit].chat](CHARS[charOfChat(id)].label))) return;
+  S.phase = 'answer'; refreshChat('unknown');
+}
+/* 둘 중 고르지 않은 사람이 보내는 말 */
+function loserSays(loserChat, winner) {
+  enqueue(loserChat, () => themSay(loserChat, [`나보다 ${josa(CHARS[winner].label, '이', '가')} 좋나 보네...`]));
 }
 function sideAnswerButton(id, yes) {
   if (S.confess[id] !== 'answer') return;
@@ -1629,8 +1647,14 @@ async function sideAnswer(id, yes) {
   if (S.confess[id] !== 'answer' || S.over) return;
   const g = S, ci = charOfChat(id);
   S.confess[id] = 'done'; refreshChat(id);
-  if (!yes) return themSay(id, SIDE_CONFESS[id].decline);
-  S.over = true; refreshChat('unknown');
+  if (!yes) {
+    const ok = await themSay(id, SIDE_CONFESS[id].decline);
+    if (ci === S.culprit) { S.rejected = ci; refreshChat('unknown'); refreshChat(id); }   // 정체를 밝힌 (알 수 없음)을 거절
+    return ok;
+  }
+  S.over = true;
+  if (S.phase === 'answer' || S.phase === 'cut') { S.phase = 'done'; loserSays('unknown', ci); }   // (알 수 없음)을 고르지 않음
+  refreshChat('unknown');
   if (!await themSay(id, REPLY_YES(call(), ci))) return;
   await wait(1600); if (S !== g) return;
   postLoveStory(ci, id);
@@ -1753,7 +1777,11 @@ async function answerFlow(yes) {
   S.phase = 'done'; refreshChat('unknown');
   if (!await themSay('unknown', yes ? REPLY_YES(call(), S.culprit) : REPLY_NO)) return;
   await wait(1600); if (S !== g) return;
-  if (yes) { postLoveStory(S.culprit, 'unknown'); return; }
+  if (yes) {
+    S.over = true;
+    if (S.rival && S.confess[S.rival] === 'answer') { S.confess[S.rival] = 'done'; refreshChat(S.rival); loserSays(S.rival, S.culprit); }
+    postLoveStory(S.culprit, 'unknown'); return;
+  }
   /* 거절하면 엔딩 없이 게임이 계속된다: 그 사람과는 더 연락할 수 없고,
      다른 멤버의 호감도를 올려서 고백받거나(20) "사귀자"로 사귀는 길만 남는다 */
   S.rejected = S.culprit; S.over = false;
@@ -1762,7 +1790,7 @@ async function answerFlow(yes) {
 }
 /* 고백을 거절한 사람: 그 사람의 채팅방(익명 채팅 포함)은 더 이상 쓸 수 없다 */
 const rejectedChat = id => S.rejected != null && (id === 'unknown' || id === CHARS[S.rejected].chat);
-const unknownClosed = () => S.over || S.rejected != null;
+const unknownClosed = () => S.over || S.rejected != null || S.revealed;
 
 /* ===================== 전화 오는 연출 =====================
    - 멤버: 호감도가 처음 10이 되면 "목소리 듣고 싶어서" 전화 (받으면 호감도 +1)
@@ -1862,6 +1890,24 @@ const ASK_OUT = {
     serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['…ㅋㅋ', '그럼 사귀던가ㅋㅋ'], no: ['…그럴 줄 알았어', '…아쉽네'], after: ['…이미 사귀기로 했잖아'] },
   jw: { shy: [['ㅎㅎ 갑자기?'], ['…장난이지? ㅎㅎ', '나 지금 좀 당황했어'], ['자꾸 그러면 진짜 믿어 버린다 ㅎㅎ']],
     serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['ㅎㅎ', '그럼 사귀던가ㅎㅎ 😊'], no: ['ㅎㅎ 장난인 거 알았어', '조금 아쉽긴 하다'], after: ['우리 이미 사귀기로 한 거 아니었어? ㅎㅎ'] },
+};
+/* 호감도 20 고백을 하는 사람이 (알 수 없음) 본인일 때, 고백 앞에 붙이는 말 */
+const SELF_REVEAL = {
+  jay: ['사실 알 수 없음도 나야 ㅋㅋ', '너한테 고백하려고 그냥 한번 보내본 거야'],
+  sh: ['사실 그 알 수 없음도 나였어 ㅎㅎ', '너한테 고백하기 전에 그냥 한번 보내봤어'],
+  sunoo: ['사실 알 수 없음도 나야아 ㅎㅎ', '너한테 고백하려구 한번 보내본 고야 🥺'],
+  jk: ['사실 알 수 없음도 나야 ㅋㅋ', '너한테 고백하려고 그냥 한번 보내봤어'],
+  nk: ['사실 알 수 없음도 나야', '고백하려고 그냥 한번 보내봤어'],
+  jw: ['사실 알 수 없음도 나였어 ㅎㅎ', '너한테 고백하려고 그냥 한번 보내봤어'],
+};
+/* 다른 사람이 고백했을 때 (알 수 없음)이 다급하게 보내는 말 (w = 고백한 사람) */
+const RIVAL_CUT = {
+  jay: w => ['야 잠깐만', `너 혹시 ${w}한테 고백받았어?`, '…나 종성이야. 알 수 없음 나였어', '나도 너 좋아해 ㅋㅋ 장난 아니고 진짜로', '나랑 걔 중에 골라 줘'],
+  sh: w => ['잠깐만', `혹시 ${w}한테 고백받았어?`, '사실 나 성훈이야. 알 수 없음 나였어', '나도 너 좋아해 ㅎㅎ 많이', '천천히 생각하고 골라 줘'],
+  sunoo: w => ['잠깐만잠깐만', `${w}한테 고백받았어?? 🥺`, '나 선우야… 알 수 없음 나였어', '나도 너 좋아한단 말이야ㅠㅠ', '나랑 걔 중에 골라 줘'],
+  jk: w => ['Wait 잠깐만', `${w}한테 고백받았어?`, '나 재윤이야. 알 수 없음 나였어', '나도 너 좋아해 ㅋㅋ 진심으로', '나랑 걔 중에 골라 줘'],
+  nk: w => ['잠깐', `${w}한테 고백받았냐`, '나 니키야. 알 수 없음 나였어', '나도 너 좋아해', '골라'],
+  jw: w => ['잠깐만', `혹시 ${w}한테 고백받았어?`, '나 정원이야 ㅎㅎ 알 수 없음 나였어', '나도 너 좋아해', '나랑 걔 중에 골라 줘'],
 };
 /* 이름만 불렀을 때 */
 const CALL_BACK = {
