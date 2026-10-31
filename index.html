@@ -1395,6 +1395,8 @@ async function respond(id, text) {
     if (/좋아|응|웅|그래|당연|나도|사랑/.test(text)) return sideAnswer(id, true);
     return;
   }
+  /* 성까지 붙여 부르면 (예: 박종성!, 김선우 뭐해) 은근 서운해한다 */
+  if (FULLNAME_HURT[id] && text.replace(/\s/g, '').startsWith(c.name)) return themSay(id, FULLNAME_HURT[id]);
   /* 이름만 부르면 "왜" (예: 종성아, 니키야, 정원 오빠, 오빠~) */
   if (new RegExp(`^((${c.label})(아|야|이|이야)?\\s*)?(오빠|오빵)?[\\s~!?.ㅋㅎ]*$`).test(text.trim()) && /\S/.test(text.replace(/[~!?.ㅋㅎ\s]/g, ''))) {
     const L = CALL_BACK[id];
@@ -1845,6 +1847,14 @@ const CALL_BACK = {
   jk: [['왜 ㅋㅋ'], ['응 왜?']],
   nk: [['왜'], ['뭐']],
   jw: [['응 왜 ㅎㅎ'], ['응, 불렀어? 😊']],
+};
+/* 성 붙여서 불렀을 때 (니키는 성이 없음) */
+const FULLNAME_HURT = {
+  jay: ['아 왜 성 붙여 ㅋㅋㅠ', '갑자기 좀 서운하다'],
+  sh: ['왜 성까지 붙여 ㅎㅎ', '갑자기 거리감 느껴지네'],
+  sunoo: ['헐 왜 성 붙여ㅠㅠ', '나 서운해 🥺'],
+  jk: ['왜 성 붙여ㅠㅠ', '엄마가 나 혼낼 때 같잖아 ㅋㅋ'],
+  jw: ['왜 성 붙여ㅠㅠ', '좀 서운한데? ㅎㅎ'],
 };
 /* 종성 기타 영상 */
 const GUITAR_ASK = /기타[^]*(보여|들려|듣고|쳐 ?줘|쳐 ?봐|쳐 ?주|연주)|(보여|들려)[^]*기타/;
