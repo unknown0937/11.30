@@ -2172,6 +2172,16 @@ const EXTRA_OTHER = {
 };
 /* 언제부터 좋아했냐고 물으면: 첫마디 + 처음 만난 날 (계절 힌트) */
 const EXTRA_SINCE = { jay: '…ㅋㅋ 그걸 꼭 말해야 되냐', sh: 'ㅎㅎ 글쎄', sunoo: '음… 아마 처음부터?', jk: 'ㅋㅋ 아주 오래전부터', nk: '…처음부터', jw: 'ㅎㅎ 꽤 오래됐어' };
+const SINCE_DAY = { jay: '…놀이터에서 처음 본 날?', sh: '동아리 환영회 날?', sunoo: '입학식 날?', jk: '엄마들 모임에서 처음 본 날?', nk: '첫 수업 날?', jw: '알바 첫날?' };
+/* 꿈 얘기 뒤에 "이상한 거", "비밀" 하면 살짝 부끄러워함 (처음 한 번 호감도 +1) */
+const DREAM_SHY = {
+  jay: ['어..?', '하 진짜ㅠㅠㅠㅠ'],
+  sh: ['…ㅎㅎ 뭐야', '그런 말 하면 나 신경 쓰이잖아'],
+  sunoo: ['헐… 뭐야아 🥺', '나 얼굴 빨개졌어'],
+  jk: ['…ㅋㅋ 뭐야', '갑자기 그러면 나 어떡하라고'],
+  nk: ['…뭐래', '…궁금하게 하지 마'],
+  jw: ['…ㅎㅎ 비밀이야?', '괜히 두근거리네'],
+};
 /* 그 밖의 말: re에 맞으면 각자 대사. aff = 처음 한 번 호감도 +1 */
 const EXTRA = [
   { key: 'missyou', aff: true, re: /보고 ?싶(어|다|당|엉)(?![?？])/, lines: {
@@ -2186,8 +2196,11 @@ const EXTRA = [
   { key: 'howami', aff: true, re: /나 ?(오늘 ?)?어때|오늘 ?나 ?어때/, lines: {
     jay: ['…뭘 물어 ㅋㅋ', '예쁘지 그럼'], sh: ['오늘도 예쁘지 ㅎㅎ'], sunoo: ['완전 이뻐어 ㅎㅎ 💛'],
     jk: ['ㅋㅋ 예쁘지 당연히', '항상 예뻐'], nk: ['…괜찮네'], jw: ['예뻐 ㅎㅎ', '오늘따라 더 😊'] } },
-  { key: 'hug', aff: true, re: /안아 ?(줘|줄래|도)|안기고|포옹|뽀뽀|껴안|허그/, lines: {
-    jay: ['…야 ㅋㅋ', '갑자기 그런 말 하면 어떡하냐'], sh: ['ㅎㅎ 만나면', '꼭 안아줄게'], sunoo: ['헉 이리 와아 🥺', '꼬옥 안아줄게 ㅎㅎ'],
+  { key: 'kiss', aff: true, re: /뽀뽀|키스|입맞춤/, lines: {
+    jay: ['... 너무 나한테 많은 걸 바라는데....', '그럼 오든가..'], sh: ['ㅎㅎ 만나서 해줄게', '…진짜로'], sunoo: ['쪽.'],
+    jk: ['ㅋㅋ 지금 그런 말 하면', '나 진짜 보러 간다?'], nk: ['…미쳤냐', '…만나면'], jw: ['…ㅎㅎ', '그런 말은 직접 만나서 해줘 😊'] } },
+  { key: 'hug', aff: true, re: /안아 ?(줘|줄래|도)|안기고|포옹|껴안|허그/, lines: {
+    jay: ['... 너무 나한테 많은 걸 바라는데....', '그럼 오든가..'], sh: ['ㅎㅎ 만나면', '꼭 안아줄게'], sunoo: ['헉 이리 와아 🥺', '꼬옥 안아줄게 ㅎㅎ'],
     jk: ['ㅋㅋ 지금 당장 갈까?', '만나면 안 놔줄 거야'], nk: ['…만나면'], jw: ['ㅎㅎ 다음에 만나면 꼭', '오늘 고생했어 😊'] } },
   { key: 'sleep', re: /같이 ?자|자장가|재워 ?줘|잠이 ?안 ?와|못 ?자겠/, lines: {
     jay: ['…뭐래 ㅋㅋ', '기타로 자장가 쳐줄까?'], sh: ['ㅎㅎ 잠 안 와?', '눈 감고 내 목소리 생각해 봐'], sunoo: ['자장가 불러줄까아? ㅎㅎ', '자장자장 🥺'],
@@ -2222,9 +2235,19 @@ async function extraTalk(id, ci, c, text) {
   /* 다른 멤버가 어떤지 */
   const o = CHARS.find(x => x !== c && new RegExp(`${x.label}(이|가|는|은|랑|이랑|하고|이는)?\\s*(어때|친해|알아\\?|어떤 ?(애|사람)|괜찮)`).test(text));
   if (o) return themSay(id, EXTRA_OTHER[id](o.label));
-  if (/언제 ?부터.{0,6}좋아|언제 ?부터 ?(나|날)/.test(text)) return themSay(id, [EXTRA_SINCE[id], FIRST_LOVE[id][0]]);
+  if (/언제 ?부터.{0,6}좋아|언제 ?부터 ?(나|날)/.test(text)) return themSay(id, [EXTRA_SINCE[id], SINCE_DAY[id]]);
+  if (S.dreamAsk === id) {
+    S.dreamAsk = null;
+    if (/이상한|야시|야한|비밀|말 ?못|부끄|19|뭔가 ?좀/.test(text)) {
+      const ok = await themSay(id, DREAM_SHY[id]);
+      const done = S.extraAff = S.extraAff || {};
+      if (ok && !done['dreamshy' + id]) { done['dreamshy' + id] = true; addAffection(ci); }
+      return ok;
+    }
+  }
   const e = EXTRA.find(x => x.re.test(text.trim()));
   if (!e) return undefined;
+  if (e.key === 'dream') S.dreamAsk = id;   // 다음 말에서 꿈 내용을 본다
   const ok = await themSay(id, e.lines[id]);
   const done = S.extraAff = S.extraAff || {};
   if (ok && e.aff && !done[e.key + id]) { done[e.key + id] = true; addAffection(ci); }
