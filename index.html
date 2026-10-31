@@ -328,6 +328,7 @@ body.playing .intro{display:none}
 .story .ring.cf{background:#1fc14b}
 .sv-cf{display:inline-flex;align-items:center;gap:3px;background:#1fc14b;color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px}
 .sv-text{position:absolute;left:50%;bottom:200px;transform:translateX(-50%) rotate(-2deg);white-space:nowrap;background:rgba(0,0,0,.55);color:#fff;font-weight:700;font-size:19px;padding:7px 14px;border-radius:8px}
+.sv-quick{position:absolute;right:12px;bottom:96px;background:rgba(255,77,125,.9);color:#fff;font-weight:700;font-size:14px;padding:8px 14px;border-radius:20px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
 .sv-tag{position:absolute;left:50%;bottom:150px;transform:translateX(-50%) rotate(-3deg);background:#fff;color:#111;font-weight:700;font-size:16px;padding:6px 12px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.35)}
 .sv-shade{position:absolute;left:0;right:0;top:0;height:170px;background:linear-gradient(rgba(0,0,0,.55),transparent)}
 .sv-shade.b{top:auto;bottom:0;height:150px;background:linear-gradient(transparent,rgba(0,0,0,.5))}
@@ -2302,6 +2303,7 @@ function openStory(i) {
     <div class="sv-bars${ls && ls.sec ? ' v3' : ''}"><i></i></div>
     <div class="sv-head">${avatarPh(i)}<b>${CHARS[i].handle}</b>${cf ? '<span class="sv-cf">★ 친한 친구</span>' : ''}<small>${heart ? '방금' : STORY_TIME[STORY_ORDER.indexOf(i)]}</small><button class="sv-x" data-close>×</button></div>
     <div class="bigheart">♥</div>
+    ${heart ? '<button class="sv-quick" data-love>사랑해 ❤️</button>' : ''}
     <div class="sv-foot"><form class="svform"><input placeholder="${heart ? '답장 보내기...' : '메시지 보내기'}" autocomplete="off"></form><button class="like ${S.liked.has(i) ? 'on' : ''}" data-like>${S.liked.has(i) ? '♥' : '♡'}</button><span>➤</span></div>`;
   sv.classList.add('show');
 }
@@ -2342,6 +2344,7 @@ $('#sv').addEventListener('click', e => {
   if (e.target.closest('[data-close]') || storyIdx === -2) closeStory();
   else if (e.target.closest('[data-like]')) likeStory();
   else if (e.target.closest('.svform')) return;
+  else if (e.target.closest('[data-love]')) storyReply(storyIdx, '사랑해');   // 버튼 한 번으로 "사랑해" 답장
   else openStory(STORY_ORDER[STORY_ORDER.indexOf(storyIdx) + 1]);
 });
 
