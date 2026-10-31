@@ -1452,6 +1452,7 @@ async function respond(id, text) {
   /* 호감도 15 이상에서 "고백해", "좋아한다고 해" 하고 재촉하면 "때가 되면" */
   if (S.affection[ci] >= 15 && CONFESS_ME_RE.test(text)) return themSay(id, CONFESS_ME[id]);
   if (LIKE_ME_RE.test(text)) {
+    if (S.affection[ci] >= 15) return likeMe(LIKE_ME_SERIOUS[id]);   // 호감도 15 이상: 웃음 없이 진지하게
     if (id === 'sh') { S.shDodge = true; return themSay(id, LIKE_ME.sh); }
     return likeMe(LIKE_ME[id]);
   }
@@ -1979,6 +1980,14 @@ const LIKE_ME = {
   jk: ['당연하지 ㅋㅋ'],
   nk: ['지금도 연락하고 있잖아'],
   jw: ['응 좋아해 ㅎㅎ'],
+};
+const LIKE_ME_SERIOUS = {
+  jay: ['좋아해...'],
+  sh: ['응', '좋아해'],
+  sunoo: ['응 좋아해'],
+  jk: ['응', '좋아해. 진심으로'],
+  nk: ['…응', '좋아해'],
+  jw: ['응 좋아해', '많이'],
 };
 /* 질투하냐는 말에 질투 난다고 했을 때 */
 const JEALOUS_YES_RE = /질투|^(응|웅|어|ㅇㅇ|맞아|그래|당연|ㅇ)(?![가-힣])/;
