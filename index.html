@@ -1489,8 +1489,9 @@ async function arrive() {
   await wait(3500); if (S !== g) return;
   S.arrived = true;
   pushMsg('unknown', them(UNKNOWN, `${call()}.`));
-  await wait(1600); if (S !== g) return;
-  pushMsg('unknown', them(UNKNOWN, '나 알지?'));
+  /* 바로 답장이 없으면 10초쯤 기다렸다가 "나 알지?" (그 사이에 답장하면 생략) */
+  await wait(10000); if (S !== g) return;
+  if (!S.extra.unknown.some(m => m.t === 'me')) await themSay('unknown', ['나 알지?']);
   await wait(60000); if (S !== g) return;
   incomingCall('hidden');
 }
