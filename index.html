@@ -1452,6 +1452,17 @@ async function respond(id, text) {
   /* 호감도 15 이상에서 "고백해", "좋아한다고 해" 하고 재촉하면 "때가 되면" */
   if (S.affection[ci] >= 15 && CONFESS_ME_RE.test(text)) return themSay(id, CONFESS_ME[id]);
   if (SWEAR_RE.test(text)) return themSay(id, SWEAR[id]);   // 욕하면 "나쁜말"
+  /* 다른 사람 이름을 부르면 진지하게 질투 → 다음에 "미안/실수"라고 하면 "다음부턴 하지 마" */
+  if (S.wrongName === id) {
+    S.wrongName = null;
+    if (/미안|실수|잘못|쏘리|sorry|죄송/i.test(text)) return themSay(id, WRONG_NAME[id].sorry);
+  }
+  const other = CHARS.find(o => o !== c && new RegExp(`^${o.label}((아|야)([\\s~!?.,ㅋㅎ]|$)|(\\s*오빠)?[~!?.,ㅋㅎ\\s]*$)`).test(text.trim()));
+  if (other) {
+    const ok = await themSay(id, WRONG_NAME[id].who);
+    if (ok) S.wrongName = id;
+    return ok;
+  }
   /* "여보" → 각자 반응 + "혹시 딴 사람한테 보내려던 건 아니지?" → 응: 다행 / 아니·잘못 보냄: 진지하게 질투 */
   if (S.yeobo === id) {
     S.yeobo = null;
@@ -2020,6 +2031,15 @@ const YEOBO = {
   jk: { first: ['ㅋㅋㅋ 뭐야 갑자기', '…혹시 딴 사람한테 보내려던 건 아니지?'], relief: ['ㅋㅋ 다행이네', '역시 나밖에 없지?'], jealous: ['…뭐야 그럼 누구야?', '나 말고 딴 남자 있는 거야?'] },
   nk: { first: ['…뭐야', '딴 사람한테 보내려던 거 아니지'], relief: ['…다행이네'], jealous: ['…누구야', '나 말고 딴 남자 있어?'] },
   jw: { first: ['ㅎㅎㅎ 응 여보', '…혹시 딴 사람한테 보내려던 건 아니지? ㅎㅎ'], relief: ['다행이다 ㅎㅎ 역시 나밖에 없지? 😊'], jealous: ['…응?', '그럼 누구한테 보내려던 거야', '나 말고?'] },
+};
+/* 다른 사람 이름으로 불렀을 때 (who) / 그 뒤에 사과하면 (sorry) */
+const WRONG_NAME = {
+  jay: { who: ['…야 나 종성인데', '걘 누구야?'], sorry: ['…다음부턴 그러지 마라'] },
+  sh: { who: ['…나 성훈인데', '걘 누구야?'], sorry: ['…다음부턴 그러지 마'] },
+  sunoo: { who: ['…나 선우인데', '걘 누구야?'], sorry: ['…다음부턴 그러지 마ㅠㅠ'] },
+  jk: { who: ['…나 재윤인데', '걘 누구야?'], sorry: ['…다음부턴 하지 마', '진짜 서운했어'] },
+  nk: { who: ['…나 니키인데', '걘 누구야'], sorry: ['다음부턴 하지 마'] },
+  jw: { who: ['…나 정원인데', '걘 누구야?'], sorry: ['다음부턴 그러지 마 ㅎㅎ', '나 좀 서운했어'] },
 };
 /* 플레이어가 욕을 했을 때 */
 const SWEAR_RE = /ㅅㅂ|ㅆㅂ|시발|씨발|씨빨|시바|ㅂㅅ|병신|ㅈㄴ|존나|졸라|ㅈ같|좆|개새|ㄱㅅㄲ|ㅅㄲ|새끼/;
