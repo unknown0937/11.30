@@ -1481,7 +1481,7 @@ async function respond(id, text) {
     const first = jagi && JAGI_FIRST[id] ? [JAGI_FIRST[id], ...YEOBO[id].first.slice(1)] : YEOBO[id].first;
     const ok = await themSay(id, first);
     if (ok) S.yeobo = id;
-    if (ok && jagi && !(S.jagi = S.jagi || {})[id]) { S.jagi[id] = true; addAffection(ci); }   // 자기야는 처음 한 번 호감도 +1
+    if (ok && !(S.jagi = S.jagi || {})[id]) { S.jagi[id] = true; addAffection(ci); }   // 여보·자기야는 (둘 합쳐) 처음 한 번 호감도 +1
     return ok;
   }
   if (NOT_LIKE_RE.test(text)) return themSay(id, NOT_LIKE[id]);   // "나 싫어?", "나한테 관심 없어?"
