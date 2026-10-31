@@ -1477,7 +1477,7 @@ async function respond(id, text) {
     if (relief === false) return themSay(id, YEOBO[id].jealous);
   }
   const jagi = /자기야|자기얌|자갸/.test(text);
-  if (jagi || /여보(?!세)/.test(text)) {
+  if (jagi || /여보(?!세)|서방/.test(text)) {   // 서방도 여보와 같은 반응
     const first = jagi && JAGI_FIRST[id] ? [JAGI_FIRST[id], ...YEOBO[id].first.slice(1)] : YEOBO[id].first;
     const ok = await themSay(id, first);
     if (ok) S.yeobo = id;
