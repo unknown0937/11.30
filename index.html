@@ -2173,6 +2173,14 @@ const EXTRA_OTHER = {
 /* 언제부터 좋아했냐고 물으면: 첫마디 + 처음 만난 날 (계절 힌트) */
 const EXTRA_SINCE = { jay: '…ㅋㅋ 그걸 꼭 말해야 되냐', sh: 'ㅎㅎ 글쎄', sunoo: '음… 아마 처음부터?', jk: 'ㅋㅋ 아주 오래전부터', nk: '…처음부터', jw: 'ㅎㅎ 꽤 오래됐어' };
 const SINCE_DAY = { jay: '…놀이터에서 처음 본 날?', sh: '동아리 환영회 날?', sunoo: '입학식 날?', jk: '엄마들 모임에서 처음 본 날?', nk: '첫 수업 날?', jw: '알바 첫날?' };
+const FIRST_KISS = {
+  jay: { no: ['…아직 안 했는데 ㅋㅋ', '왜 물어보냐'], want: '…근데 하고 싶은 사람은 있어' },
+  sh: { no: ['ㅎㅎ 아직 안 해봤어'], want: '근데 하고 싶은 사람은 있어' },
+  sunoo: { no: ['아직 안 해봤어 ㅎㅎ', '왜애? 궁금해? 🥺'], want: '…근데 하고 싶은 사람은 있어' },
+  jk: { no: ['ㅋㅋ 아직이야', '호주에서도 안 했어 진짜로'], want: '근데 하고 싶은 사람은 있어 ㅋㅋ' },
+  nk: { no: ['안 했어', '…왜'], want: '…하고 싶은 사람은 있고' },
+  jw: { no: ['아직 안 해봤어 ㅎㅎ'], want: '근데… 하고 싶은 사람은 있어' },
+};
 /* 꿈 얘기 뒤에 "이상한 거", "비밀" 하면 살짝 부끄러워함 (처음 한 번 호감도 +1) */
 const DREAM_SHY = {
   jay: ['어..?', '하 진짜ㅠㅠㅠㅠ'],
@@ -2239,6 +2247,8 @@ async function extraTalk(id, ci, c, text) {
   const o = CHARS.find(x => x !== c && new RegExp(`${x.label}(이|가|는|은|랑|이랑|하고|이는)?\\s*(어때|친해|알아\\?|어떤 ?(애|사람)|괜찮)`).test(text));
   if (o) return themSay(id, EXTRA_OTHER[id](o.label));
   if (/언제 ?부터.{0,6}좋아|언제 ?부터 ?(나|날)/.test(text)) return themSay(id, [EXTRA_SINCE[id], SINCE_DAY[id]]);
+  /* 첫키스 누구냐고 하면 다들 아직 안 했다고 함. 호감도 15 이상이면 "하고 싶은 사람은 있어" */
+  if (/첫 ?키스/.test(text)) return themSay(id, [...FIRST_KISS[id].no, ...(S.affection[ci] >= 15 ? [FIRST_KISS[id].want] : [])]);
   if (S.dreamAsk === id) {
     S.dreamAsk = null;
     if (/이상한|야시|야한|비밀|말 ?못|부끄|19|뭔가 ?좀/.test(text)) {
