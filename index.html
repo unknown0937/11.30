@@ -1395,6 +1395,11 @@ async function respond(id, text) {
     if (/좋아|응|웅|그래|당연|나도|사랑/.test(text)) return sideAnswer(id, true);
     return;
   }
+  /* 이름만 부르면 "왜" (예: 종성아, 니키야, 정원 오빠, 오빠~) */
+  if (new RegExp(`^((${c.label})(아|야|이|이야)?\\s*)?(오빠|오빵)?[\\s~!?.ㅋㅎ]*$`).test(text.trim()) && /\S/.test(text.replace(/[~!?.ㅋㅎ\s]/g, ''))) {
+    const L = CALL_BACK[id];
+    return themSay(id, L[Math.floor(Math.random() * L.length)]);
+  }
   const asked = S.asked[id] = S.asked[id] || new Set();
   if (await askOut(id, ci, text)) return;
   /* 종성: "기타 소리 들려줄까?"에 좋다고 하거나, 기타 치는 거 보여 달라고 하면 기타 영상을 보낸다 */
@@ -1831,6 +1836,15 @@ const ASK_OUT = {
     serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['…ㅋㅋ', '그럼 사귀던가ㅋㅋ'], no: ['…그럴 줄 알았어', '…아쉽네'], after: ['…이미 사귀기로 했잖아'] },
   jw: { shy: [['ㅎㅎ 갑자기?'], ['…장난이지? ㅎㅎ', '나 지금 좀 당황했어'], ['자꾸 그러면 진짜 믿어 버린다 ㅎㅎ']],
     serious: ['…', '진심이야?', '너 그 말 책임질 수 있어?'], yes: ['ㅎㅎ', '그럼 사귀던가ㅎㅎ 😊'], no: ['ㅎㅎ 장난인 거 알았어', '조금 아쉽긴 하다'], after: ['우리 이미 사귀기로 한 거 아니었어? ㅎㅎ'] },
+};
+/* 이름만 불렀을 때 */
+const CALL_BACK = {
+  jay: [['왜 ㅋㅋ'], ['왜 불러']],
+  sh: [['응 왜 ㅎㅎ'], ['응?']],
+  sunoo: [['웅 왜애? ㅎㅎ'], ['왜 불러엉 🥺']],
+  jk: [['왜 ㅋㅋ'], ['응 왜?']],
+  nk: [['왜'], ['뭐']],
+  jw: [['응 왜 ㅎㅎ'], ['응, 불렀어? 😊']],
 };
 /* 종성 기타 영상 */
 const GUITAR_ASK = /기타[^]*(보여|들려|듣고|쳐 ?줘|쳐 ?봐|쳐 ?주|연주)|(보여|들려)[^]*기타/;
