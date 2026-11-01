@@ -1448,6 +1448,39 @@ async function respond(id, text) {
     if (/좋아|응|웅|그래|당연|나도|사랑/.test(text)) return sideAnswer(id, true);
     return;
   }
+  /* 남친 생겼다는 말에 질투한 뒤 "장난이야"라고 하면 안도 */
+  if (S.bfTease === id) {
+    S.bfTease = null;
+    /* 남친이 누구냐는 말에 이름을 대면: 본인이면 안심하고 좋아함 / 다른 멤버면 언짢아하고, 그 멤버가 "내가 언제부터 너 남친이었어" (그 멤버 호감도 +3) */
+    const x = CHARS.find(o => text.includes(o.label));
+    if (x === c || (!x && /^너(야|지|잖아|라고)?[\s.!?~ㅋㅎ]*$|^너 ?말고 ?누구/.test(text.trim()))) return flirtSay(id, ci, 'bfself', BF_NAMED[id].self);
+    if (x) {
+      const ok = await themSay(id, BF_NAMED[id].other(x.label));
+      const xi = CHARS.indexOf(x), xid = x.chat, g = S;
+      if (ok && !rejectedChat(xid)) S.timers.push(setTimeout(() => {
+        if (S !== g) return;
+        enqueue(xid, async () => {
+          if (!await themSay(xid, BF_NAMED[xid].told)) return;
+          const done = S.extraAff = S.extraAff || {};
+          if (!done['bftold' + xid]) { done['bftold' + xid] = true; addAffection(xi, 3); }
+        });
+      }, 5000));
+      return ok;
+    }
+    if (/장난|농담|구라|뻥|아니|거짓말|ㅋㅋ/.test(text)) return themSay(id, EXTRA_BF[id].relief);
+  }
+  /* "올릴까 말까?"에 대한 대답: 좋다고 하면 게시물을 올리고, 올리지 말라고 하면 "너한테만 보여주려고 한 거였어" */
+  if (S.postAsk && S.postAsk[id] === 'ask') {
+    const no = /올리지|올리면 ?안|별로|하지 ?마|안 ?올|싫|ㄴㄴ|말아|나만|아니/.test(text);
+    const yes = !no && /올려|좋아|좋다|좋은데|잘 ?나왔|예뻐|이뻐|예쁘|멋|응|웅|ㅇㅇ|당연|완전|최고|대박|올리자|ㄱㄱ|무조건/.test(text);
+    if (yes || no) {
+      S.postAsk[id] = 'done';
+      if (no) return themSay(id, POST_ASK[id].no);
+      const ok = await themSay(id, POST_ASK[id].yes);
+      if (ok) uploadPost(ci);
+      return ok;
+    }
+  }
   /* 성까지 붙여 부르면 (예: 박종성!, 김선우 뭐해) 은근 서운해한다 */
   if (FULLNAME_HURT[id] && text.replace(/\s/g, '').startsWith(c.name)) return themSay(id, FULLNAME_HURT[id]);
   /* 성훈은 "선배"라고 부르면 좋아함 / 처음 "오빠"라고 부르면 다들 설레함 (종성은 어색해하면서). 처음 한 번 호감도 +1 */
@@ -1538,23 +1571,6 @@ async function respond(id, text) {
     if (S.affection[ci] >= 15) return likeMe(LIKE_ME_SERIOUS[id]);   // 호감도 15 이상: 웃음 없이 진지하게
     if (id === 'sh') { S.shDodge = true; return themSay(id, LIKE_ME.sh); }
     return likeMe(LIKE_ME[id]);
-  }
-  /* 남친 생겼다는 말에 질투한 뒤 "장난이야"라고 하면 안도 */
-  if (S.bfTease === id) {
-    S.bfTease = null;
-    if (/장난|농담|구라|뻥|아니|거짓말|ㅋㅋ/.test(text)) return themSay(id, EXTRA_BF[id].relief);
-  }
-  /* "올릴까 말까?"에 대한 대답: 좋다고 하면 게시물을 올리고, 올리지 말라고 하면 "너한테만 보여주려고 한 거였어" */
-  if (S.postAsk && S.postAsk[id] === 'ask') {
-    const no = /올리지|올리면 ?안|별로|하지 ?마|안 ?올|싫|ㄴㄴ|말아|나만|아니/.test(text);
-    const yes = !no && /올려|좋아|좋다|좋은데|잘 ?나왔|예뻐|이뻐|예쁘|멋|응|웅|ㅇㅇ|당연|완전|최고|대박|올리자|ㄱㄱ|무조건/.test(text);
-    if (yes || no) {
-      S.postAsk[id] = 'done';
-      if (no) return themSay(id, POST_ASK[id].no);
-      const ok = await themSay(id, POST_ASK[id].yes);
-      if (ok) uploadPost(ci);
-      return ok;
-    }
   }
   const ex = await extraTalk(id, ci, c, text);
   if (ex !== undefined) return ex;
@@ -2306,6 +2322,15 @@ const CALL_MY_NAME = {
   nk: n => ['이름? ㅋㅋ', n, '부르니까 이상하게 떨리네'],
   jw: n => [`응 ${n} ㅎㅎ`, '이름 예쁘다 😊'],
 };
+/* 남친이 누구냐는 말에: self = 자기 이름을 대면, other(x) = 다른 멤버 이름을 대면, told = 이름이 나온 멤버가 보내는 말 */
+const BF_NAMED = {
+  jay: { self: ['나?', 'ㅋㅋ 아 진짜 놀랐잖아', '…근데 좋네'], other: x => [`${x}?`, '…하', '진짜 기분 별로다'], told: ['뭐야', '내가 언제부터 너 남친이었냐 ㅋㅋ', '…싫다는 건 아니고'] },
+  sh: { self: ['나? ㅎㅎ', '휴 다행이다', '근데 나 언제 남친 됐어? 좋긴 한데'], other: x => [`${x}? 걔가?`, '…', '나 지금 좀 많이 언짢네'], told: ['ㅎㅎ 뭐야', '내가 언제부터 너 남친이었어?', '듣고 좀 설렜는데'] },
+  sunoo: { self: ['헐 나야?? 💛', '아 진짜 심장 떨어지는 줄 알았잖아ㅠㅠ', '좋다 ㅎㅎ'], other: x => [`${x}?`, '진짜 싫어', '왜 하필 걔야'], told: ['헐 뭐야아', '내가 언제부터 너 남친이었어? 💛', '나는 좋은뎅'] },
+  jk: { self: ['ㅋㅋ 나?', '아 다행이다 진짜', '그럼 오늘부터 1일이야?'], other: x => [`${x}…?`, '나 지금 진짜 질투 나', '장난이라고 해 줘'], told: ['ㅋㅋ 뭐야', '내가 언제부터 너 남친이었어?', '근데 그거 진짜로 만들까?'] },
+  nk: { self: ['나?', 'ㅋㅋ 아 뭐야 놀랐잖아', '좋긴 하네'], other: x => [`${x}?`, '짜증나', '왜 걔야'], told: ['뭐야', '내가 언제부터 너 남친이었어 ㅋㅋ', '부끄럽게'] },
+  jw: { self: ['나? ㅎㅎ', '다행이다… 진짜 놀랐어', '근데 좋다 😊'], other: x => [`${x}…?`, '아', '나 지금 좀 많이 속상하다'], told: ['ㅎㅎ 뭐야', '내가 언제부터 너 남친이었어?', '기분은 좋다 😊'] },
+};
 const EXTRA_BF = {
   jay: { who: ['뭐?', '누군데'], relief: ['아 진짜 ㅋㅋ', '심장 떨어질 뻔했잖아'] },
   sh: { who: ['진짜?', '누구야'], relief: ['ㅎㅎ 다행이다', '장난이 너무 심하잖아'] },
@@ -2615,7 +2640,7 @@ async function extraTalk(id, ci, c, text) {
   /* "내 이름 불러줘": 종성·니키는 부끄러워하며, 나머지는 능글맞게 */
   if (/이름 ?(좀 ?)?(불러|말해) ?(줘|봐|주라)|내 ?이름 ?(불러|말해)/.test(text)) return flirtSay(id, ci, 'callname', CALL_MY_NAME[id](call()));
   /* 남친 생겼다고 하면 진지하게 질투 → 다음에 "장난이야"면 안도 */
-  if (/남친 ?생겼|남자 ?친구 ?생겼|애인 ?생겼|연애 ?시작/.test(text)) {
+  if (/(남친|남자 ?친구) ?(생겼|있어|있음|있거든|있는데|있다)|애인 ?생겼|연애 ?시작/.test(text)) {
     const ok = await themSay(id, EXTRA_BF[id].who);
     if (ok) S.bfTease = id;
     return ok;
