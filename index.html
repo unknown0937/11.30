@@ -1816,12 +1816,32 @@ const GF = {
   like: { jay: '나 너 좋아해', sh: '나 너 좋아해 ㅎㅎ', sunoo: '나 너 좋아해', jk: '나 너 좋아해', nk: '나 너 좋아해', jw: '나 너 좋아해' },
   ask: { jay: '나랑 사귀자', sh: '나랑 사귀자', sunoo: '나랑 사귀자', jk: '나랑 사귀자', nk: '나랑 사귀자', jw: '나랑 사귀자' },
 };
+/* 나이: 동갑(02)끼리는 반말, 동생은 "형 잠깐만요;;"처럼 형한테 말하고, 형은 동생 이름을 부른다 */
+const BIRTH = { jay: 2002, sh: 2002, jk: 2002, sunoo: 2003, jw: 2004, nk: 2005 };
+const GF_Y = {
+  cut: { sunoo: '아 형 잠깐만요;; 제가 먼저 말할래요', jw: '형 잠깐만요;; 저도 할 말 있어요', nk: '아 형 잠만요;; 내가 먼저 말할 거예요' },
+  first: { sunoo: '형 저 먼저 좋아했거든요?', jw: '형 제가 먼저 좋아했는데요…', nk: '형 내가 먼저 좋아했거든요?' },
+};
+const GF_O = {
+  annoy: { jay: v => `야 ${v} 좀 조용히 해 봐;;`, sh: v => `${v} 좀 기다려 봐 ㅎㅎ`, jk: v => `${v} 좀 기다려 줘;;`, sunoo: v => `${v} 진짜 끼어들지 마;;`, jw: v => `${v} 내 말 좀 끝까지 들어 줘` },
+  counter: { jay: '무슨 소리야 ㅋㅋ 형이 훨씬 먼저야', sh: '그건 아니지 ㅎㅎ 형이 먼저야', jk: 'ㅋㅋ 말도 안 돼 형이 먼저지', sunoo: '아니거든?? 형이 먼저거든', jw: '그건 좀 아닌 것 같은데 ㅎㅎ 형이 먼저야' },
+};
+const GF_YA = {   // 동생이 형한테 받아칠 때 (annoy/counter)
+  annoy: { sunoo: '아 형 진짜 끼어들지 마요;;', jw: '형 제 말 좀 끝까지 들어 줘요', nk: '아 형 진짜 끼어들지 마요' },
+  counter: { sunoo: '아니거든요?? 형 제가 먼저거든요', jw: '형 그건 좀 아닌 것 같은데요 ㅎㅎ', nk: '아니 형 내가 먼저예요' },
+};
+function gfLine(key, spk, to) {
+  const sc = CHARS[spk].chat, tc = CHARS[to].chat;
+  if (BIRTH[sc] > BIRTH[tc]) { const y = (GF_Y[key] || GF_YA[key] || {})[sc]; if (y) return y; }
+  if (BIRTH[sc] < BIRTH[tc] && GF_O[key] && GF_O[key][sc]) { const o = GF_O[key][sc]; return typeof o === 'function' ? o(josa(CHARS[to].label, '아', '야')) : o; }
+  return GF[key][sc];
+}
 async function groupFight() {
   const G = S.group, a = G.a, b = G.b, A = CHARS[a].chat, B = CHARS[b].chat;
   G.state = 'talking';
   pushMsg('group', sys(`${CHARS[a].label}님이 ${S.name}님과 ${CHARS[b].label}님을 초대했습니다.`));
   const liker = Math.random() < .5 ? a : b, asker = liker === a ? b : a;
-  if (!await groupSay([[a, GF.intro[A]], [a, '할 말이 있어서'], [b, GF.cut[B]], [a, GF.annoy[A]], [b, GF.first[B]], [a, GF.counter[A]],
+  if (!await groupSay([[a, GF.intro[A]], [a, '할 말이 있어서'], [b, gfLine('cut', b, a)], [a, gfLine('annoy', a, b)], [b, gfLine('first', b, a)], [a, gfLine('counter', a, b)],
     [a, GF.since[A]], [b, GF.since[B]], [liker, GF.like[CHARS[liker].chat]], [asker, GF.ask[CHARS[asker].chat]]])) return;
   G.state = 'choose'; refreshChat('group');
   openGroupPick();
