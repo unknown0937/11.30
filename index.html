@@ -2455,7 +2455,7 @@ const EXTRA = [
 ];
 async function extraTalk(id, ci, c, text) {
   /* "얼굴 보여줘": 각자 지금 모습 사진 */
-  if (/얼굴 ?(좀 ?)?(보여|보고 ?싶|봐도)/.test(text)) return themSay(id, FACE_PIC[id]);
+  if (/얼굴 ?(좀 ?)?(보여|보고 ?싶|봐도)|얼사|얼굴 ?사진/.test(text)) return themSay(id, FACE_PIC[id]);
   /* "○○ 보고 싶다"인데 ○○가 내가 아니면: "걘 누구지? 나는 별로 안 보고 싶어?" */
   const mm = text.trim().match(/^([가-힣]{2,4}?)(아|야|이|이가|가)?\s*(너무 ?|진짜 ?|완전 ?)?보고 ?싶/);
   if (mm && mm[1] !== c.label && !/^(너|나|엄마|아빠|강아지|집|가족|친구|오빠|우리|자기|여보|얼굴|사진|목소리|셀카|너무|진짜|완전|빨리|지금|오늘|내일)$/.test(mm[1]))
