@@ -1842,7 +1842,7 @@ function groupPick(win) {
   S.nudged[loseChat] = S.flirtNudged[loseChat] = true;
   refreshChat('group'); refreshChat('unknown');
   pushMsg('group', me(`미안… 나는 ${CHARS[win].label}`));
-  enqueue('group', () => groupSay(SIDE_CONFESS[loseChat].decline.map(t => [lose, t])));
+  enqueue(loseChat, async () => { await wait(1500); if (S === g) await themSay(loseChat, SIDE_CONFESS[loseChat].decline); });   // 반응은 각자 갠톡으로
   enqueue(winChat, async () => {
     await wait(2500); if (S !== g) return;
     if (!await themSay(winChat, REPLY_YES(call(), win))) return;
