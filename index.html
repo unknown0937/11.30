@@ -1412,6 +1412,15 @@ function enqueue(id, fn) {
   const g = S;
   S.queue[id] = (S.queue[id] || Promise.resolve()).then(() => (S === g ? fn() : null));
 }
+/* 띄어쓰기 봐주기: 대답을 못 찾으면 띄어쓰기를 없앤 문장으로 한 번 더 찾는다 ("질투 나" = "질투나") */
+const LOOSE_STATE = ['yeobo', 'yeoboWho', 'fk', 'sayAsk', 'bfTease', 'ocAsk', 'dreamAsk', 'wrongName', 'jealAsk', 'savedAsk', 'shDodge', 'guitarOffer', 'guitarPlayed', 'jwGlass'];
+async function respondLoose(id, text) {
+  const g = S, before = (S.extra[id] || []).length, snap = LOOSE_STATE.map(k => S[k]);
+  await respond(id, text);
+  if (S !== g || !/\s/.test(text) || (S.extra[id] || []).length !== before || S.inCall) return;
+  LOOSE_STATE.forEach((k, i) => { S[k] = snap[i]; });
+  await respond(id, text.replace(/\s+/g, ''));
+}
 /* 플레이어가 직접 입력한 메시지 보내기 */
 function send(id, text) {
   if (id !== 'unknown') S.flirtLast[id] = LOVE_RE.test(text) || CUTE_RE.test(text) || intentOf(text) === 'flirt';
@@ -1423,7 +1432,7 @@ function send(id, text) {
   const fc = S.flirtCount = S.flirtCount || {};
   const fifth = ci >= 0 && S.flirtLast[id] && (fc[id] = (fc[id] || 0) + 1) === 5;
   enqueue(id, async () => {
-    await respond(id, text);
+    await respondLoose(id, text);
     if (third && !rejectedChat(id)) await themSay(id, OTHER_TALK[id]);
     if (fifth && !rejectedChat(id) && !S.over) await themSay(id, FLIRT_FIVE[id]);
   });
