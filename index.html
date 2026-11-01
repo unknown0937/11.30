@@ -2559,7 +2559,7 @@ async function extraTalk(id, ci, c, text) {
     S.savedAsk = null;
     if (/진짜|보여|인증|캡처|캡쳐|구라|거짓말|뻥|확인/.test(text)) return themSay(id, ['아 몰라', '❤️ 이렇게만 해놨어', '됐냐']);
   }
-  if (/(뭐라고|머라고|어떻게|뭘로) ?저장|저장 ?(명|이름)|저장 ?(뭐라고|머라고) ?(했|해)/.test(text)) {
+  if (/(뭐라고|머라고|어떻게|뭘로|뭐로|머로|무엇으로) ?저장|저장 ?(명|이름)|저장 ?(뭐라고|머라고|뭐로|뭘로) ?(했|해)|저장 ?(된|한) ?거 ?(뭐|머)/.test(text)) {
     const ok = await themSay(id, SAVED_AS[id](S.name));
     if (ok && id === 'jay') S.savedAsk = id;
     return ok;
