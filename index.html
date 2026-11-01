@@ -1534,7 +1534,7 @@ async function respond(id, text) {
     return ok;
   }
   if (NOT_LIKE_RE.test(text)) return flirtSay(id, ci, 'notlike', NOT_LIKE[id]);   // "나 싫어?", "나한테 관심 없어?"
-  if (LIKE_ME_RE.test(text)) {
+  if (LIKE_ME_RE.test(text) && !/얼마나|얼만큼|만큼/.test(text)) {
     if (S.affection[ci] >= 15) return likeMe(LIKE_ME_SERIOUS[id]);   // 호감도 15 이상: 웃음 없이 진지하게
     if (id === 'sh') { S.shDodge = true; return themSay(id, LIKE_ME.sh); }
     return likeMe(LIKE_ME[id]);
