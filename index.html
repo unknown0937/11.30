@@ -1245,6 +1245,7 @@ function checkCode() {
     renderHome(); show('home');
     if (S.unread.sunoo) scheduleNudge('sunoo');
     if (!S.dmTimer) { S.dmTimer = true; const g = S; S.timers.push(setTimeout(() => { if (S === g) receiveDM(); }, 30000)); }
+    if (!S.lonelyTimer) { S.lonelyTimer = true; const g = S; S.timers.push(setInterval(() => { if (S === g) lonelyTick(); }, 5000)); }
     const app = S.pending;
     if (app) setTimeout(() => app === 'kakao' ? openApp('kakao', 'chat', 'sunoo') : openApp(app), 450);
     return;
@@ -2594,6 +2595,27 @@ const JEALOUS_YES = {
   nk: [['ㅋㅋ 귀여워'], ['질투하지 마', '난 어차피 너 좋아하는데']],
   jw: [['귀여워 ㅎㅎ'], ['질투 안 해도 돼 ㅎㅎ', '난 어차피 너 좋아하는데 😊']],
 };
+/* 호감도 10 이상인 사람과 20초 동안 연락을 안 하면 "너랑 말 안 하니까 심심하네", "보고 싶어" 같은 연락이 온다.
+   한 번 보내면 플레이어가 그 채팅방을 다시 볼 때까지는 또 보내지 않는다. 한 번에 한 명씩만 */
+const LONELY = {
+  jay: [['너랑 말 안 하니까 심심하네 ㅋㅋ'], ['뭐 해', '그냥 보고 싶어서 연락했어']],
+  sh: [['너랑 말 안 하니까 심심하다 ㅎㅎ'], ['뭐 해?', '그냥 보고 싶어서 ㅎㅎ']],
+  sunoo: [['너랑 얘기 안 하니까 심심해애'], ['보구 싶어 ㅎㅎ 💛']],
+  jk: [['너랑 말 안 하니까 심심하네 ㅋㅋ'], ['뭐해애?', '보고 싶어서 ㅋㅋ']],
+  nk: [['너랑 얘기 안 하니까 심심해 ㅋㅋ'], ['보고 싶어']],
+  jw: [['너랑 말 안 하니까 심심하네 ㅎㅎ'], ['뭐 해? ㅎㅎ', '갑자기 보고 싶어서 😊']],
+};
+function lonelyTick() {
+  if (S.over || S.inCall || S.typing) return;
+  const now = Date.now(), seen = S.lastSeen = S.lastSeen || {}, sent = S.lonelySent = S.lonelySent || {};
+  CHARS.forEach(c => { if (inApp('kakao', 'chat', c.chat)) { seen[c.chat] = now; sent[c.chat] = false; } });
+  if (S.lonelyAt && now - S.lonelyAt < 20000) return;   // 연달아 여러 명이 보내지 않게
+  const c = CHARS.find((c, i) => S.affection[i] >= 10 && !rejectedChat(c.chat) && !sent[c.chat] && (seen[c.chat] = seen[c.chat] || now) && now - seen[c.chat] >= 20000);
+  if (!c) return;
+  sent[c.chat] = true; S.lonelyAt = now;
+  const L = LONELY[c.chat];
+  enqueue(c.chat, () => themSay(c.chat, L[Math.floor(Math.random() * L.length)]));
+}
 /* 플러팅을 다섯 번째로 했을 때 */
 const FLIRT_FIVE = {
   jay: ['야', '이럴 거면 그냥 나랑 사귀든가'],
