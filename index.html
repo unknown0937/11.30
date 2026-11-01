@@ -2714,7 +2714,7 @@ const JEALOUS_YES = {
   jw: [['귀여워 ㅎㅎ'], ['질투 안 해도 돼 ㅎㅎ', '난 어차피 너 좋아하는데 😊']],
 };
 /* 호감도 10 이상인 사람과 20초 동안 연락을 안 하면 "너랑 말 안 하니까 심심하네", "보고 싶어" 같은 연락이 온다.
-   한 번 보내면 플레이어가 그 채팅방을 다시 볼 때까지는 또 보내지 않는다. 한 번에 한 명씩만 */
+   멤버마다 한 게임에 딱 한 번만 보낸다. 한 번에 한 명씩만 */
 const LONELY = {
   jay: [['너랑 말 안 하니까 심심하네 ㅋㅋ'], ['뭐 해', '그냥 보고 싶어서 연락했어']],
   sh: [['너랑 말 안 하니까 심심하다 ㅎㅎ'], ['뭐 해?', '그냥 보고 싶어서 ㅎㅎ']],
@@ -2726,7 +2726,7 @@ const LONELY = {
 function lonelyTick() {
   if (S.over || S.inCall || S.typing) return;
   const now = Date.now(), seen = S.lastSeen = S.lastSeen || {}, sent = S.lonelySent = S.lonelySent || {};
-  CHARS.forEach(c => { if (inApp('kakao', 'chat', c.chat)) { seen[c.chat] = now; sent[c.chat] = false; } });
+  CHARS.forEach(c => { if (inApp('kakao', 'chat', c.chat)) seen[c.chat] = now; });
   if (S.lonelyAt && now - S.lonelyAt < 20000) return;   // 연달아 여러 명이 보내지 않게
   const c = CHARS.find((c, i) => S.affection[i] >= 10 && !rejectedChat(c.chat) && !sent[c.chat] && (seen[c.chat] = seen[c.chat] || now) && now - seen[c.chat] >= 20000);
   if (!c) return;
