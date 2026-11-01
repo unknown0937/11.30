@@ -2538,6 +2538,9 @@ async function flirtSay(id, ci, key, lines) {
   return ok;
 }
 async function extraTalk(id, ci, c, text) {
+  /* "사랑해": 좋아해보다 무거운 말. 호감도 10 미만이면 부끄러워하고, 10 이상이면 진지하게 받아들이고 좋아함 */
+  if (/사랑해|사랑한다|사랑함/.test(text) && !/사랑해 ?(줘|봐)|얼마나|얼만큼|만큼|사랑한다고 ?(해|말해)/.test(text))
+    return flirtSay(id, ci, 'love', LOVE_WORD[id][S.affection[ci] >= 10 ? 'deep' : 'shy']);
   if (id === 'jay' && S.guitarPlayed && GUITAR_PRAISE.test(text)) return undefined;   // 기타 영상 칭찬은 따로 처리
   /* "나 너한테 할 말 있어" → 긴장 → "아니야 ㅋㅋ"면 "기대했잖아" */
   if (S.sayAsk === id) {
@@ -2767,6 +2770,14 @@ const TODAY_IS = {
   jk: { guess: ['ㅋㅋ 오늘?', '너가 나한테 연락한 날?'], bday: ['ㅋㅋ 내가 모를 리가', 'Happy birthday! 생일 축하해'] },
   nk: { guess: ['무슨 날인데', '모르겠어 알려줘'], bday: ['알지 ㅋㅋ', '생일 축하해… 딸기우유 사 갈게'] },
   jw: { guess: ['음… 우리 오늘도 연락한 날? ㅎㅎ'], bday: ['응 ㅎㅎ 알지', '생일 축하해 😊 태어나 줘서 고마워'] },
+};
+const LOVE_WORD = {
+  jay: { shy: ['사랑해?', '야 그 말은 좀ㅠㅠ 너무 갑자기잖아'], deep: ['진심이야?', '…그 말 들으니까 진짜 좋다'] },
+  sh: { shy: ['사랑…? ㅎㅎ', '그 말은 좀 부끄럽다'], deep: ['…', '그 말 진짜 좋다', '오래 기억할게'] },
+  sunoo: { shy: ['헉 사랑해??', '아 부끄러워ㅠㅠ 갑자기 왜애'], deep: ['진짜?', '그 말 들으니까 심장이 너무 빨리 뛰어', '고마워'] },
+  jk: { shy: ['ㅋㅋ 사랑?', '와 그건 좀 부끄럽네'], deep: ['…', '너한테 그 말 들으니까 이상하게 떨린다', '고마워 진짜'] },
+  nk: { shy: ['…', '그런 말 갑자기 하면 어떡해ㅠㅠ'], deep: ['…진짜?', '그 말… 진짜 좋다'] },
+  jw: { shy: ['어… ㅎㅎ', '그 말은 너무 갑작스러운데'], deep: ['…응', '그 말 정말 고마워', '나도 너한테 그런 사람이 되고 싶어 😊'] },
 };
 /* 얼굴 보여 달라고 할 때 */
 const FACE_PIC = {
