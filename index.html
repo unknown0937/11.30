@@ -1285,6 +1285,7 @@ $('#app').addEventListener('click', e => {
   else if (t.dataset.act === 'guess') openGuess();
   else if (t.dataset.act === 'yes' || t.dataset.act === 'no') answerButton(t.dataset.act === 'yes');
   else if (t.dataset.act === 'choose') openChoice();
+  else if (t.dataset.act === 'gpick') openGroupPick();
   else if (t.dataset.act === 'cyes' || t.dataset.act === 'cno') sideAnswerButton(cur().arg, t.dataset.act === 'cyes');
   else if (t.hasAttribute('data-tg')) { t.classList.toggle('on'); toast('지금은 설정을 바꿀 수 없어요'); }
 });
@@ -1302,7 +1303,7 @@ const TODAY = '2025년 10월 30일 목요일';
 /* 채팅방마다 원래 있던 대화 (오늘 밤 새로 오가는 메시지는 S.extra에 쌓인다) */
 function baseChat(id) {
   switch (id) {
-    case 'unknown': return [];
+    case 'unknown': case 'group': return [];
     case 'sunoo': return [me('오늘 진짜 피곤하다 ㅠㅠ', '오후 10:02'), them('선우', '고생해쪄 ㅠㅠ 얼른 자 ㅎㅎ', '오후 10:03'), them('선우', `${call()}~ 내일 떡볶이 먹으러 가자아 🍢`, '오후 11:28'), them('선우', '아 그리구 인스타 봤어? 다들 스토리 올렸던뎅 ㅎㅎ', '오후 11:29')];
     case 'mom': return [them('엄마', '재윤이 유학 끝나고 한국 들어왔대~', '오후 9:30'), them('엄마', '연락 한번 해 봐. 너 보고 싶어 하더라', '오후 9:31'), them('엄마', '아 그리고 11월 15일 재윤이 생일이니까 선물 하나 챙겨~', '오후 9:31'), them('엄마', '전화는 왜 안 받아~ 일찍 자라 🙏', '오후 9:32')];
     case 'jw': return [me('저번에 빌린 우산 다음에 꼭 돌려줄게!', '오후 10:31'), them('정원', '천천히 줘도 돼 ㅎㅎ', '오후 10:35'), them('정원', '오늘 고생 많았지? 따뜻하게 하고 푹 쉬어 😊', '오후 10:40')];
@@ -1313,11 +1314,11 @@ function baseChat(id) {
   }
 }
 const CHAT_TITLE = { sunoo: '선우', mom: '엄마', jw: '정원', sh: '성훈', nk: '니키', jay: '종성', jk: '재윤' };
-const chatTitle = id => id === 'unknown' ? unknownName() : CHAT_TITLE[id];
+const chatTitle = id => id === 'unknown' ? unknownName() : id === 'group' ? groupTitle() : CHAT_TITLE[id];
 const chatMsgs = id => [sys(TODAY), ...baseChat(id), ...(S.extra[id] || [])];
 const DEFAULT_ORDER = ['sunoo', 'jw', 'nk', 'mom', 'sh', 'jay', 'jk'];
 function kakaoRows() {
-  const ids = [...(S.arrived ? ['unknown'] : []), ...DEFAULT_ORDER];
+  const ids = [...(S.arrived ? ['unknown'] : []), ...(S.group ? ['group'] : []), ...DEFAULT_ORDER];
   /* 방금 대화한 방이 위로 올라온다 */
   ids.sort((a, b) => (S.touched[b] || 0) - (S.touched[a] || 0));
   return ids.map(id => {
@@ -1349,7 +1350,7 @@ PAGES.kakao = {
     }).join('');
     S.newCount[id] = 0;
     if (S.typing === id) {
-      const who = chatTitle(id);
+      const who = (id === 'group' && S.typingWho) || chatTitle(id);
       body += `<div class="km typing ${prev === who ? 'cont' : ''}">${avatarOf(who)}<div><div class="kn">${who}</div><div class="kb"><i></i><i></i><i></i></div></div></div>`;
     }
     return head(chatTitle(id), '<span>🔍</span><span>☰</span>') + `<div class="scroll">${body}</div>` + chatFoot(id);
@@ -1358,6 +1359,7 @@ PAGES.kakao = {
 /* 채팅방 하단: 직접 입력하는 칸. 익명 채팅에는 「너 누구야?」와 고백 대답 버튼도 있다 */
 function chatFoot(id) {
   if (rejectedChat(id)) return `<div class="kfoot"><div class="kinput">미안해서 연락을 못하겠다...</div></div>`;
+  if (id === 'group' && S.group && S.group.state === 'choose') return `<div class="kfoot"><button type="button" class="chipb main" data-act="gpick">누구의 마음을 받아줄까?</button></div>`;
   if (S.phase === 'choose' && (id === 'unknown' || id === S.rival)) return `<div class="kfoot"><button type="button" class="chipb main" data-act="choose">누구의 마음을 받아줄까?</button></div>`;
   if (id === 'unknown' && unknownClosed() && S.phase !== 'answer') return `<div class="kfoot"><div class="kinput">대화가 끝났습니다</div></div>`;
   let quick = '';
@@ -1636,7 +1638,7 @@ const FLIRT_NUDGE = {
 const NUDGE_MS = 10000;   // 안 읽으면 10초 뒤 재촉
 function scheduleNudge(id) {
   const flirt = () => S.flirtLast[id] && !S.flirtNudged[id];   // 플러팅해 놓고 안 읽으면 따로 한 번 더
-  if ((S.nudged[id] && !flirt()) || id === 'mom') return;
+  if ((S.nudged[id] && !flirt()) || id === 'mom' || id === 'group') return;
   clearTimeout(S.nudgeT[id]);   // 마지막 메시지부터 다시 센다
   const g = S;
   S.nudgeT[id] = setTimeout(() => {
@@ -1737,6 +1739,16 @@ function addAffection(who, n = 1) {
     const g = S;
     S.timers.push(setTimeout(() => { if (S === g) incomingCall(who); }, 6000));
   }
+  /* 호감도 17이 두 명이 되면: 둘 중 한 명이 단톡방에 초대해서 둘이 다투듯 고백 → 한 명 고르기 */
+  if (S.affection[who] >= 17 && !S.group && !S.over && !rejectedChat(id) && S.confess[id] !== 'telling' && S.confess[id] !== 'answer') {
+    const other = CHARS.findIndex((c, i) => i !== who && S.affection[i] >= 17 && !rejectedChat(c.chat) && !S.confess[c.chat]);
+    if (other >= 0) {
+      S.group = { a: Math.random() < .5 ? who : other, b: 0, state: 'pending' };
+      S.group.b = S.group.a === who ? other : who;
+      const g = S;
+      S.timers.push(setTimeout(() => { if (S === g) groupFight(); }, 5000));
+    }
+  }
   /* 호감도 12: "이거 인스타에 올릴까 말까?" 하고 사진을 보내 온다 */
   if (S.affection[who] >= 12 && !(S.postAsk = S.postAsk || {})[id] && !S.over && !rejectedChat(id)) {
     S.postAsk[id] = 'pending';
@@ -1744,7 +1756,7 @@ function addAffection(who, n = 1) {
     S.timers.push(setTimeout(() => { if (S === g) enqueue(id, async () => { if (await themSay(id, POST_ASK[id].ask(`pa${who}`))) S.postAsk[id] = 'ask'; }); }, 8000));
   }
   /* 호감도가 가득 차면 먼저 고백한다. (알 수 없음) 본인이면 고백하면서 정체도 밝힌다 */
-  if (S.affection[who] >= CONFESS_AT && !rejectedChat(id) && !S.confess[id] && !S.over) {
+  if (S.affection[who] >= CONFESS_AT && !rejectedChat(id) && !S.confess[id] && !S.over && !S.group) {
     S.confess[id] = 'pending';
     const g = S;
     S.timers.push(setTimeout(() => { if (S === g) enqueue(id, () => sideConfess(id)); }, 3000));
@@ -1780,6 +1792,63 @@ async function rivalCut(id) {
   if (!await themSay('unknown', [...lines.slice(0, -1), ...FIRST_LOVE[cc], BETTER_THAN[cc], lines[lines.length - 1]])) return;
   S.phase = 'choose'; refreshChat('unknown');
   openChoice();
+}
+/* ===== 단톡방: 호감도 17인 두 사람이 다투듯이 고백 ===== */
+const groupTitle = () => S.group ? `${CHARS[S.group.a].label}, ${CHARS[S.group.b].label}` : '단톡방';
+async function groupSay(lines) {
+  const g = S;
+  for (const [ci, text] of lines) {
+    await wait(rnd(700, 1500)); if (S !== g) return false;
+    S.typing = 'group'; S.typingWho = CHARS[ci].label; refreshChat('group');
+    await wait(rnd(600, 900) + Math.min(text.length * 40, 1600)); if (S !== g) return false;
+    S.typing = null; S.typingWho = null;
+    pushMsg('group', them(CHARS[ci].label, text));
+  }
+  return true;
+}
+const GF = {
+  intro: { jay: '야 갑자기 초대해서 미안 ㅋㅋ', sh: '갑자기 초대해서 놀랐지? ㅎㅎ', sunoo: '갑자기 초대해서 미안 ㅎㅎ', jk: '갑자기 초대해서 미안 ㅋㅋ', nk: '갑자기 초대해서 미안 ㅋㅋ', jw: '갑자기 불러서 미안해 ㅎㅎ' },
+  cut: { jay: '아 잠만 내가 먼저 말할 거야;;', sh: '잠깐만 ㅎㅎ 내가 먼저 말할게', sunoo: '아 잠만잠만 내가 먼저 말할 거야;;', jk: '아 잠깐 내가 먼저 할래;;', nk: '아 잠만 내가 먼저 말할 거야;;', jw: '잠깐만 ㅎㅎ 나도 할 말 있어' },
+  annoy: { jay: '야 좀 조용히 해 봐;;', sh: '아 좀 기다려 봐 ㅎㅎ', sunoo: '아 진짜 끼어들지 마;;', jk: '아 좀 기다려 줘;;', nk: '아 진짜 끼어들지 마', jw: '잠깐만 내 말 좀 끝까지 들어 줘' },
+  first: { jay: '내가 먼저 좋아했거든?', sh: '내가 먼저 좋아했거든? ㅎㅎ', sunoo: '내가 먼저 좋아했거든?', jk: '아니 내가 먼저 좋아했거든?', nk: '내가 먼저 좋아했거든?', jw: '내가 먼저 좋아했는데…' },
+  counter: { jay: '무슨 소리야 ㅋㅋ 내가 훨씬 먼저야', sh: '그건 아니지 ㅎㅎ', sunoo: '아니거든?? 내가 먼저거든', jk: 'ㅋㅋ 말도 안 돼', nk: '아니 내가 먼저야', jw: '그건 좀 아닌 것 같은데 ㅎㅎ' },
+  since: { jay: '난 놀이터에서 처음 본 날부터였어', sh: '난 동아리 환영회 날부터야', sunoo: '난 입학식 날부터였어', jk: '난 엄마들 모임에서 처음 본 날부터야', nk: '난 첫 수업 날부터였어', jw: '난 알바 첫날부터였어' },
+  like: { jay: '나 너 좋아해', sh: '나 너 좋아해 ㅎㅎ', sunoo: '나 너 좋아해', jk: '나 너 좋아해', nk: '나 너 좋아해', jw: '나 너 좋아해' },
+  ask: { jay: '나랑 사귀자', sh: '나랑 사귀자', sunoo: '나랑 사귀자', jk: '나랑 사귀자', nk: '나랑 사귀자', jw: '나랑 사귀자' },
+};
+async function groupFight() {
+  const G = S.group, a = G.a, b = G.b, A = CHARS[a].chat, B = CHARS[b].chat;
+  G.state = 'talking';
+  pushMsg('group', sys(`${CHARS[a].label}님이 ${S.name}님과 ${CHARS[b].label}님을 초대했습니다.`));
+  const liker = Math.random() < .5 ? a : b, asker = liker === a ? b : a;
+  if (!await groupSay([[a, GF.intro[A]], [a, '할 말이 있어서'], [b, GF.cut[B]], [a, GF.annoy[A]], [b, GF.first[B]], [a, GF.counter[A]],
+    [a, GF.since[A]], [b, GF.since[B]], [liker, GF.like[CHARS[liker].chat]], [asker, GF.ask[CHARS[asker].chat]]])) return;
+  G.state = 'choose'; refreshChat('group');
+  openGroupPick();
+}
+function openGroupPick() {
+  const G = S.group; if (!G || G.state !== 'choose') return;
+  const m = $('#modal');
+  m.innerHTML = `<div class="sheet"><h3>누구의 마음을 받아줄까?</h3><p class="msub">한 명을 고르면 다른 한 명에게는 거절하게 돼요</p>
+    <div class="gl two">${[G.a, G.b].map(i => `<button class="gb" data-gpick="${i}">${avatarPh(i, 'round')}<span>${CHARS[i].label}</span></button>`).join('')}</div>
+    <button class="gcancel" data-close>채팅 먼저 볼래</button></div>`;
+  m.classList.add('show');
+}
+function groupPick(win) {
+  const G = S.group; if (!G || G.state !== 'choose') return;
+  closeModal();
+  G.state = 'done'; S.over = true;
+  const lose = win === G.a ? G.b : G.a, winChat = CHARS[win].chat, loseChat = CHARS[lose].chat, g = S;
+  S.nudged[loseChat] = S.flirtNudged[loseChat] = true;
+  refreshChat('group'); refreshChat('unknown');
+  pushMsg('group', me(`미안… 나는 ${CHARS[win].label}`));
+  enqueue('group', () => groupSay(SIDE_CONFESS[loseChat].decline.map(t => [lose, t])));
+  enqueue(winChat, async () => {
+    await wait(2500); if (S !== g) return;
+    if (!await themSay(winChat, REPLY_YES(call(), win))) return;
+    await wait(1600); if (S !== g) return;
+    postLoveStory(win, winChat);
+  });
 }
 /* 둘 중 한 명 고르기: 고른 사람은 고백을 받아준 대사 → 전화·스토리, 고르지 않은 사람은 거절당했을 때 대사 */
 function openChoice() {
@@ -1898,6 +1967,8 @@ function openGuess() {
 }
 $('#modal').addEventListener('click', e => {
   const p = e.target.closest('[data-pick]');
+  const gp = e.target.closest('[data-gpick]');
+  if (gp) { groupPick(+gp.dataset.gpick); return; }
   const ch = e.target.closest('[data-choose]');
   if (ch) { chooseOne(+ch.dataset.choose); return; }
   if (p && !p.disabled) {
