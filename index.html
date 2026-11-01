@@ -1413,7 +1413,13 @@ function enqueue(id, fn) {
 function send(id, text) {
   if (id !== 'unknown') S.flirtLast[id] = LOVE_RE.test(text) || CUTE_RE.test(text) || intentOf(text) === 'flirt';
   pushMsg(id, me(text));
-  enqueue(id, () => respond(id, text));
+  /* 다른 멤버 얘기를 세 번째로 하면, 대답 뒤에 "근데 왜 자꾸 내 앞에서 딴 남자 얘기해?" */
+  const ci = charOfChat(id), om = S.otherMention = S.otherMention || {};
+  const third = ci >= 0 && CHARS.some(o => o !== CHARS[ci] && text.includes(o.label)) && (om[id] = (om[id] || 0) + 1) === 3;
+  enqueue(id, async () => {
+    await respond(id, text);
+    if (third && !rejectedChat(id)) await themSay(id, OTHER_TALK[id]);
+  });
 }
 async function respond(id, text) {
   if (id === 'unknown') return respondUnknown(text);
@@ -2485,6 +2491,15 @@ const JEALOUS_YES = {
   jk: [['ㅋㅋ 귀여워'], ['ㅋㅋ 걱정 마', '난 어차피 너 좋아하는데']],
   nk: [['ㅋㅋ 귀여워'], ['질투하지 마', '난 어차피 너 좋아하는데']],
   jw: [['귀여워 ㅎㅎ'], ['질투 안 해도 돼 ㅎㅎ', '난 어차피 너 좋아하는데 😊']],
+};
+/* 다른 멤버 얘기를 세 번째로 했을 때 */
+const OTHER_TALK = {
+  jay: ['근데 왜 자꾸 내 앞에서 딴 남자 얘기하냐', '신경 쓰이게'],
+  sh: ['근데 왜 자꾸 내 앞에서 딴 남자 얘기해?', '나 좀 서운한데 ㅎㅎ'],
+  sunoo: ['근데 왜 자꾸 내 앞에서 딴 남자 얘기해?', '나 삐질 거야'],
+  jk: ['근데 왜 자꾸 내 앞에서 딴 남자 얘기해?', '나 질투 나는데 ㅋㅋ'],
+  nk: ['근데 왜 자꾸 내 앞에서 딴 남자 얘기해', '신경 쓰이잖아'],
+  jw: ['근데 왜 자꾸 내 앞에서 딴 남자 얘기해?', '나도 질투할 줄 알아 ㅎㅎ'],
 };
 /* 처음 "오빠"라고 불렀을 때 */
 const OPPA = {
