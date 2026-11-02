@@ -1416,10 +1416,53 @@ function enqueue(id, fn) {
 const LOOSE_STATE = ['yeobo', 'yeoboWho', 'fk', 'sayAsk', 'bfTease', 'ocAsk', 'dreamAsk', 'wrongName', 'jealAsk', 'savedAsk', 'shDodge', 'guitarOffer', 'guitarPlayed', 'jwGlass'];
 async function respondLoose(id, text) {
   const g = S, before = (S.extra[id] || []).length, snap = LOOSE_STATE.map(k => S[k]);
+  /* 오타가 분명하면(대표 멘트와 비슷한데 그대로는 안 들어 있으면) 고친 멘트로 바로 알아듣는다. 이어지는 질문에 답하는 중이면 그대로 둔다 */
+  const fix = !snap.some(v => v) && typoGuess(text);
+  if (fix && !text.replace(/\s+/g, '').includes(fix)) text = fix;
   await respond(id, text);
   if (S !== g || !/\s/.test(text) || (S.extra[id] || []).length !== before || S.inCall) return;
   LOOSE_STATE.forEach((k, i) => { S[k] = snap[i]; });
   await respond(id, text.replace(/\s+/g, ''));
+  if (S !== g || (S.extra[id] || []).length !== before || S.inCall) return;
+  /* 오타 봐주기: 자음·모음 단위로 비교해서 비슷한 멘트가 있으면 그 멘트로 알아듣는다 */
+  const guess = typoGuess(text);
+  if (!guess) return;
+  LOOSE_STATE.forEach((k, i) => { S[k] = snap[i]; });
+  await respond(id, guess);
+}
+/* 오타 비교용 대표 멘트 (띄어쓰기 없이) */
+const TYPO_SAMPLES = ['좋아해', '사랑해', '귀여워', '보고싶어', '보고싶었어', '안아줘', '키스하자', '나랑잘래', '같이씻을래', '결혼하자', '섹시하다', '설렌다', '잘생겼다', '멋있어',
+  '목소리좋다', '입술예쁘다', '팔베개해줘', '꼬시는중', '넘어올래', '유혹하는거지', '책임져', '너나좋아하지', '나싫어', '얼마나좋아해', '얼마나사랑해', '사귀자', '자기야',
+  '첫키스누구야', '남친있어', '얼굴보여줘', '근육보여줘', '애칭지어줘', '내이름불러줘', '뭐라고저장했어', '남소해줘', '체포하겠어', '인생네컷찍자', '커플링맞출래', '집앞이야',
+  '지금보러와', '꿈에너나왔어', '내꿈꿔', '넌내거야', '나만봐', '할말있어', '오늘무슨날', '심심해', '배고파', '피곤해', '힘들어', '내생각했어', '데이트하자', '손잡아도돼',
+  '질투나', '나오늘어때', '같이있고싶어', '너웃는거좋아', '씻고나왔어', '침대에누워있어', '나한테반했지', '우리무슨사이야', '나어디가좋아', '너운동해'];
+const JAMO_CHO = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ', JAMO_JUNG = 'ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ', JAMO_JONG = ' ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ';
+const jamo = t => [...t.replace(/\s+/g, '')].map(ch => {
+  const c = ch.charCodeAt(0) - 0xAC00;
+  if (c < 0 || c > 11171) return ch;
+  return JAMO_CHO[Math.floor(c / 588)] + JAMO_JUNG[Math.floor(c % 588 / 28)] + (c % 28 ? JAMO_JONG[c % 28] : '');
+}).join('');
+/* 입력 안 어딘가에 대표 멘트가 오타 몇 개 이내로 들어 있는지 (근사 부분 문자열 편집 거리) */
+function nearIn(p, t) {
+  let prev = new Array(t.length + 1).fill(0);
+  for (let i = 1; i <= p.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= t.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (p[i - 1] === t[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return Math.min(...prev);
+}
+function typoGuess(text) {
+  const t = jamo(text);
+  if (t.length < 4) return null;
+  let best = null, bestD = 99;
+  for (const sm of TYPO_SAMPLES) {
+    const p = jamo(sm), allow = p.length < 6 ? 0 : p.length < 12 ? 1 : 2;
+    if (!allow) continue;
+    const d = nearIn(p, t);
+    if (d <= allow && d < bestD) { best = sm; bestD = d; }
+  }
+  return best;
 }
 /* 플레이어가 직접 입력한 메시지 보내기 */
 function send(id, text) {
