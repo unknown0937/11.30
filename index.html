@@ -1468,6 +1468,7 @@ function typoGuess(text, onlyTypo) {
   for (const sm of TYPO_SAMPLES) {
     const p = jamo(sm), allow = p.length < 6 ? 0 : p.length < 12 ? 1 : 2;
     if (!allow) continue;
+    if (onlyTypo && t.length > p.length + 4) continue;   // 긴 문장 속 일부만 비슷한 건 미리 고치지 않는다
     const d = nearIn(p, t);
     if (d <= allow && d < bestD) { best = sm; bestD = d; }
   }
