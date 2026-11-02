@@ -1417,8 +1417,8 @@ const LOOSE_STATE = ['yeobo', 'yeoboWho', 'fk', 'sayAsk', 'bfTease', 'ocAsk', 'd
 async function respondLoose(id, text) {
   const g = S, before = (S.extra[id] || []).length, snap = LOOSE_STATE.map(k => S[k]);
   /* 오타가 분명하면(대표 멘트와 비슷한데 그대로는 안 들어 있으면) 고친 멘트로 바로 알아듣는다. 이어지는 질문에 답하는 중이면 그대로 둔다 */
-  const fix = !snap.some(v => v) && typoGuess(text);
-  if (fix && !text.replace(/\s+/g, '').includes(fix)) text = fix;
+  const fix = !snap.some(v => v) && typoGuess(text, true);
+  if (fix) text = fix;
   await respond(id, text);
   if (S !== g || !/\s/.test(text) || (S.extra[id] || []).length !== before || S.inCall) return;
   LOOSE_STATE.forEach((k, i) => { S[k] = snap[i]; });
@@ -1452,7 +1452,7 @@ function nearIn(p, t) {
   }
   return Math.min(...prev);
 }
-function typoGuess(text) {
+function typoGuess(text, onlyTypo) {
   const t = jamo(text);
   if (t.length < 4) return null;
   let best = null, bestD = 99;
@@ -1462,6 +1462,7 @@ function typoGuess(text) {
     const d = nearIn(p, t);
     if (d <= allow && d < bestD) { best = sm; bestD = d; }
   }
+  if (onlyTypo && bestD === 0) return null;   // 그대로 들어 있으면(활용형 포함) 오타가 아니다
   return best;
 }
 /* 플레이어가 직접 입력한 메시지 보내기 */
