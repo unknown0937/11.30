@@ -1245,6 +1245,14 @@ function checkCode() {
     renderHome(); show('home');
     if (S.unread.sunoo) scheduleNudge('sunoo');
     if (!S.dmTimer) { S.dmTimer = true; const g = S; S.timers.push(setTimeout(() => { if (S === g) receiveDM(); }, 30000)); }
+    /* 희승(차단한 사람)에게서 5분, 10분 뒤 문자가 온다. 답장은 할 수 없다 */
+    if (!S.hsTimer) {
+      S.hsTimer = true; const g = S;
+      const hs = lines => { if (S !== g) return; (S.hsMsgs = S.hsMsgs || []).push(...lines); S.hsUnread = 1; S.badges.sms = (S.badges.sms || 0) + 1; renderHome(); if (inApp('sms')) renderApp();
+        if (S.unblocked) banner('<div class="ni ic-sms mini"></div>', '희승', esc(lines[lines.length - 1]), () => openApp('sms', 'thread', 'hs')); };
+      S.timers.push(setTimeout(() => hs(['그냥 밤이라서 그런가', '좀 보고 싶네']), 5 * 60000));
+      S.timers.push(setTimeout(() => hs(['…너는 벌써 나 다 잊었지?', '늦게 연락해서 미안. 이제 진짜 연락 안 할게', '어차피 안 읽겠지만']), 10 * 60000));
+    }
     if (!S.lonelyTimer) { S.lonelyTimer = true; const g = S; S.timers.push(setInterval(() => { if (S === g) lonelyTick(); }, 5000)); }
     const app = S.pending;
     if (app) setTimeout(() => app === 'kakao' ? openApp('kakao', 'chat', 'sunoo') : openApp(app), 450);
@@ -3060,7 +3068,7 @@ function smsList() {
     { id: 'card', from: '1588-8100', last: '[Web발신] ○○카드 승인 4,800원 편의점 일시불', time: '오후 9:41' },
     { id: 'jake', from: '010-4821-0915', last: 'Hey! 재윤이야 ㅋㅋ 한국 번호 새로 만들었어. 저장해 줘!', time: '10월 27일', unread: S.unread.sms },
     /* 차단한 희승에게서 온 문자: 맨 아래에 있고, 차단을 풀어야 보인다 */
-    { id: 'hs', from: S.unblocked ? '희승' : '차단된 연락처', last: S.unblocked ? '이제 나 안 보고 싶어?' : '가려진 메시지가 있습니다', time: '오후 11:02', hidden: !S.unblocked },
+    { id: 'hs', from: S.unblocked ? '희승' : '차단된 연락처', last: S.unblocked ? ((S.hsMsgs || []).slice(-1)[0] || '이제 나 안 보고 싶어?') : '가려진 메시지가 있습니다', time: '오후 11:02', hidden: !S.unblocked, unread: S.hsUnread },
   ];
 }
 PAGES.sms = {
@@ -3073,9 +3081,11 @@ PAGES.sms = {
     const m = smsList().find(x => x.id === id);
     let body = `<div class="stime">${m.time}</div><div class="sb">${m.last}</div>`;
     if (id === 'hs') {
+      S.hsUnread = 0;
+      const more = (S.hsMsgs || []).map(t => `<div class="sb${S.unblocked ? '' : ' blurred'}">${S.unblocked ? esc(t) : '●'.repeat(Math.min(t.length, 14))}</div>`).join('');
       body = S.unblocked
-        ? `<div class="stime">오늘 오후 11:02</div><div class="sb">이제 나 안 보고 싶어?</div><div class="stime">차단했던 연락처입니다</div>`
-        : `<div class="stime">오늘 오후 11:02</div><div class="sb blurred">●●●● ●●●●●●●●●?</div><div class="stime">차단한 연락처의 메시지입니다.<br>설정 › 차단된 연락처에서 차단을 해제하면 볼 수 있어요.</div>`;
+        ? `<div class="stime">오늘 오후 11:02</div><div class="sb">이제 나 안 보고 싶어?</div>${more}<div class="stime">차단했던 연락처입니다</div>`
+        : `<div class="stime">오늘 오후 11:02</div><div class="sb blurred">●●●● ●●●●●●●●●?</div>${more}<div class="stime">차단한 연락처의 메시지입니다.<br>설정 › 차단된 연락처에서 차단을 해제하면 볼 수 있어요.</div>`;
       return head(m.from) + `<div class="scroll">${body}</div><div class="kfoot" style="background:#0f1016"><div class="kinput">이 대화에는 답장할 수 없습니다</div></div>`;
     }
     if (id === 'jake') {
