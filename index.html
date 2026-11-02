@@ -1848,12 +1848,6 @@ function addAffection(who, n = 1) {
     const g = S;
     S.timers.push(setTimeout(() => { if (S === g) enqueue(id, () => oopsSend(id)); }, 10000));
   }
-  /* 호감도 18: "너 생각나서 만든 플리" — 곡 제목을 이어 읽으면 고백 */
-  if (S.affection[who] >= 18 && !once['pl' + id] && !S.over && !rejectedChat(id)) {
-    once['pl' + id] = true;
-    const g = S, P = PLAYLIST[id];
-    S.timers.push(setTimeout(() => { if (S === g) enqueue(id, () => themSay(id, [P.say, { pl: { name: P.name, tracks: P.tracks } }, P.after])); }, 6000));
-  }
   /* 호감도 12: "이거 인스타에 올릴까 말까?" 하고 사진을 보내 온다 */
   if (S.affection[who] >= 12 && !(S.postAsk = S.postAsk || {})[id] && !S.over && !rejectedChat(id)) {
     S.postAsk[id] = 'pending';
@@ -1880,7 +1874,9 @@ async function sideConfess2(id) {
   const ci = charOfChat(id), self = ci === S.culprit && !unknownClosed();
   if (self) { S.revealed = true; S.phase = 'done'; renderHome(); refreshChat('unknown'); }
   const rival = !self && S.culprit != null && S.arrived && !unknownClosed();
-  if (!await themSay(id, [...(self ? SELF_REVEAL[id] : []), ...SIDE_CONFESS[id].confess(call())])) return;
+  const P = PLAYLIST[id], viaPl = Math.random() < .5;   // 고백 방법은 매번 랜덤: 그냥 말로 / 플레이리스트로
+  const body = viaPl ? [P.say, { pl: { name: 'untitled', tracks: P.tracks } }, ...P.ask] : SIDE_CONFESS[id].confess(call());
+  if (!await themSay(id, [...(self ? SELF_REVEAL[id] : []), ...body])) return;
   /* 다른 사람이 고백하면, 대답하기 전에 (알 수 없음)이 다급하게 연락해서 정체를 밝히고 고백한다 → 둘 중 한 명을 고르는 화면 */
   if (rival) {
     S.confess[id] = 'wait'; S.rival = id; refreshChat(id);
@@ -2879,14 +2875,14 @@ async function oopsSend(id) {
   if (m) { m.deleted = true; m.text = '삭제된 메시지입니다.'; refreshChat(id); }
   await themSay(id, O.after);
 }
-/* 호감도 18 플레이리스트: 곡 제목을 순서대로 이어 읽으면 고백이 된다 */
+/* 호감도 20 고백을 플레이리스트로 할 때: 곡 제목을 순서대로 이어 읽으면 고백이 된다 (플리 이름은 untitled) */
 const PLAYLIST = {
-  jay: { say: '너 생각나서 만든 플리', name: '밤에 혼자 듣는 노래', tracks: ['너를', '처음 본 그 봄부터', '나는', '쭉', '좋아했어'], after: '제목 순서대로 들어 봐 ㅋㅋ' },
-  sh: { say: '너 생각나면서 만든 플리야 ㅎㅎ', name: '동아리방에서', tracks: ['사실', '처음 본 날부터', '너만', '보였어', '좋아해'], after: '제목 잘 보고 들어 줘' },
-  sunoo: { say: '너 생각나서 플리 만들었어 💛', name: '떡볶이 먹으면서 들을 노래', tracks: ['베프 말고', '이제는', '너의', '남자친구가', '되고 싶어'], after: '제목 순서대로 읽어 봐아' },
-  jk: { say: '너 생각나서 만든 플리 ㅋㅋ', name: '3년 동안 들은 노래', tracks: ['3년 동안', '매일', '네 생각만', '했어', '좋아해'], after: '제목 이어서 읽어 봐 ㅋㅋ' },
-  nk: { say: '플리 만들었어', name: '연습실 플리', tracks: ['말은 잘 못하지만', '나', '너', '좋아해'], after: '…제목 순서대로 봐' },
-  jw: { say: '너 생각나서 만든 플리야 ㅎㅎ', name: '비 오는 날 듣는 노래', tracks: ['우산 빌려준 날부터', '계속', '너만', '생각났어', '좋아해'], after: '제목 순서대로 천천히 읽어 봐 😊' },
+  jay: { say: '너 생각나서 만든 플리', tracks: ['너를', '처음 본 그 봄부터', '나는', '쭉', '좋아했어'], ask: ['이해했냐', '그럼 너 대답은 뭔데'] },
+  sh: { say: '너 생각하면서 만든 플리야 ㅎㅎ', tracks: ['사실', '처음 본 날부터', '너만', '보였어', '좋아해'], ask: ['ㅎㅎ 이해했어?', '그럼 너의 대답은 뭐야..?'] },
+  sunoo: { say: '너 생각나서 플리 만들었어 💛', tracks: ['베프 말고', '이제는', '너의', '남자친구가', '되고 싶어'], ask: ['이해했어?', '그럼… 너의 대답은 뭐야?'] },
+  jk: { say: '너 생각나서 만든 플리 ㅋㅋ', tracks: ['3년 동안', '매일', '네 생각만', '했어', '좋아해'], ask: ['이해했어? ㅋㅋ', '그럼 너 대답은 뭐야..?'] },
+  nk: { say: '플리 만들었어', tracks: ['말은 잘 못하지만', '나', '너', '좋아해'], ask: ['이해했어?', '…대답은'] },
+  jw: { say: '너 생각나서 만든 플리야 ㅎㅎ', tracks: ['우산 빌려준 날부터', '계속', '너만', '생각났어', '좋아해'], ask: ['이해했어? ㅎㅎ', '그럼 너의 대답은 뭐야..?'] },
 };
 /* 플러팅을 다섯 번째로 했을 때 */
 const FLIRT_FIVE = {
