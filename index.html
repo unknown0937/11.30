@@ -360,6 +360,11 @@ body.playing .intro{display:none}
 .kimg{padding:0;overflow:hidden;border-radius:14px!important;background:none!important}
 .kimg img{display:block;width:180px;cursor:zoom-in}
 .kimg video{display:block;width:220px;background:#000}
+.kpl{min-width:200px;padding:10px 12px!important}
+.kpl-h{font-weight:700;margin-bottom:8px;font-size:13.5px}
+.kpl-t{display:flex;gap:10px;font-size:13px;padding:4px 0;border-top:1px solid rgba(255,255,255,.08)}
+.kpl-t span{color:#9aa0b4;width:12px;text-align:right}
+.kdel{color:#9aa0b4!important;font-style:italic}
 .photo{position:absolute;inset:0;z-index:67;background:#000;display:none;align-items:center;justify-content:center;cursor:zoom-out}
 .photo.show{display:flex;animation:svin .2s ease-out}
 .photo img{max-width:100%;max-height:100%}
@@ -1354,7 +1359,9 @@ PAGES.kakao = {
       const who = m.name === UNKNOWN ? unknownName() : m.name;
       const cont = prev === who; prev = who;
       const bubble = m.img ? `<div class="kb kimg"><img src="${SELFIES[m.img]}" data-zoom="${m.img}" alt="사진"></div>`
-        : m.vid ? `<div class="kb kimg"><video src="${VIDEOS[m.vid]}" controls playsinline preload="auto"></video></div>` : `<div class="kb">${esc(m.text)}</div>`;
+        : m.vid ? `<div class="kb kimg"><video src="${VIDEOS[m.vid]}" controls playsinline preload="auto"></video></div>`
+        : m.pl ? `<div class="kb kpl"><div class="kpl-h">🎧 ${esc(m.pl.name)}</div>${m.pl.tracks.map((t, i) => `<div class="kpl-t"><span>${i + 1}</span>${esc(t)}</div>`).join('')}</div>`
+        : m.deleted ? `<div class="kb kdel">삭제된 메시지입니다.</div>` : `<div class="kb">${esc(m.text)}</div>`;
       return `<div class="km ${cont ? 'cont' : ''} ${isNew ? 'new' : ''}">${avatarOf(who)}<div><div class="kn">${who}</div>${bubble}</div><span class="kt">${m.time}</span></div>`;
     }).join('');
     S.newCount[id] = 0;
@@ -1412,7 +1419,8 @@ async function themSay(id, lines) {
     S.typing = id; refreshChat(id);
     await wait(l.img || l.vid ? rnd(1500, 2500) : rnd(700, 1100) + Math.min(l.length * 45, 2200)); if (S !== g) return false;
     S.typing = null;
-    pushMsg(id, l.img ? { ...them(name, '사진을 보냈습니다.'), img: l.img } : l.vid ? { ...them(name, '동영상을 보냈습니다.'), vid: l.vid } : them(name, l));
+    pushMsg(id, l.img ? { ...them(name, '사진을 보냈습니다.'), img: l.img } : l.vid ? { ...them(name, '동영상을 보냈습니다.'), vid: l.vid }
+      : l.pl ? { ...them(name, '플레이리스트를 공유했습니다.'), pl: l.pl } : them(name, l));
     if (id === 'jay' && /들려줄까/.test(l)) S.guitarOffer = true;   // 종성이 기타 소리 들려줄까 물어봄
   }
   return true;
@@ -1832,6 +1840,19 @@ function addAffection(who, n = 1) {
       const g = S;
       S.timers.push(setTimeout(() => { if (S === g) groupFight(); }, 5000));
     }
+  }
+  /* 호감도 14: 친구한테 보내려던 고민을 실수로 나한테 보냈다가 지운다 */
+  const once = S.evOnce = S.evOnce || {};
+  if (S.affection[who] >= 14 && !once['oops' + id] && !S.over && !rejectedChat(id)) {
+    once['oops' + id] = true;
+    const g = S;
+    S.timers.push(setTimeout(() => { if (S === g) enqueue(id, () => oopsSend(id)); }, 10000));
+  }
+  /* 호감도 18: "너 생각나서 만든 플리" — 곡 제목을 이어 읽으면 고백 */
+  if (S.affection[who] >= 18 && !once['pl' + id] && !S.over && !rejectedChat(id)) {
+    once['pl' + id] = true;
+    const g = S, P = PLAYLIST[id];
+    S.timers.push(setTimeout(() => { if (S === g) enqueue(id, () => themSay(id, [P.say, { pl: { name: P.name, tracks: P.tracks } }, P.after])); }, 6000));
   }
   /* 호감도 12: "이거 인스타에 올릴까 말까?" 하고 사진을 보내 온다 */
   if (S.affection[who] >= 12 && !(S.postAsk = S.postAsk || {})[id] && !S.over && !rejectedChat(id)) {
@@ -2840,6 +2861,32 @@ const CLINGY = {
   jk: n => [`${n} 어디야?`, '혹시 나 지겨워…?', '아니지? ㅋㅋ'],
   nk: n => [`${n} 왜 안 읽어`, '딴 애랑 연락하는 거면 나 진짜 삐질 거야'],
   jw: n => [`${n} 바빠? ㅎㅎ`, '혹시 내가 귀찮게 했나 싶어서…', '읽으면 꼭 답장해 줘'],
+};
+/* 잘못 보낸 메시지: msg = 친구한테 보내려던 말(곧 지워짐), after = 지우고 나서 하는 말 */
+const OOPS = {
+  jay: { msg: '야 나 걔한테 고백할까 진짜 미치겠다', after: ['아 잘못 보냈다', '아무것도 아니야 보지 마 ㅋㅋ'] },
+  sh: { msg: '얘들아 나 걔한테 고백해도 될까… 진지하게', after: ['아 잘못 보냈네 ㅎㅎ', '못 본 걸로 해 줘'] },
+  sunoo: { msg: '얘들아 나 걔 너무 좋아 어떡해ㅠㅠ 고백할까', after: ['헉 잘못 보냈다ㅠㅠ', '보지 마 보지 마!!'] },
+  jk: { msg: '얘들아 나 걔한테 고백할까 ㅋㅋ 진지함', after: ['아 잠깐 그거 아니야 ㅋㅋ', '잘못 보냈어…'] },
+  nk: { msg: '형들 나 걔한테 고백할까', after: ['아', '잘못 보냈어 보지 마'] },
+  jw: { msg: '형 나 걔한테 고백해도 될까…', after: ['아 잘못 보냈다 ㅎㅎ', '혹시 봤어…? 못 본 걸로 해 줘'] },
+};
+async function oopsSend(id) {
+  const g = S, O = OOPS[id];
+  if (!await themSay(id, [O.msg])) return;
+  await wait(3500); if (S !== g) return;
+  const m = [...(S.extra[id] || [])].reverse().find(x => x.text === O.msg);
+  if (m) { m.deleted = true; m.text = '삭제된 메시지입니다.'; refreshChat(id); }
+  await themSay(id, O.after);
+}
+/* 호감도 18 플레이리스트: 곡 제목을 순서대로 이어 읽으면 고백이 된다 */
+const PLAYLIST = {
+  jay: { say: '너 생각나서 만든 플리', name: '밤에 혼자 듣는 노래', tracks: ['너를', '처음 본 그 봄부터', '나는', '쭉', '좋아했어'], after: '제목 순서대로 들어 봐 ㅋㅋ' },
+  sh: { say: '너 생각나면서 만든 플리야 ㅎㅎ', name: '동아리방에서', tracks: ['사실', '처음 본 날부터', '너만', '보였어', '좋아해'], after: '제목 잘 보고 들어 줘' },
+  sunoo: { say: '너 생각나서 플리 만들었어 💛', name: '떡볶이 먹으면서 들을 노래', tracks: ['베프 말고', '이제는', '너의', '남자친구가', '되고 싶어'], after: '제목 순서대로 읽어 봐아' },
+  jk: { say: '너 생각나서 만든 플리 ㅋㅋ', name: '3년 동안 들은 노래', tracks: ['3년 동안', '매일', '네 생각만', '했어', '좋아해'], after: '제목 이어서 읽어 봐 ㅋㅋ' },
+  nk: { say: '플리 만들었어', name: '연습실 플리', tracks: ['말은 잘 못하지만', '나', '너', '좋아해'], after: '…제목 순서대로 봐' },
+  jw: { say: '너 생각나서 만든 플리야 ㅎㅎ', name: '비 오는 날 듣는 노래', tracks: ['우산 빌려준 날부터', '계속', '너만', '생각났어', '좋아해'], after: '제목 순서대로 천천히 읽어 봐 😊' },
 };
 /* 플러팅을 다섯 번째로 했을 때 */
 const FLIRT_FIVE = {
