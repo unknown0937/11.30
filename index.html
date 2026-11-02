@@ -1378,6 +1378,7 @@ function pushMsg(id, m) {
   if (inApp('kakao', 'chat', id)) { S.newCount[id] = 1; renderApp(); return; }
   if (m.t === 'them') {
     S.unread[id] = (S.unread[id] || 0) + 1; S.badges.kakao++;
+    if (S.unread[id] === 1) (S.unreadAt = S.unreadAt || {})[id] = Date.now();   // 안 읽은 메시지가 생긴 때
     renderHome(); refreshChat(id);
     banner('<div class="ni ic-kakao mini"></div>', chatTitle(id), esc(m.text), () => openApp('kakao', 'chat', id));
     scheduleNudge(id);
@@ -2809,6 +2810,10 @@ const LONELY = {
 function lonelyTick() {
   if (S.over || S.inCall || S.typing) return;
   const now = Date.now(), seen = S.lastSeen = S.lastSeen || {}, sent = S.lonelySent = S.lonelySent || {};
+  /* 호감도 15 이상인 사람의 메시지를 20초 동안 안 읽으면, 집착하듯 독촉 (멤버마다 한 번) */
+  const ua = S.unreadAt = S.unreadAt || {}, cling = S.clingSent = S.clingSent || {};
+  const cc = CHARS.find((c, i) => S.affection[i] >= 15 && !rejectedChat(c.chat) && !cling[c.chat] && S.unread[c.chat] && ua[c.chat] && now - ua[c.chat] >= 20000 && !S.hold[c.chat]);
+  if (cc) { cling[cc.chat] = true; enqueue(cc.chat, () => themSay(cc.chat, CLINGY[cc.chat](call()))); return; }
   CHARS.forEach(c => { if (inApp('kakao', 'chat', c.chat)) seen[c.chat] = now; });
   if (S.lonelyAt && now - S.lonelyAt < 20000) return;   // 연달아 여러 명이 보내지 않게
   const c = CHARS.find((c, i) => S.affection[i] >= 10 && !rejectedChat(c.chat) && !sent[c.chat] && (seen[c.chat] = seen[c.chat] || now) && now - seen[c.chat] >= 20000);
@@ -2817,6 +2822,15 @@ function lonelyTick() {
   const L = LONELY[c.chat];
   enqueue(c.chat, () => themSay(c.chat, L[Math.floor(Math.random() * L.length)]));
 }
+/* 호감도 15 이상인데 20초 동안 안 읽을 때 (n = "미지야"처럼 부르는 말) */
+const CLINGY = {
+  jay: n => [`${n} 왜 안 읽어`, '혹시 딴 애랑 연락 중인 건 아니지?'],
+  sh: n => [n, '바쁜 거 알아 ㅎㅎ 근데 좀 서운하다', '혹시 나 지겨워…?'],
+  sunoo: n => [`${n} 왜 안 읽어어`, '혹시 딴 사람이랑 연락하는 거 아니지? 🥺'],
+  jk: n => [`${n} 어디야?`, '혹시 나 지겨워…?', '아니지? ㅋㅋ'],
+  nk: n => [`${n} 왜 안 읽어`, '딴 애랑 연락하는 거면 나 진짜 삐질 거야'],
+  jw: n => [`${n} 바빠? ㅎㅎ`, '혹시 내가 귀찮게 했나 싶어서…', '읽으면 꼭 답장해 줘'],
+};
 /* 플러팅을 다섯 번째로 했을 때 */
 const FLIRT_FIVE = {
   jay: ['야', '이럴 거면 그냥 나랑 사귀든가'],
