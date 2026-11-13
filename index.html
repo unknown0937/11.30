@@ -1842,9 +1842,9 @@ function addAffection(who, n = 1) {
       S.timers.push(setTimeout(() => { if (S === g) groupFight(); }, 5000));
     }
   }
-  /* 호감도 14: 친구한테 보내려던 고민을 실수로 나한테 보냈다가 지운다 */
+  /* 호감도 15: 친구한테 보내려던 고민을 실수로 나한테 보냈다가 지운다 */
   const once = S.evOnce = S.evOnce || {};
-  if (S.affection[who] >= 14 && !once['oops' + id] && !S.over && !rejectedChat(id)) {
+  if (S.affection[who] >= 15 && !once['oops' + id] && !S.over && !rejectedChat(id)) {
     once['oops' + id] = true;
     const g = S;
     S.timers.push(setTimeout(() => { if (S === g) enqueue(id, () => oopsSend(id)); }, 10000));
